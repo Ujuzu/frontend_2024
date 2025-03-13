@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
+
+@theme {
+  --color-GRAY_01: #333;
+}
