@@ -1,8 +1,15 @@
 @import 'tailwindcss';
-
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
 
 @theme {
-  --color-GRAY_01: #333;
+  --color-BLUE_01: #1e57c7;
+  --color-GRAY_01: #f5f7fa;
+
+  --color-GREEN_O1: #19b23a;
+
+  --color-BLACK_01: #333;
+  --color-BLACK_02: #000b17;
+
+  --color-PINK_01: #ac19ad;
 }

@@ -29,5 +29,5 @@
   "ts-node": {
     "esm": true
   },
-  "include": ["src"]
+  "include": ["src", "src/.d.ts", "tailwind.config.js"]
 }
