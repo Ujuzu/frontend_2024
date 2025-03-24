@@ -1,6 +1,6 @@
 import { FilterIcon } from '@/assets/icons';
 import table_avatar from '@/assets/images/table_avatar.png';
-import { Popover } from 'flowbite-react';
+import { Popover } from 'flowbite';
 const tableData = [
   {
     name: 'Asam Manny',
