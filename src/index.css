@@ -3,6 +3,11 @@
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
 
+* {
+  font-family: 'Poppins', sans-serif;
+}
+
+
 @theme {
   --color-BLUE_01: #1e57c7;
   --color-GRAY_01: #f5f7fa;
