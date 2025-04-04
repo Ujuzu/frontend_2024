@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
       setShowLoader(false);
       if (location.pathname.startsWith('/u/')) {
-        navigate('/admin/', { replace: true });
+        navigate('/admin/login', { replace: true });
       }
       return;
     }
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthenticated(false);
     setUser(null);
     window.history.replaceState({}, '', '/admin/login');
-    window.location.href = "/admin";
+    window.location.href = "/admin/login";
   };
   
   // Check auth on mount and location changes
