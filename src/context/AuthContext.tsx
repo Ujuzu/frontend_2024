@@ -80,8 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     sessionStorage.clear();
     setIsAuthenticated(false);
     setUser(null);
-    window.history.replaceState({}, '', '/admin/login');
-    window.location.href = "/admin/login";
+    window.location.replace('/admin/login');
   };
   
   // Check auth on mount and location changes
