@@ -1,120 +1,80 @@
-// src/context/AuthContext.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+interface User {
+  id: string;
+  // Add other user properties as needed
+}
 
 interface AuthContextType {
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: any | null;
-  login: (token: string, userData: any) => void;
+  login: (token: string, user: User) => void;
   logout: () => void;
+  setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [user, setUser] = useState<any | null>(null);
-  const [showLoader, setShowLoader] = useState<boolean>(false);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation();
-  const API_URL = (import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337').replace(/\/$/, '');
 
-  // Check auth status
-  const checkAuth = async () => {
-    setIsLoading(true);
-    setShowLoader(true);
-    
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setIsAuthenticated(false);
-      setUser(null);
-      setIsLoading(false);
-      setShowLoader(false);
-      if (location.pathname.startsWith('/u/')) {
-        navigate('/admin/login', { replace: true });
-      }
-      return;
-    }
-    
-    try {
-      const response = await axios.get(`${API_URL}/api/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
       
-      setUser(response.data);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Authentication check failed:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setIsAuthenticated(false);
-      setUser(null);
-      if (location.pathname.startsWith('/u/')) {
-        navigate('/admin/', { replace: true });
+      if (token && storedUser) {
+        try {
+          // Optionally validate token with your backend here
+          setUser(JSON.parse(storedUser));
+          setIsAuthenticated(true);
+        } catch (error) {
+          // If user data is invalid, clear storage
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
       }
-    } finally {
+      
       setIsLoading(false);
-      setShowLoader(false);
-    }
-  };
-  
-  // Login function
-  const login = (token: string, userData: any) => {
+    };
+    
+    checkAuth();
+  }, []);
+
+  const login = (token: string, userData: User) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
-    setIsAuthenticated(true);
     setUser(userData);
-    navigate('/u/', { replace: true });
+    setIsAuthenticated(true);
   };
-  
-  // Logout function (now without delay)
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     sessionStorage.clear();
     setIsAuthenticated(false);
     setUser(null);
-    window.location.replace('/admin/login');
+    navigate('/admin/login', { replace: true });
   };
-  
-  // Check auth on mount and location changes
-  useEffect(() => {
-    checkAuth();
-    
-    // Prevent back button after logout
-    const handlePopState = () => {
-      if (!isAuthenticated && location.pathname.startsWith('/u/')) {
-        navigate('/admin/', { replace: true });
-      }
-    };
-    
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [location.pathname]);
-  
-  // Global loading screen
-  if ((isLoading || showLoader) && location.pathname.startsWith('/u/')) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="h-16 w-16 text-[#AC19AD] animate-spin" />
-      </div>
-    );
-  }
-  
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+
+  const value = {
+    user,
+    isAuthenticated,
+    isLoading,
+    login,
+    logout,
+    setUser
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
