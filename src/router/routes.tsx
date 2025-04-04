@@ -23,6 +23,7 @@ export const routes: RouteObject[] = [
         index: true,
         element: <Navigate to="/admin/login" replace />
       },
+      // Public routes - accessible without authentication
       {
         path: 'register',
         element: <AdminRegister />,
@@ -38,6 +39,15 @@ export const routes: RouteObject[] = [
       {
         path: 'reset-password/:token',
         element: <ResetPassword />,
+      },
+      // Protected admin routes - require authentication
+      {
+        element: <ProtectedRoute />,
+        children: [
+          // Add your protected admin routes here
+          // For example: dashboard, settings, profile, etc.
+          // { path: 'dashboard', element: <Dashboard /> },
+        ]
       }
     ],
   },
