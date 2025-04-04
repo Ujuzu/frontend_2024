@@ -2,39 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-// Define the API URL
-const API_URL = 'http://localhost:1337';
+const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 
 interface User {
-  id: string;
-  name: string;
+  id: number;
+  username: string;
   email: string;
-  idNumber: string;
-  role: 'Admin' | 'Instructor';
-  status: 'Active' | 'Inactive';
+  provider: string;
+  confirmed: boolean;
+  blocked: boolean;
+  createdAt: string;
+  updatedAt: string;
+  role?: {
+    id: number;
+    name: string;
+    description: string;
+    type: string;
+    createdAt: string;
+    updatedAt: string;
+  };
 }
 
-interface StrapiResponse<T> {
-  data: {
-    id: number;
-    attributes: T & {
-      createdAt: string;
-      updatedAt: string;
-      publishedAt: string;
-    };
-  }[];
-  meta: {
-    pagination: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  };
+interface UserFormData {
+  username?: string;
+  email?: string;
+  password?: string;
 }
 
 const UserManagement: React.FC = () => {
@@ -43,7 +38,7 @@ const UserManagement: React.FC = () => {
   const [totalResults, setTotalResults] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 10;
-
+  
   // Dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
@@ -51,11 +46,11 @@ const UserManagement: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   
   // Form state
-  const [formData, setFormData] = useState<Partial<User>>({});
+  const [formData, setFormData] = useState<UserFormData>({});
   
   // Filter state
   const [filterText, setFilterText] = useState('');
-
+  
   // Function to fetch users from Strapi
   const fetchUsers = async (page = 1, filter = '') => {
     setIsLoading(true);
@@ -64,38 +59,28 @@ const UserManagement: React.FC = () => {
       const queryParams = new URLSearchParams({
         'pagination[page]': page.toString(),
         'pagination[pageSize]': resultsPerPage.toString(),
-        'sort': 'createdAt:desc',
       });
       
       // Add filter if provided
       if (filter) {
-        queryParams.append('filters[$or][0][name][$containsi]', filter);
-        queryParams.append('filters[$or][1][email][$containsi]', filter);
-        queryParams.append('filters[$or][2][idNumber][$containsi]', filter);
+        queryParams.append('_q', filter);
       }
-
-      const response = await axios.get<StrapiResponse<User>>(
+      
+      // Get auth token from localStorage
+      const token = localStorage.getItem('token');
+      
+      const response = await axios.get<User[]>(
         `${API_URL}/api/users?${queryParams.toString()}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-
-      // Transform Strapi response to match our User interface
-      const transformedUsers = response.data.data.map(item => ({
-        id: item.id.toString(),
-        name: item.attributes.name,
-        email: item.attributes.email,
-        idNumber: item.attributes.idNumber,
-        role: item.attributes.role,
-        status: item.attributes.status,
-      }));
-
-      setUsers(transformedUsers);
-      setTotalResults(response.data.meta.pagination.total);
-      setCurrentPage(response.data.meta.pagination.page);
+      
+      setUsers(response.data);
+      setTotalResults(response.data.length); // This is an estimate; Strapi might provide total in headers
+      
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load users. Please try again.');
@@ -103,69 +88,66 @@ const UserManagement: React.FC = () => {
       setIsLoading(false);
     }
   };
-
+  
   // Initial fetch
   useEffect(() => {
     fetchUsers(currentPage, filterText);
   }, [currentPage]);
-
+  
   // Handle filter changes with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
       setCurrentPage(1); // Reset to first page when filtering
       fetchUsers(1, filterText);
     }, 500); // Debounce for 500ms
-
     return () => clearTimeout(timer);
   }, [filterText]);
-
+  
   const handleAddUser = () => {
     setFormData({});
     setIsAddUserOpen(true);
   };
-
+  
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
-    setFormData(user);
+    setFormData({
+      username: user.username,
+      email: user.email
+    });
     setIsEditUserOpen(true);
   };
-
+  
   const handleDeleteUser = (user: User) => {
     setSelectedUser(user);
     setIsDeleteUserOpen(true);
   };
-
+  
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-
-  const handleRoleChange = (value: string) => {
-    setFormData({
-      ...formData,
-      role: value as 'Admin' | 'Instructor'
-    });
-  };
-
-  const handleStatusChange = (value: string) => {
-    setFormData({
-      ...formData,
-      status: value as 'Active' | 'Inactive'
-    });
-  };
-
+  
   const saveUser = async () => {
     try {
+      const token = localStorage.getItem('token');
+      
       if (isAddUserOpen) {
         // Create new user
+        // Match structure required by Strapi
+        const userData = {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        };
+        
         await axios.post(
-          `${API_URL}/api/users`,
-          { data: formData },
+          `${API_URL}/api/auth/local/register`,
+          userData,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           }
@@ -175,12 +157,23 @@ const UserManagement: React.FC = () => {
         setIsAddUserOpen(false);
       } else if (isEditUserOpen && selectedUser) {
         // Update existing user
+        // Note: password update might require different endpoint
+        const userData = {
+          username: formData.username,
+          email: formData.email
+        };
+        
+        // Only include password if it was entered
+        if (formData.password && formData.password.trim() !== '') {
+          (userData as any).password = formData.password;
+        }
+        
         await axios.put(
           `${API_URL}/api/users/${selectedUser.id}`,
-          { data: formData },
+          userData,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           }
@@ -201,13 +194,15 @@ const UserManagement: React.FC = () => {
     setFormData({});
     setSelectedUser(null);
   };
-
+  
   const confirmDelete = async () => {
     if (selectedUser) {
       try {
+        const token = localStorage.getItem('token');
+        
         await axios.delete(`${API_URL}/api/users/${selectedUser.id}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         
@@ -225,7 +220,7 @@ const UserManagement: React.FC = () => {
       setSelectedUser(null);
     }
   };
-
+  
   const totalPages = Math.ceil(totalResults / resultsPerPage);
   
   const goToPage = (page: number) => {
@@ -233,7 +228,12 @@ const UserManagement: React.FC = () => {
       setCurrentPage(page);
     }
   };
-
+  
+  // Helper to safely display role name
+  const getRoleName = (user: User) => {
+    return user.role?.name || user.role?.type || 'N/A';
+  };
+  
   return (
     <div className="container mx-auto p-6">
       <div className="bg-white rounded-lg shadow-sm p-6">
@@ -265,7 +265,7 @@ const UserManagement: React.FC = () => {
           </div>
         </div>
         
-        {/* Users Table */}
+        {/* Users Table - Updated to match Strapi response */}
         <div className="overflow-x-auto">
           {isLoading ? (
             <div className="flex justify-center items-center py-8">
@@ -276,22 +276,25 @@ const UserManagement: React.FC = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
+                    ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Username
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID Number
+                    Provider
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Confirmed
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Role
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Action
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -300,23 +303,26 @@ const UserManagement: React.FC = () => {
                   users.map((user) => (
                     <tr key={user.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm font-medium text-gray-900">{user.id}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{user.username}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500">{user.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{user.idNumber}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{user.role}</div>
+                        <div className="text-sm text-gray-500">{user.provider}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          user.confirmed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {user.status}
+                          {user.confirmed ? 'Yes' : 'No'}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{getRoleName(user)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
@@ -336,7 +342,7 @@ const UserManagement: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                       No users found
                     </td>
                   </tr>
@@ -389,7 +395,7 @@ const UserManagement: React.FC = () => {
                       ? totalPages - 4 + idx 
                       : currentPage - 2 + idx;
                   
-                  return (
+                  return pageNumber <= totalPages ? (
                     <button
                       key={idx}
                       onClick={() => goToPage(pageNumber)}
@@ -401,7 +407,7 @@ const UserManagement: React.FC = () => {
                       >
                       {pageNumber}
                     </button>
-                  );
+                  ) : null;
                 })}
                 
                 <button
@@ -418,7 +424,7 @@ const UserManagement: React.FC = () => {
         </div>
       </div>
       
-      {/* Add User Dialog */}
+      {/* Add User Dialog - Simplified */}
       <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -426,13 +432,13 @@ const UserManagement: React.FC = () => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="name" className="text-right text-sm font-medium">
-                Name
+              <label htmlFor="username" className="text-right text-sm font-medium">
+                Username
               </label>
               <Input
-                id="name"
-                name="name"
-                value={formData.name || ''}
+                id="username"
+                name="username"
+                value={formData.username || ''}
                 onChange={handleFormChange}
                 className="col-span-3"
               />
@@ -451,44 +457,17 @@ const UserManagement: React.FC = () => {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="idNumber" className="text-right text-sm font-medium">
-                ID Number
+              <label htmlFor="password" className="text-right text-sm font-medium">
+                Password
               </label>
               <Input
-                id="idNumber"
-                name="idNumber"
-                value={formData.idNumber || ''}
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password || ''}
                 onChange={handleFormChange}
                 className="col-span-3"
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="role" className="text-right text-sm font-medium">
-                Role
-              </label>
-              <Select onValueChange={handleRoleChange} defaultValue="Instructor">
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Instructor">Instructor</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="status" className="text-right text-sm font-medium">
-                Status
-              </label>
-              <Select onValueChange={handleStatusChange} defaultValue="Active">
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
           <DialogFooter>
@@ -502,7 +481,7 @@ const UserManagement: React.FC = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Edit User Dialog */}
+      {/* Edit User Dialog - Simplified */}
       <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -510,13 +489,13 @@ const UserManagement: React.FC = () => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-name" className="text-right text-sm font-medium">
-                Name
+              <label htmlFor="edit-username" className="text-right text-sm font-medium">
+                Username
               </label>
               <Input
-                id="edit-name"
-                name="name"
-                value={formData.name || ''}
+                id="edit-username"
+                name="username"
+                value={formData.username || ''}
                 onChange={handleFormChange}
                 className="col-span-3"
               />
@@ -535,44 +514,18 @@ const UserManagement: React.FC = () => {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-idNumber" className="text-right text-sm font-medium">
-                ID Number
+              <label htmlFor="edit-password" className="text-right text-sm font-medium">
+                Password
               </label>
               <Input
-                id="edit-idNumber"
-                name="idNumber"
-                value={formData.idNumber || ''}
+                id="edit-password"
+                name="password"
+                type="password"
+                placeholder="Leave blank to keep current password"
+                value={formData.password || ''}
                 onChange={handleFormChange}
                 className="col-span-3"
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-role" className="text-right text-sm font-medium">
-                Role
-              </label>
-              <Select onValueChange={handleRoleChange} defaultValue={formData.role}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Instructor">Instructor</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="edit-status" className="text-right text-sm font-medium">
-                Status
-              </label>
-              <Select onValueChange={handleStatusChange} defaultValue={formData.status}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
           <DialogFooter>
@@ -596,9 +549,9 @@ const UserManagement: React.FC = () => {
             <p>Are you sure you want to delete this user? This action cannot be undone.</p>
             {selectedUser && (
               <div className="mt-4 p-3 bg-gray-50 rounded">
-                <p><strong>Name:</strong> {selectedUser.name}</p>
+                <p><strong>Username:</strong> {selectedUser.username}</p>
                 <p><strong>Email:</strong> {selectedUser.email}</p>
-                <p><strong>ID Number:</strong> {selectedUser.idNumber}</p>
+                <p><strong>ID:</strong> {selectedUser.id}</p>
               </div>
             )}
           </div>

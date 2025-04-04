@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { BellIcon, ChatIcon, FillCaretIcon } from '@/assets/icons';
 import SearchInput from '../input/searchInput';
 import Badge from '../badge';
-import avatar from '@/assets/images/avatar.png';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 interface UserData {
   id: number;
@@ -20,8 +19,8 @@ export default function TopBar() {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+  const searchInputRef = useRef<HTMLInputElement>(null!);
+  const { logout } = useAuth();
 
   useEffect(() => {
     // Load user data from localStorage
@@ -89,11 +88,7 @@ export default function TopBar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    sessionStorage.removeItem('isAuthenticated');
-    sessionStorage.removeItem('justLoggedIn');
-    navigate('/admin/login');
+    logout();
   };
 
   const getUserDisplayName = () => {

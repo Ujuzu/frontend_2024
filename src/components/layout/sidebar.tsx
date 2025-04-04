@@ -7,6 +7,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Menu, LogOut, Monitor, Users, FileText, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 
+
+interface NavItemProps {
+  path: string;
+  title: string;
+  icon: React.ReactNode;
+  collapsed: boolean;
+}
+
 // Navigation links with consistent structure
 const links = [
   {
@@ -34,7 +42,16 @@ const links = [
 export default function Sidebar() {
   const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [_isMobile, setIsMobile] = useState(false);
+  
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('isAuthenticated');
+    sessionStorage.removeItem('justLoggedIn');
+    window.history.pushState(null, "", "/admin/login");
+    window.location.href = "/admin";
+  };
   
   useEffect(() => {
     const handleResize = () => {
@@ -51,8 +68,8 @@ export default function Sidebar() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const NavItem = ({ path, title, icon, collapsed }) => {
+  
+  const NavItem = ({ path, title, icon, collapsed }: NavItemProps) => {
     const questionMarkIndex = path.indexOf("?");
     const linkWithoutQuery =
       questionMarkIndex !== -1 ? path.substring(0, questionMarkIndex) : path;
@@ -92,7 +109,7 @@ export default function Sidebar() {
       </NavLink>
     );
   };
-
+  
   return (
     <>
       {/* Mobile Sidebar Trigger */}
@@ -130,11 +147,7 @@ export default function Sidebar() {
                 <Button
                   variant="ghost"
                   className="w-full flex justify-start items-center py-3 px-3 text-white hover:bg-gray-800 rounded-md"
-                  onClick={() => {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                    window.location.href = '/admin/login';
-                  }}
+                  onClick={handleLogout}
                 >
                   <LogOut className="w-5 h-5 text-[#AC19AD]" />
                   <span className="ml-3">Sign Out</span>
@@ -144,7 +157,7 @@ export default function Sidebar() {
           </SheetContent>
         </Sheet>
       </div>
-
+      
       {/* Desktop Sidebar */}
       <aside
         className={`hidden md:flex flex-col bg-[#000b17] h-screen min-h-screen max-h-screen sticky top-0 left-0 overflow-hidden transition-all duration-300 border-r border-[#1a2333] ${
@@ -182,11 +195,7 @@ export default function Sidebar() {
                   <Button
                     variant="ghost"
                     className="w-full flex justify-center items-center py-3 px-3 hover:bg-gray-800 rounded-md"
-                    onClick={() => {
-                      localStorage.removeItem('token');
-                      localStorage.removeItem('user');
-                      window.location.href = '/admin/login';
-                    }}
+                    onClick={handleLogout}
                   >
                     <LogOut className="w-5 h-5 text-[#AC19AD]" />
                   </Button>
@@ -200,11 +209,7 @@ export default function Sidebar() {
             <Button
               variant="ghost"
               className="w-full flex justify-start items-center py-3 px-3 text-white hover:bg-gray-800 rounded-md"
-              onClick={() => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                window.location.href = '/admin/login';
-              }}
+              onClick={handleLogout}
             >
               <LogOut className="w-5 h-5 text-[#AC19AD]" />
               <span className="ml-3">Sign Out</span>

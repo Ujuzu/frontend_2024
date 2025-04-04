@@ -5,8 +5,10 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import logo from "@/assets/images/logo.png"; // Import logo
+import logo from "@/assets/images/logo.png";
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { AxiosError } from 'axios';
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,27 +16,55 @@ const AdminLogin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const navigate = useNavigate();
+  const { login } = useAuth();
   
   // Define the API URL
   const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
-
+  
   // Check for existing token on component mount
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      navigate('/admin/userManagement');
+      navigate('/u/');
+    }
+    
+    // Check for remembered email
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
     }
   }, [navigate]);
-
+  
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
-      toast.error('Please fill in all fields');
+    // Clear previous error messages
+    setErrorMessage('');
+    
+    // Validate input fields
+    if (!email.trim()) {
+      setErrorMessage('Email is required');
+      toast.error('Email is required');
       return;
     }
-
+    
+    if (!password.trim()) {
+      setErrorMessage('Password is required');
+      toast.error('Password is required');
+      return;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage('Please enter a valid email address');
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -42,8 +72,13 @@ const AdminLogin: React.FC = () => {
         identifier: email,
         password: password
       });
-
-      console.log('Login response:', response.data);
+      
+      // Check if response contains expected data
+      if (!response.data || !response.data.jwt || !response.data.user) {
+        throw new Error('Invalid response from server');
+      }
+      
+      login(response.data.jwt, response.data.user);
       
       // Store the token and user info
       localStorage.setItem('token', response.data.jwt);
@@ -56,18 +91,54 @@ const AdminLogin: React.FC = () => {
         localStorage.removeItem('rememberedEmail');
       }
       
+      // Set session storage for newly logged in state
+      sessionStorage.setItem('isAuthenticated', 'true');
+      sessionStorage.setItem('justLoggedIn', 'true');
+      
       toast.success('Login successful!');
       
       // Redirect to admin dashboard using React Router
       navigate('/u/');
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Login failed. Please check your credentials.');
+      
+      // Handle different types of errors
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<any>;
+        
+        if (!axiosError.response) {
+          setErrorMessage('Network error. Please check your internet connection.');
+          toast.error('Network error. Please check your internet connection.');
+        } else {
+          const status = axiosError.response.status;
+          const errorData = axiosError.response.data;
+          
+          if (status === 400) {
+            setErrorMessage('Invalid email or password');
+            toast.error('Invalid email or password');
+          } else if (status === 401 || status === 403) {
+            setErrorMessage('Unauthorized. Please check your credentials.');
+            toast.error('Unauthorized. Please check your credentials.');
+          } else if (status === 429) {
+            setErrorMessage('Too many login attempts. Please try again later.');
+            toast.error('Too many login attempts. Please try again later.');
+          } else if (errorData && errorData.error && errorData.error.message) {
+            setErrorMessage(errorData.error.message);
+            toast.error(errorData.error.message);
+          } else {
+            setErrorMessage('Login failed. Please try again later.');
+            toast.error('Login failed. Please try again later.');
+          }
+        }
+      } else {
+        setErrorMessage('An unexpected error occurred. Please try again.');
+        toast.error('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-900 to-[#000b17] p-4">
       <div className="w-full max-w-md">
@@ -77,6 +148,12 @@ const AdminLogin: React.FC = () => {
         
         <div className="bg-white p-8 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-center mb-6">Admin Sign In</h2>
+          
+          {errorMessage && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
+              {errorMessage}
+            </div>
+          )}
           
           <form onSubmit={handleLogin}>
             <div className="mb-4">
@@ -134,8 +211,7 @@ const AdminLogin: React.FC = () => {
               
               <div className="text-sm">
                 <Link to="/admin/forgot-password" className="text-blue-600 hover:underline">
-                  Forgot password?
-                </Link>
+                  Forgot Password </Link>
               </div>
             </div>
             
@@ -187,7 +263,6 @@ const AdminLogin: React.FC = () => {
             </div>
           </form>
         </div>
-
         <div className="mt-8 text-center text-white text-sm">
           <p>© {new Date().getFullYear()} Ujuzi. All rights reserved.</p>
         </div>
