@@ -1,22 +1,15 @@
 import { createBrowserRouter } from 'react-router-dom';
-
-import NotFoundPage from '@/pages/404page';
-import ErrorPage from '@/pages/errorPage';
 import App from '@/App';
+import ErrorPage from '@/pages/errorPage';
+import { routes } from './routes';
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: '/',
+    element: <App />,
     errorElement: <ErrorPage />,
-    children: [
-      {
-        path: '/',
-        element: <App />,
-      },
-    ],
-  },
-  {
-    path: '*',
-    element: <NotFoundPage />,
-  },
+    children: routes
+  }
 ]);
+
+export default router;
