@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Menu, LogOut, Monitor, Users, FileText, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
-
+import { useAuth } from '@/context/AuthContext';
 
 interface NavItemProps {
   path: string;
@@ -43,14 +43,10 @@ export default function Sidebar() {
   const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [_isMobile, setIsMobile] = useState(false);
+  const { logout } = useAuth();
   
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    sessionStorage.removeItem('isAuthenticated');
-    sessionStorage.removeItem('justLoggedIn');
-    window.history.pushState(null, "", "/admin/login");
-    window.location.href = "/admin";
+    logout();
   };
   
   useEffect(() => {
