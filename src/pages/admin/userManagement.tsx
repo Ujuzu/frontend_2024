@@ -3,8 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
-
+import { toast, Toaster } from 'react-hot-toast'; 
 const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 
 interface User {
@@ -35,14 +34,14 @@ interface UserFormData {
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [totalResults, setTotalResults] = useState<number>(0);
+  const [allUsers, setAllUsers] = useState<User[]>([]); // Store all fetched users
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 10;
   
   // Dialog states
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
-  const [isDeleteUserOpen, setIsDeleteUserOpen] = useState(false);
+  const [isBlockUserOpen, setIsBlockUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   
   // Form state
@@ -50,36 +49,81 @@ const UserManagement: React.FC = () => {
   
   // Filter state
   const [filterText, setFilterText] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   
-  // Function to fetch users from Strapi
-  const fetchUsers = async (page = 1, filter = '') => {
+  // Function to fetch all users from Strapi
+  const fetchUsers = async (filter = '') => {
     setIsLoading(true);
     try {
-      // Create query parameters for pagination and filtering
-      const queryParams = new URLSearchParams({
-        'pagination[page]': page.toString(),
-        'pagination[pageSize]': resultsPerPage.toString(),
-      });
-      
-      // Add filter if provided
-      if (filter) {
-        queryParams.append('_q', filter);
-      }
-      
       // Get auth token from localStorage
       const token = localStorage.getItem('token');
       
-      const response = await axios.get<User[]>(
-        `${API_URL}/api/users?${queryParams.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // First try to get total count to determine pagination strategy
+      const countResponse = await axios.get(`${API_URL}/api/users/count`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }).catch(() => ({ data: null })); // Gracefully handle if count endpoint doesn't exist
       
-      setUsers(response.data);
-      setTotalResults(response.data.length); // This is an estimate; Strapi might provide total in headers
+      let allFetchedUsers: User[] = [];
+      
+      // If filter is provided, use search query
+      if (filter) {
+        const response = await axios.get<User[]>(
+          `${API_URL}/api/users?filters[$or][0][username][$containsi]=${filter}&filters[$or][1][email][$containsi]=${filter}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        allFetchedUsers = response.data;
+      } else {
+        // If total count is small enough or count endpoint doesn't exist, fetch all users at once
+        if (!countResponse.data || countResponse.data < 100) {
+          const response = await axios.get<User[]>(
+            `${API_URL}/api/users?pagination[pageSize]=100`, // Get a reasonably large batch
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          allFetchedUsers = response.data;
+        } else {
+          // For large datasets, implement batched fetching
+          let page = 1;
+          let hasMore = true;
+          
+          while (hasMore) {
+            const response = await axios.get<User[]>(
+              `${API_URL}/api/users?pagination[page]=${page}&pagination[pageSize]=100`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            
+            if (response.data.length > 0) {
+              allFetchedUsers = [...allFetchedUsers, ...response.data];
+              page++;
+            } else {
+              hasMore = false;
+            }
+            
+            // Safety check to prevent infinite loops
+            if (page > 10) hasMore = false;
+          }
+        }
+      }
+      
+      // Store all users for client-side pagination and filtering
+      setAllUsers(allFetchedUsers);
+      setFilteredUsers(allFetchedUsers);
+      
+      // Apply client-side pagination
+      applyPagination(allFetchedUsers, 1);
       
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -89,19 +133,45 @@ const UserManagement: React.FC = () => {
     }
   };
   
+  // Apply pagination to the filtered users array
+  const applyPagination = (usersList: User[], page: number) => {
+    const startIndex = (page - 1) * resultsPerPage;
+    const endIndex = startIndex + resultsPerPage;
+    setUsers(usersList.slice(startIndex, endIndex));
+  };
+  
   // Initial fetch
   useEffect(() => {
-    fetchUsers(currentPage, filterText);
-  }, [currentPage]);
+    fetchUsers();
+  }, []);
   
   // Handle filter changes with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
-      setCurrentPage(1); // Reset to first page when filtering
-      fetchUsers(1, filterText);
+      if (filterText) {
+        // Apply client-side filtering
+        const lowercasedFilter = filterText.toLowerCase();
+        const filtered = allUsers.filter(user => 
+          user.username.toLowerCase().includes(lowercasedFilter) || 
+          user.email.toLowerCase().includes(lowercasedFilter)
+        );
+        setFilteredUsers(filtered);
+        setCurrentPage(1); // Reset to first page when filtering
+        applyPagination(filtered, 1);
+      } else {
+        // If filter is cleared, restore all users
+        setFilteredUsers(allUsers);
+        applyPagination(allUsers, 1);
+        setCurrentPage(1);
+      }
     }, 500); // Debounce for 500ms
     return () => clearTimeout(timer);
-  }, [filterText]);
+  }, [filterText, allUsers]);
+  
+  // Handle page changes
+  useEffect(() => {
+    applyPagination(filteredUsers, currentPage);
+  }, [currentPage, filteredUsers]);
   
   const handleAddUser = () => {
     setFormData({});
@@ -117,9 +187,9 @@ const UserManagement: React.FC = () => {
     setIsEditUserOpen(true);
   };
   
-  const handleDeleteUser = (user: User) => {
+  const handleToggleBlockUser = (user: User) => {
     setSelectedUser(user);
-    setIsDeleteUserOpen(true);
+    setIsBlockUserOpen(true);
   };
   
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,7 +254,7 @@ const UserManagement: React.FC = () => {
       }
       
       // Refresh the user list
-      fetchUsers(currentPage, filterText);
+      fetchUsers(filterText);
       
     } catch (error) {
       console.error('Error saving user:', error);
@@ -195,32 +265,38 @@ const UserManagement: React.FC = () => {
     setSelectedUser(null);
   };
   
-  const confirmDelete = async () => {
+  const confirmToggleBlock = async () => {
     if (selectedUser) {
       try {
         const token = localStorage.getItem('token');
         
-        await axios.delete(`${API_URL}/api/users/${selectedUser.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await axios.put(
+          `${API_URL}/api/users/${selectedUser.id}`,
+          { blocked: !selectedUser.blocked },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
         
-        toast.success('User deleted successfully!');
+        toast.success(`User ${selectedUser.blocked ? 'activated' : 'blocked'} successfully!`);
         
         // Refresh the user list
-        fetchUsers(currentPage, filterText);
+        fetchUsers(filterText);
         
       } catch (error) {
-        console.error('Error deleting user:', error);
-        toast.error('Failed to delete user. Please try again.');
+        console.error('Error updating user block status:', error);
+        toast.error('Failed to update user status. Please try again.');
       }
       
-      setIsDeleteUserOpen(false);
+      setIsBlockUserOpen(false);
       setSelectedUser(null);
     }
   };
   
+  const totalResults = filteredUsers.length;
   const totalPages = Math.ceil(totalResults / resultsPerPage);
   
   const goToPage = (page: number) => {
@@ -229,13 +305,12 @@ const UserManagement: React.FC = () => {
     }
   };
   
-  // Helper to safely display role name
-  const getRoleName = (user: User) => {
-    return user.role?.name || user.role?.type || 'N/A';
-  };
-  
+    
   return (
     <div className="container mx-auto p-6">
+      {/* Add Toaster component for notifications */}
+      <Toaster position="top-right" />
+      
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">User Management</h1>
@@ -291,7 +366,7 @@ const UserManagement: React.FC = () => {
                     Confirmed
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
+                    Blocked
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -322,7 +397,11 @@ const UserManagement: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{getRoleName(user)}</div>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                         user.blocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                        }`}>
+                        {user.blocked ? 'True' : 'False'}
+                      </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
@@ -332,10 +411,10 @@ const UserManagement: React.FC = () => {
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDeleteUser(user)}
-                          className="text-red-600 hover:text-red-900"
+                          onClick={() => handleToggleBlockUser(user)}
+                          className={user.blocked ? "text-green-600 hover:text-green-900" : "text-red-600 hover:text-red-900"}
                         >
-                          Delete
+                          {user.blocked ? 'Activate' : 'Block'}
                         </button>
                       </td>
                     </tr>
@@ -364,7 +443,7 @@ const UserManagement: React.FC = () => {
             </button>
             <button
               onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || totalPages === 0}
               className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               Next
@@ -378,47 +457,59 @@ const UserManagement: React.FC = () => {
               </p>
             </div>
             <div>
-              <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                <button
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                >
-                  <span className="sr-only">Previous</span>
-                  &lt;
-                </button>
-                
-                {[...Array(Math.min(5, totalPages))].map((_, idx) => {
-                  const pageNumber = currentPage <= 3 
-                    ? idx + 1 
-                    : currentPage >= totalPages - 2 
-                      ? totalPages - 4 + idx 
-                      : currentPage - 2 + idx;
+              {totalPages > 0 && (
+                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  >
+                    <span className="sr-only">Previous</span>
+                    &lt;
+                  </button>
                   
-                  return pageNumber <= totalPages ? (
-                    <button
-                      key={idx}
-                      onClick={() => goToPage(pageNumber)}
-                      className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                        currentPage === pageNumber
-                          ? 'bg-[#AC19AD] text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AC19AD]'
-                          : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                      }`}
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, idx) => {
+                    let pageNumber;
+                    
+                    if (totalPages <= 5) {
+                      // If we have 5 or fewer pages, show all pages
+                      pageNumber = idx + 1;
+                    } else if (currentPage <= 3) {
+                      // If we're near the start, show pages 1-5
+                      pageNumber = idx + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      // If we're near the end, show the last 5 pages
+                      pageNumber = totalPages - 4 + idx;
+                    } else {
+                      // Otherwise show 2 before and 2 after current page
+                      pageNumber = currentPage - 2 + idx;
+                    }
+                    
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => goToPage(pageNumber)}
+                        className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                          currentPage === pageNumber
+                            ? 'bg-[#AC19AD] text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#AC19AD]'
+                            : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
+                        }`}
                       >
-                      {pageNumber}
-                    </button>
-                  ) : null;
-                })}
-                
-                <button
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                >
-                  <span className="sr-only">Next</span>
-                  &gt;
-                </button>
-              </nav>
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
+                  
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                  >
+                    <span className="sr-only">Next</span>
+                    &gt;
+                  </button>
+                </nav>
+              )}
             </div>
           </div>
         </div>
@@ -539,14 +630,21 @@ const UserManagement: React.FC = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Delete User Dialog */}
-      <Dialog open={isDeleteUserOpen} onOpenChange={setIsDeleteUserOpen}>
+      {/* Block/Activate User Dialog */}
+      <Dialog open={isBlockUserOpen} onOpenChange={setIsBlockUserOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogTitle>
+              {selectedUser?.blocked ? 'Confirm Activation' : 'Confirm Block'}
+            </DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+            <p>
+              Are you sure you want to {selectedUser?.blocked ? 'activate' : 'block'} this user?
+              {selectedUser?.blocked 
+                ? ' The user will regain access to the system.' 
+                : ' The user will no longer be able to access the system.'}
+            </p>
             {selectedUser && (
               <div className="mt-4 p-3 bg-gray-50 rounded">
                 <p><strong>Username:</strong> {selectedUser.username}</p>
@@ -556,15 +654,17 @@ const UserManagement: React.FC = () => {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteUserOpen(false)}>
+            <Button variant="outline" onClick={() => setIsBlockUserOpen(false)}>
               Cancel
             </Button>
             <Button 
-              onClick={confirmDelete} 
-              variant="destructive" 
-              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={confirmToggleBlock} 
+              className={selectedUser?.blocked 
+                ? "bg-green-600 hover:bg-green-700 text-white" 
+                : "bg-red-600 hover:bg-red-700 text-white"
+              }
             >
-              Delete
+              {selectedUser?.blocked ? 'Activate' : 'Block'}
             </Button>
           </DialogFooter>
         </DialogContent>
