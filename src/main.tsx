@@ -1,13 +1,26 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
-import router from './router';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import App from '@/App';
+import ErrorPage from '@/pages/errorPage';
+import { routes } from './router/routes';
+import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+// Create router with App as the root component that children routes will render inside
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <App />,
+    errorElement: <ErrorPage />,
+    children: routes
+  }
+]);
 
-root.render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );
