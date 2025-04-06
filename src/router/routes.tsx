@@ -8,12 +8,11 @@ import ForgotPassword from '@/pages/admin/forgotPassword';
 import ResetPassword from '@/pages/admin/resetPassword';
 import LayoutWrapper from '@/components/layout/layoutWrapper';
 import AdminLayout from '@/components/layout/AdminLayout';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 export const routes: RouteObject[] = [
   {
     index: true,
-    element: <Navigate to="/admin/login" replace /> // Default redirect
+    element: <Navigate to="/admin/login" replace /> 
   },
   {
     path: '/admin',
@@ -23,7 +22,6 @@ export const routes: RouteObject[] = [
         index: true,
         element: <Navigate to="/admin/login" replace />
       },
-      // Public routes - accessible without authentication
       {
         path: 'register',
         element: <AdminRegister />,
@@ -40,15 +38,6 @@ export const routes: RouteObject[] = [
         path: 'reset-password/:token',
         element: <ResetPassword />,
       },
-      // Protected admin routes - require authentication
-      {
-        element: <ProtectedRoute />,
-        children: [
-          // Add your protected admin routes here
-          // For example: dashboard, settings, profile, etc.
-          // { path: 'dashboard', element: <Dashboard /> },
-        ]
-      }
     ],
   },
   {
@@ -56,18 +45,13 @@ export const routes: RouteObject[] = [
     element: <LayoutWrapper />,
     children: [
       {
-        element: <ProtectedRoute />,
-        children: [
-          {
-            index: true,
-            element: <UserManagement />,
-          },
-          {
-            path: 'user-management',
-            element: <UserManagement />,
-          }
-        ]
+        index: true,
+        element: <UserManagement />,
       },
+      {
+        path: 'user-management',
+        element: <UserManagement />,
+      }
     ],
   },
   {
