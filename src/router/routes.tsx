@@ -8,11 +8,12 @@ import ForgotPassword from '@/pages/admin/forgotPassword';
 import ResetPassword from '@/pages/admin/resetPassword';
 import LayoutWrapper from '@/components/layout/layoutWrapper';
 import AdminLayout from '@/components/layout/AdminLayout';
+import PlatformMonitoring from '@/pages/admin/platformMonitoring';
 
 export const routes: RouteObject[] = [
   {
     index: true,
-    element: <Navigate to="/admin/login" replace /> 
+    element: <Navigate to="/u/platform-monitoring" replace /> 
   },
   {
     path: '/admin',
@@ -46,11 +47,19 @@ export const routes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <UserManagement />,
+        element: <Navigate to="/u/platform-monitoring" replace />
       },
       {
         path: 'user-management',
         element: <UserManagement />,
+      },
+      {
+        path: 'platform-monitoring',
+        element: <PlatformMonitoring />,
+      },
+      {
+        path: 'p',
+        element: <Navigate to="/u/platform-monitoring" replace />
       }
     ],
   },
