@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "@/assets/images/logo.png";
-import { USER_MANAGEMENT_PATH } from "@/data/url.data";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ interface NavItemProps {
   title: string;
   icon: React.ReactNode;
   collapsed: boolean;
+  onClick?: () => void;
 }
 
 // Navigation links with consistent structure
@@ -20,22 +20,22 @@ const links = [
   {
     title: "Platform Monitoring",
     icon: <Monitor className="w-5 h-5" />,
-    path: "/u/p",
+    path: "/u/platform-monitoring",
   },
   {
     title: "User Management",
     icon: <Users className="w-5 h-5" />,
-    path: USER_MANAGEMENT_PATH,
+    path: "/u/user-management",
   },
   {
     title: "Content Management",
     icon: <FileText className="w-5 h-5" />,
-    path: "/u/c",
+    path: "/u/content-management",
   },
   {
     title: "Subscription Management",
     icon: <CreditCard className="w-5 h-5" />,
-    path: "/u/s",
+    path: "/u/subscription-management",
   },
 ];
 
@@ -44,9 +44,15 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [_isMobile, setIsMobile] = useState(false);
   const { logout } = useAuth();
+  const [open, setOpen] = useState(false);
   
   const handleLogout = () => {
     logout();
+  };
+  
+  // Close sheet when navigating on mobile
+  const handleMobileNavClick = () => {
+    setOpen(false);
   };
   
   useEffect(() => {
@@ -65,7 +71,7 @@ export default function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   
-  const NavItem = ({ path, title, icon, collapsed }: NavItemProps) => {
+  const NavItem = ({ path, title, icon, collapsed, onClick }: NavItemProps) => {
     const questionMarkIndex = path.indexOf("?");
     const linkWithoutQuery =
       questionMarkIndex !== -1 ? path.substring(0, questionMarkIndex) : path;
@@ -78,6 +84,7 @@ export default function Sidebar() {
             <TooltipTrigger asChild>
               <NavLink
                 to={path}
+                onClick={onClick}
                 className={`flex justify-center items-center py-3 px-3 rounded-md transition-colors duration-200 ${
                   isActive ? "bg-[#AC19AD] text-white" : "text-gray-400 hover:bg-[#1a2333] hover:text-gray-200"
                 }`}
@@ -96,6 +103,7 @@ export default function Sidebar() {
     return (
       <NavLink
         to={path}
+        onClick={onClick}
         className={`flex items-center justify-start py-3 px-3 rounded-md transition-colors duration-200 ${
           isActive ? "bg-[#AC19AD] text-white" : "text-gray-400 hover:bg-[#1a2333] hover:text-gray-200"
         }`}
@@ -110,7 +118,7 @@ export default function Sidebar() {
     <>
       {/* Mobile Sidebar Trigger */}
       <div className="fixed top-4 left-4 z-40 md:hidden">
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
               variant="outline"
@@ -133,7 +141,7 @@ export default function Sidebar() {
                 <ul className="flex flex-col gap-y-1.5 px-3 mt-4">
                   {links.map((link) => (
                     <li key={link.title}>
-                      <NavItem {...link} collapsed={false} />
+                      <NavItem {...link} collapsed={false} onClick={handleMobileNavClick} />
                     </li>
                   ))}
                 </ul>
@@ -143,7 +151,10 @@ export default function Sidebar() {
                 <Button
                   variant="ghost"
                   className="w-full flex justify-start items-center py-3 px-3 text-white hover:bg-gray-800 rounded-md"
-                  onClick={handleLogout}
+                  onClick={() => {
+                    handleLogout();
+                    handleMobileNavClick();
+                  }}
                 >
                   <LogOut className="w-5 h-5 text-[#AC19AD]" />
                   <span className="ml-3">Sign Out</span>
