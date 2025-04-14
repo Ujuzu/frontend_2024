@@ -10,6 +10,7 @@ import LayoutWrapper from '@/components/layout/layoutWrapper';
 import AdminLayout from '@/components/layout/AdminLayout';
 import PlatformMonitoring from '@/pages/admin/platformMonitoring';
 import ContentManagement from '@/pages/admin/contentManagement';
+import SubcriptionManagement from '@/pages/admin/subscriptionManagement';
 
 export const routes: RouteObject[] = [
   {
@@ -65,6 +66,10 @@ export const routes: RouteObject[] = [
       {
         path:'content-management',
         element: <ContentManagement />,
+      },
+      {
+        path:'subscription-management',
+        element: <SubcriptionManagement />,
       }
     ],
   },
