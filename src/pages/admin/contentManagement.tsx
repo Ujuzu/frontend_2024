@@ -766,16 +766,18 @@ const ContentManagement: React.FC = () => {
         )}
       </div>
       
-        {/* Add Course Dialog - Now using CourseCreation component */}
-        <Dialog open={isAddCourseOpen} onOpenChange={setIsAddCourseOpen}>
+       {/* Add Course Dialog - Now using CourseCreation component */}
+<Dialog open={isAddCourseOpen} onOpenChange={setIsAddCourseOpen}>
   <DialogContent className="sm:max-w-[80vw] w-full max-h-[95vh] p-0">
+    <DialogHeader>
+      <DialogTitle></DialogTitle>
+    </DialogHeader>
     <CourseCreation 
       onClose={() => setIsAddCourseOpen(false)} 
       onSuccess={handleCourseCreationSuccess} 
     />
   </DialogContent>
 </Dialog>
-
       {/* Edit Course Dialog - Using the original form for editing */}
       <Dialog open={isEditCourseOpen} onOpenChange={setIsEditCourseOpen}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">

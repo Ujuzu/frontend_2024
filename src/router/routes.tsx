@@ -11,6 +11,7 @@ import AdminLayout from '@/components/layout/AdminLayout';
 import PlatformMonitoring from '@/pages/admin/platformMonitoring';
 import ContentManagement from '@/pages/admin/contentManagement';
 import SubcriptionManagement from '@/pages/admin/subscriptionManagement';
+import LogoutPage from '@/pages/LogoutPage'; // Import the LogoutPage component
 
 export const routes: RouteObject[] = [
   {
@@ -41,6 +42,10 @@ export const routes: RouteObject[] = [
         path: 'reset-password/:token',
         element: <ResetPassword />,
       },
+      {
+        path: 'logout',
+        element: <LogoutPage />, // Add the logout route
+      },
     ],
   },
   {
@@ -70,6 +75,10 @@ export const routes: RouteObject[] = [
       {
         path:'subscription-management',
         element: <SubcriptionManagement />,
+      },
+      {
+        path: 'logout',
+        element: <LogoutPage />, // Add the logout route here as well
       }
     ],
   },

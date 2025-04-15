@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -21,6 +22,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const navigate = useNavigate(); // Now this will work since we're inside Router context
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +62,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(userData);
       setIsAuthenticated(true);
       
+      // Redirect to saved URL or default
+      const redirectUrl = sessionStorage.getItem('redirectUrl') || '/u/';
+      sessionStorage.removeItem('redirectUrl');
+      navigate(redirectUrl);
+      
       await new Promise(resolve => setTimeout(resolve, 300)); // Optional delay
     } catch (error) {
       console.error('Login error:', error);
@@ -76,6 +83,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     setIsAuthenticated(false);
     setUser(null);
+
+    navigate('/u/login', { replace: true });
   };
 
   const value = {

@@ -4,7 +4,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from '@/App';
 import ErrorPage from '@/pages/errorPage';
 import { routes } from './router/routes';
-import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
 // Create router with App as the root component that children routes will render inside
@@ -19,8 +18,6 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
