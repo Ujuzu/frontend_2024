@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/AuthContext';
 import { Loader } from 'lucide-react';
 
@@ -25,7 +26,8 @@ const PUBLIC_ROUTES = [
   '/admin/reset-password',
 ];
 
-function App() {
+// Create a separate component for the authenticated content
+const AuthenticatedApp = () => {
   const { isAuthenticated, isInitializing } = useAuth();
   const location = useLocation();
   const [loadingState, setLoadingState] = React.useState<LoadingState>('visible');
@@ -35,7 +37,6 @@ function App() {
       setLoadingState('fading');
       setTimeout(() => setLoadingState('hidden'), 300);
     }, 1000); // Minimum 1 second display time
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -56,10 +57,19 @@ function App() {
   }
 
   if (isAuthenticated && isPublicRoute) {
-    return <Navigate to="/u/" replace />;
+    return <Navigate to="/u/platform-monitoring" replace />;
   }
 
   return <Outlet />;
+};
+
+// Main App component wraps everything with AuthProvider
+function App() {
+  return (
+    <AuthProvider>
+      <AuthenticatedApp />
+    </AuthProvider>
+  );
 }
 
 export default App;

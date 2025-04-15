@@ -1,8 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
-import { BellIcon, ChatIcon, FillCaretIcon } from '@/assets/icons';
-import SearchInput from '../input/searchInput';
-import Badge from '../badge';
-import { useAuth } from '@/context/AuthContext';
+import { Bell, MessageSquare, ChevronDown, Search, LogOut, User, Settings, X } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate } from 'react-router-dom';
+
 
 interface UserData {
   id: number;
@@ -15,13 +27,12 @@ interface UserData {
 }
 
 export default function TopBar() {
-  const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null!);
-  const { logout } = useAuth();
-
+  const navigate = useNavigate();
+ 
   useEffect(() => {
     // Load user data from localStorage
     const userData = localStorage.getItem('user');
@@ -33,19 +44,6 @@ export default function TopBar() {
         console.error('Error parsing user data:', error);
       }
     }
-  }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
-    }
-    
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, []);
 
   useEffect(() => {
@@ -87,8 +85,10 @@ export default function TopBar() {
     return user.email.charAt(0).toUpperCase();
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    setIsSigningOut(true);
+    
+    navigate('/u/logout');
   };
 
   const getUserDisplayName = () => {
@@ -103,24 +103,6 @@ export default function TopBar() {
     }
     
     return user.username || user.email.split('@')[0];
-  };
-
-  const renderAvatar = () => {
-    if (user?.avatar) {
-      return (
-        <img
-          className="w-8 h-8 md:w-9 md:h-9 object-cover rounded-full border-2 border-gray-100"
-          src={user.avatar}
-          alt="User avatar" 
-        />
-      );
-    }
-    
-    return (
-      <div className="w-8 h-8 md:w-9 md:h-9 rounded-full border-2 border-gray-100 bg-[#AC19AD] text-white flex items-center justify-center font-medium">
-        {getInitials()}
-      </div>
-    );
   };
 
   return (
@@ -139,74 +121,122 @@ export default function TopBar() {
           )}
           
           <div className="hidden md:block max-w-md w-full mx-4">
-            <div className="shadow-sm border border-gray-100 rounded-lg bg-white">
-              <SearchInput sz="sm" placeholder="Search Dashboard" />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input 
+                type="search" 
+                placeholder="Search Dashboard" 
+                id="desktop-search"
+                name="desktop-search"
+                className="pl-10 h-9 bg-white border border-gray-100"
+              />
             </div>
           </div>
           
           {showMobileSearch ? (
             <div className="md:hidden flex-1 ml-12 pr-2 animate-fade-in">
-              <div className="shadow-sm border border-gray-100 rounded-lg bg-white flex items-center">
-                <SearchInput sz="sm" placeholder="Search" ref={searchInputRef} />
-                <button 
+              <div className="relative flex items-center">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input 
+                  ref={searchInputRef}
+                  type="search" 
+                  placeholder="Search" 
+                  id="mobile-search"
+                  name="mobile-search"
+                  className="pl-10 pr-10 h-9 bg-white border border-gray-100"
+                />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="absolute right-0"
                   onClick={toggleMobileSearch}
-                  className="p-2 text-gray-500 hover:text-gray-700"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  <X className="h-4 w-4 text-gray-500" />
+                </Button>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-2 md:gap-4">
-              <button 
-                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="md:hidden rounded-full"
                 onClick={toggleMobileSearch}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
+                <Search className="h-5 w-5 text-gray-600" />
+              </Button>
               
-              <button className="flex items-center justify-center w-9 h-9 rounded-full bg-[#FFEEE8] hover:bg-[#FFE0D6] transition-colors">
-                <ChatIcon className="w-5 h-5 text-orange-500" />
-              </button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="rounded-full bg-orange-50 hover:bg-orange-100"
+              >
+                <MessageSquare className="h-5 w-5 text-orange-500" />
+              </Button>
               
-              <button className="flex items-center justify-center w-9 h-9 rounded-full bg-[#F5F7FA] hover:bg-gray-200 transition-colors">
-                <span className="relative inline-block">
-                  <Badge className="absolute -top-0.5 -right-0.5 !w-2 !h-2" />
-                  <BellIcon className="w-5 h-5 text-gray-700" />
-                </span>
-              </button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="rounded-full bg-gray-50 hover:bg-gray-100"
+              >
+                <div className="relative">
+                  <Badge className="absolute -top-1 -right-1 w-2 h-2 p-0 bg-red-500" />
+                  <Bell className="h-5 w-5 text-gray-700" />
+                </div>
+              </Button>
               
-              <div className="relative" ref={dropdownRef}>
-                <button 
-                  className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
-                  onClick={() => setShowDropdown(!showDropdown)}
-                >
-                  {renderAvatar()}
-                  <FillCaretIcon className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''} hidden md:block`} />
-                </button>
-                
-                {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-800">{getUserDisplayName()}</p>
-                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8 md:h-9 md:w-9">
+                        {user?.avatar ? (
+                          <AvatarImage src={user.avatar} alt={getUserDisplayName()} />
+                        ) : null}
+                        <AvatarFallback className="bg-purple-600 text-white">
+                          {getInitials()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <ChevronDown className="w-4 h-4 text-gray-600 transition-transform duration-200 hidden md:block" />
                     </div>
-                    <a href="#profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
-                    <a href="#settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                    <hr className="my-1 border-gray-100" />
-                    <button 
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                )}
-              </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48" align="end">
+                  <DropdownMenuLabel>
+                    <p className="text-sm font-medium text-gray-800">{getUserDisplayName()}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Your Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="text-red-500 focus:text-red-500"
+                    disabled={isSigningOut}
+                    onClick={handleLogout}
+                  >
+                    {isSigningOut ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin h-4 w-4 mr-2 border-2 border-red-500 border-t-transparent rounded-full" />
+                        <span>Signing out...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sign out</span>
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           )}
         </div>

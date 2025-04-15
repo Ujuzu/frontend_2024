@@ -163,6 +163,7 @@ const AdminLogin: React.FC = () => {
               <Input
                 id="email"
                 type="email"
+                autoComplete="off"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

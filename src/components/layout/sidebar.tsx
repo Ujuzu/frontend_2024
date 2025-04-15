@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import logo from "@/assets/images/logo.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Menu, LogOut, Monitor, Users, FileText, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
-import { useAuth } from '@/context/AuthContext';
 
 interface NavItemProps {
   path: string;
@@ -43,11 +42,12 @@ export default function Sidebar() {
   const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [_isMobile, setIsMobile] = useState(false);
-  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   
   const handleLogout = () => {
-    logout();
+    //logout();
+    navigate('/u/logout');
   };
   
   // Close sheet when navigating on mobile
