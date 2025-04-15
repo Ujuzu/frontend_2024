@@ -84,7 +84,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsAuthenticated(false);
     setUser(null);
 
-    navigate('/u/login', { replace: true });
+    navigate('/u/logout', { 
+            replace: true,
+            state: { noBack: true }
+    });
   };
 
   const value = {
