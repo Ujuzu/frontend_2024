@@ -2,7 +2,13 @@ import { useState, useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import logo from "@/assets/images/logo.png";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription
+} from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Menu, LogOut, Monitor, Users, FileText, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -132,6 +138,10 @@ export default function Sidebar() {
             side="left" 
             className="p-0 w-72 bg-[#000b17] border-r-[#1a2333] max-h-screen overflow-y-auto"
           >
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetDescription className="sr-only">
+              Navigation menu for the application
+            </SheetDescription>
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-center py-6 px-4 border-b border-[#1a2333]">
                 <img src={logo} className="w-32 h-auto" alt="Logo" />

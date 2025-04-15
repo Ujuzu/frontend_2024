@@ -99,7 +99,7 @@ const AdminRegister: React.FC = () => {
   
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-900 to-[#000b17] p-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#000b17] p-4">
         <div className="w-full max-w-md">
           <div className="flex justify-center mb-6">
             <img src={logo} alt="Logo" className="w-48 h-auto" />
