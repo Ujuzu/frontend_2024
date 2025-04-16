@@ -129,14 +129,14 @@ export default function Sidebar() {
             <Button
               variant="outline"
               size="icon"
-              className="bg-[#AC19AD] text-white hover:bg-[#8e16a1] border-none shadow-lg"
+              className="bg-[#AC19AD] text-black hover:bg-black border-none shadow-lg"
             >
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
           <SheetContent 
             side="left" 
-            className="p-0 w-72 bg-[#000b17] border-r-[#1a2333] max-h-screen overflow-y-auto"
+            className="p-0 w-72 bg-[#000b17] border-r-[#1a2333] max-h-screen overflow-y-auto animate-in slide-in-from-left duration-300"
           >
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SheetDescription className="sr-only">
@@ -188,7 +188,7 @@ export default function Sidebar() {
             variant="outline"
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
-            className="cursor-pointer bg-[#AC19AD] text-white hover:bg-[#8e16a1] border-none"
+            className="cursor-pointer bg-[#AC19AD] text-white hover:bg-[#8e16a1] border-none transition-colors duration-200"
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </Button>

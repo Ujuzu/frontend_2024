@@ -15,6 +15,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+
 interface UserData {
   id: number;
   username: string;
@@ -23,12 +25,35 @@ interface UserData {
   lastName?: string;
   fullName?: string;
   avatar?: string;
+  firstname?: string;
+  lastname?: string;
+  documentId?: string;
+  profilePic?: {
+    id: number;
+    name: string;
+    url: string;
+    formats?: {
+      thumbnail?: {
+        url: string;
+      };
+      small?: {
+        url: string;
+      };
+      medium?: {
+        url: string;
+      };
+      large?: {
+        url: string;
+      };
+    };
+  };
 }
 
 export default function TopBar() {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null!);
   const navigate = useNavigate();
  
@@ -39,11 +64,48 @@ export default function TopBar() {
       try {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
+        
+        // Fetch avatar if user exists
+        if (parsedUser && parsedUser.id) {
+          fetchUserAvatar(parsedUser.id);
+        }
       } catch (error) {
         console.error('Error parsing user data:', error);
       }
     }
   }, []);
+
+  const fetchUserAvatar = async (userId: number) => {
+    try {
+      const response = await fetch(`${API_URL}/api/users/${userId}?populate=profilePic`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user avatar');
+      }
+      
+      const userData = await response.json();
+      
+      if (userData.profilePic) {
+        // Select the most appropriate image format - preferring medium size
+        if (userData.profilePic.formats && userData.profilePic.formats.medium) {
+          // Need to add base URL if the returned URL is relative
+          const baseUrl = 'https://backend-2024-8fxl.onrender.com';
+          const imageUrl = userData.profilePic.formats.medium.url.startsWith('/')
+            ? `${baseUrl}${userData.profilePic.formats.medium.url}`
+            : userData.profilePic.formats.medium.url;
+          setAvatarUrl(imageUrl);
+        } else if (userData.profilePic.url) {
+          // Use main URL if formats aren't available
+          const baseUrl = 'https://backend-2024-8fxl.onrender.com';
+          const imageUrl = userData.profilePic.url.startsWith('/')
+            ? `${baseUrl}${userData.profilePic.url}`
+            : userData.profilePic.url;
+          setAvatarUrl(imageUrl);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user avatar:', error);
+    }
+  };
 
   useEffect(() => {
     if (showMobileSearch && searchInputRef.current) {
@@ -65,6 +127,12 @@ export default function TopBar() {
   const getInitials = () => {
     if (!user) return '?';
     
+    // Check for firstname/lastname first (API response format)
+    if (user.firstname && user.lastname) {
+      return `${user.firstname.charAt(0)}${user.lastname.charAt(0)}`;
+    }
+    
+    // Then check for firstName/lastName (localStorage format)
     if (user.firstName && user.lastName) {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
     }
@@ -91,6 +159,12 @@ export default function TopBar() {
   const getUserDisplayName = () => {
     if (!user) return 'User';
     
+    // Check for firstname/lastname first (API response format)
+    if (user.firstname && user.lastname) {
+      return `${user.firstname} ${user.lastname}`;
+    }
+    
+    // Then check for firstName/lastName (localStorage format)
     if (user.firstName && user.lastName) {
       return `${user.firstName} ${user.lastName}`;
     }
@@ -155,8 +229,8 @@ export default function TopBar() {
           ) : (
             <div className="flex items-center gap-2 md:gap-4">
               <Button 
-                    size="icon"
-                className="md:hidden rounded-full"
+                size="icon"
+                className="md:hidden rounded-full bg-white"
                 onClick={toggleMobileSearch}
               >
                 <Search className="h-5 w-5 text-gray-600" />
@@ -186,8 +260,8 @@ export default function TopBar() {
                   <Button variant="ghost" className="p-1 rounded-full hover:bg-gray-100 transition-colors">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8 md:h-9 md:w-9">
-                        {user?.avatar ? (
-                          <AvatarImage src={user.avatar} alt={getUserDisplayName()} />
+                        {avatarUrl ? (
+                          <AvatarImage src={avatarUrl} alt={getUserDisplayName()} />
                         ) : null}
                         <AvatarFallback className="bg-purple-600 text-white">
                           {getInitials()}

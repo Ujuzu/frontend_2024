@@ -4,22 +4,6 @@
   font-family: 'Poppins', sans-serif;
 }
 
-html, body, #root {
-  background-color: var(--color-BLACK_02) !important; /* #000b17 */
-  transition: none !important;
-}
-
-.dark {
-  /* Keep your existing variables but add these */
-  --background: var(--color-BLACK_02) !important;
-  --card: var(--color-BLACK_02) !important;
-  --sidebar: var(--color-BLACK_02) !important;
-  
-  /* Add transition override */
-  transition: none !important;
-  animation: none !important;
-}
-
 @theme {
   --color-BLUE_01: #1e57c7;
   --color-GRAY_01: #f5f7fa;
