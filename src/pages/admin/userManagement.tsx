@@ -411,28 +411,28 @@ const UserManagement: React.FC = () => {
                         <div className="flex space-x-4">
                           <button
                             onClick={() => handleViewUser(user)}
-                            className="text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-all"
+                            className="h-8 w-8 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-full p-1.5"
                             title="View Details"
                           >
-                            <Eye size={20} />
+                            <Eye size={18} />
                           </button>
                           <button
                             onClick={() => handleEditUser(user)}
-                            className="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-blue-50 transition-all"
+                            className="h-8 w-8 text-amber-600 hover:text-amber-900 hover:bg-amber-50 rounded-full p-1.5"
                             title="Edit User"
                           >
-                            <Edit size={20} />
+                            <Edit size={18} />
                           </button>
                           <button
                             onClick={() => handleToggleBlockUser(user)}
-                            className={`p-2 rounded-full transition-all ${
+                            className={`h-8 w-8 ${
                               user.blocked 
-                                ? "text-green-600 hover:text-green-900 hover:bg-green-50" 
+                                ? "text-green-600 hover:text-green-900 hover:bg-green-50"
                                 : "text-red-600 hover:text-red-900 hover:bg-red-50"
-                            }`}
+                            }rounded-full p-1.5 `}
                             title={user.blocked ? "Activate User" : "Block User"}
                           >
-                            {user.blocked ? <Unlock size={20} /> : <Lock size={20} />}
+                            {user.blocked ? <Unlock size={18} /> : <Lock size={18} />}
                           </button>
                         </div>
                       </TableCell>
