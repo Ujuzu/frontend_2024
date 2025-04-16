@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, MessageSquare, ChevronDown, Search, LogOut, User, Settings, X } from 'lucide-react';
+import { Bell, MessageSquare, ChevronDown, ChevronUp, Search, LogOut, User, Settings, X } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ interface UserData {
 export default function TopBar() {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null!);
   const navigate = useNavigate();
  
@@ -154,8 +155,7 @@ export default function TopBar() {
           ) : (
             <div className="flex items-center gap-2 md:gap-4">
               <Button 
-                variant="ghost" 
-                size="icon"
+                    size="icon"
                 className="md:hidden rounded-full"
                 onClick={toggleMobileSearch}
               >
@@ -181,7 +181,7 @@ export default function TopBar() {
                 </div>
               </Button>
               
-              <DropdownMenu>
+              <DropdownMenu onOpenChange={setDropdownOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="p-1 rounded-full hover:bg-gray-100 transition-colors">
                     <div className="flex items-center gap-2">
@@ -193,7 +193,11 @@ export default function TopBar() {
                           {getInitials()}
                         </AvatarFallback>
                       </Avatar>
-                      <ChevronDown className="w-4 h-4 text-gray-600 transition-transform duration-200 hidden md:block" />
+                      {dropdownOpen ? (
+                        <ChevronUp className="w-4 h-4 text-gray-600 transition-transform duration-200 hidden md:block" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-gray-600 transition-transform duration-200 hidden md:block" />
+                      )}
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
