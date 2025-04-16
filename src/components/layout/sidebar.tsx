@@ -127,16 +127,16 @@ export default function Sidebar() {
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="bg-[#AC19AD] text-black hover:bg-black border-none shadow-lg"
+              className=" text-black hover:bg-black border-none shadow-lg"
             >
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
           <SheetContent 
             side="left" 
-            className="p-0 w-72 bg-[#000b17] border-r-[#1a2333] max-h-screen overflow-y-auto animate-in slide-in-from-left duration-300"
+            className="p-0 w-72 bg-[#000b17] border-r-[#1a2333] max-h-screen overflow-y-auto"
           >
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SheetDescription className="sr-only">
