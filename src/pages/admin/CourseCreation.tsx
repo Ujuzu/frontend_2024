@@ -28,10 +28,10 @@ const CourseCreation: React.FC<CourseCreationProps> = ({ onClose, onSuccess }) =
   
   // Form Data
   const [formData, setFormData] = useState<CourseFormData>({
-    locale: 'en',
+    language: 'English',
     certificate: false,
     quizes: false,
-    level: 'beginner'
+    level: 'Beginner'
   });
   
   // Curriculum items
@@ -54,7 +54,7 @@ const CourseCreation: React.FC<CourseCreationProps> = ({ onClose, onSuccess }) =
     switch (currentStep) {
       case 1:
         // Basic info validation
-        if (!formData.course_name || !formData.documentId) {
+        if (!formData.course_name || !formData.level || !formData.language || !formData.duration || !formData.short_desc) {
           return false;
         }
         return true;
@@ -77,7 +77,11 @@ const CourseCreation: React.FC<CourseCreationProps> = ({ onClose, onSuccess }) =
   
   // Navigation between steps
   const nextStep = () => {
-    if (!validateCurrentStep()) return;
+    if (!validateCurrentStep()) {
+      // Show validation feedback
+      alert("Please fill in all required fields before proceeding.");
+      return;
+    }
     setCurrentStep(currentStep + 1);
   };
   
@@ -89,7 +93,25 @@ const CourseCreation: React.FC<CourseCreationProps> = ({ onClose, onSuccess }) =
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
-      // Submission logic would go here
+      
+      // Create the request payload
+      const courseData = {
+        ...formData,
+        // Convert boolean to number for quizes if needed
+        quizes: formData.quizes === true ? 1 : 0
+      };
+      
+      // Here you would typically have API call logic
+      // For example:
+      // const response = await fetch('/api/courses', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(courseData)
+      // });
+      
+      // if (!response.ok) throw new Error('Failed to create course');
+      
+      // Mock successful submission
       setTimeout(() => {
         setIsSubmitting(false);
         onSuccess();
@@ -97,6 +119,7 @@ const CourseCreation: React.FC<CourseCreationProps> = ({ onClose, onSuccess }) =
     } catch (error) {
       console.error('Error creating course:', error);
       setIsSubmitting(false);
+      alert("There was an error creating the course. Please try again.");
     }
   };
   
@@ -267,7 +290,7 @@ const CourseCreation: React.FC<CourseCreationProps> = ({ onClose, onSuccess }) =
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="bg-[#AC19AD] hover:bg-[#AC19AD]/90 focus:ring-2 focus:ring-[#AC19AD]/40 text-white flex items-center gap-2 px-6 py-2 transition-all shadow-sm"
+                className="bg-[#AC19AD] hover:bg-[#AC19AD]/90 focus:ring-2 focus:ring-[#AC19AD]/40 text-white flex items-center gap-2 px-6 py-2 transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>

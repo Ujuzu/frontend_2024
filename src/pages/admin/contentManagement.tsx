@@ -28,6 +28,7 @@ import EditCourseDialog from './dialogs/EditCourseDialog';
 import DeleteCourseDialog from './dialogs/DeleteCourseDialog';
 import ViewCourseDialog from './dialogs/ViewCourseDialog';
 const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+
 // Define the Course interface based on your structure
 interface Course {
   id: number;
@@ -76,6 +77,7 @@ interface StrapiResponse {
   data: Course[];
   meta: Meta;
 }
+
 interface CourseFormData {
   documentId?: string;
   short_desc?: string;
@@ -170,7 +172,15 @@ const ContentManagement: React.FC = () => {
     });
     setIsAddCourseOpen(true);
   };
-  
+
+   const handleEditSuccess = () => {
+  setIsEditCourseOpen(false);
+  // Refresh content list
+  fetchCourses(currentPage, filterText);
+  toast.success('Course updated successfully!');
+    }; 
+
+
   const handleViewCourse = (course: Course) => {
     setSelectedCourse(course);
     setIsViewCourseOpen(true);
@@ -247,7 +257,7 @@ const ContentManagement: React.FC = () => {
       if (isEditCourseOpen && selectedCourse) {
         // Update existing course
         await axios.put(
-          `${API_URL}/api/courses/${selectedCourse.id}`,
+          `${API_URL}/api/courses/${selectedCourse.documentId}`,
           apiData,
           {
             headers: {
@@ -281,7 +291,7 @@ const ContentManagement: React.FC = () => {
         const token = localStorage.getItem('token');
         
         await axios.delete(
-          `${API_URL}/api/courses/${selectedCourse.id}`,
+          `${API_URL}/api/courses/${selectedCourse.documentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -562,12 +572,7 @@ const ContentManagement: React.FC = () => {
         isOpen={isEditCourseOpen}
         onClose={() => setIsEditCourseOpen(false)}
         selectedCourse={selectedCourse}
-        onSave={saveCourse}
-        formData={formData}
-        handleFormChange={handleFormChange}
-        handleSelectChange={handleSelectChange}
-        handleCheckboxChange={handleCheckboxChange}
-        handleNumberChange={handleNumberChange}
+        onSave={handleEditSuccess}
       />
       
       {/* Delete Course Dialog - Using the DeleteCourseDialog component */}

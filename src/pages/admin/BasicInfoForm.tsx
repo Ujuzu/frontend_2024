@@ -66,29 +66,13 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
         </div>
         
         <div className="space-y-2">
-          <label htmlFor="documentId" className="block text-sm font-medium text-gray-700">
-            Document ID <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <Input
-              id="documentId"
-              name="documentId"
-              value={formData.documentId || ''}
-              onChange={handleInputChange}
-              placeholder="Enter document ID"
-              className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
-              required
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
           <label htmlFor="course_category" className="block text-sm font-medium text-gray-700">
-            Course Category
+            Course Category <span className="text-red-500">*</span>
           </label>
           <Select 
             value={formData.course_category || ''} 
             onValueChange={(value) => handleSelectChange('course_category', value)}
+            required
           >
             <SelectTrigger className="w-full border-gray-300 focus:ring-[#AC19AD] focus:border-[#AC19AD]">
               <SelectValue placeholder="Select category" />
@@ -103,11 +87,29 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
             </SelectContent>
           </Select>
         </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <Clock size={16} className="text-[#AC19AD]" />
+            <label htmlFor="duration" className="block text-sm font-medium text-gray-700">
+              Duration <span className="text-red-500">*</span>
+            </label>
+          </div>
+          <Input
+            id="duration"
+            name="duration"
+            value={formData.duration || ''}
+            onChange={handleInputChange}
+            placeholder="e.g. 4 weeks"
+            className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+            required
+          />
+        </div>
       </div>
       
       <div className="space-y-2">
         <label htmlFor="short_desc" className="block text-sm font-medium text-gray-700">
-          Short Description
+          Short Description <span className="text-red-500">*</span>
         </label>
         <Textarea
           id="short_desc"
@@ -115,6 +117,37 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
           value={formData.short_desc || ''}
           onChange={handleInputChange}
           placeholder="Enter a short description of your course"
+          rows={3}
+          className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="short_desc_2" className="block text-sm font-medium text-gray-700">
+          Alternative Description 1
+        </label>
+        <Textarea
+          id="short_desc_2"
+          name="short_desc_2"
+          value={formData.short_desc_2 || ''}
+          onChange={handleInputChange}
+          placeholder="Enter an alternative description for your course"
+          rows={3}
+          className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="short_desc_3" className="block text-sm font-medium text-gray-700">
+          Alternative Description 2
+        </label>
+        <Textarea
+          id="short_desc_3"
+          name="short_desc_3"
+          value={formData.short_desc_3 || ''}
+          onChange={handleInputChange}
+          placeholder="Enter another alternative description for your course"
           rows={3}
           className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
         />
@@ -134,28 +167,44 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
           className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
         />
       </div>
+
+      <div className="space-y-2">
+        <label htmlFor="weekly_curriculum_intro" className="block text-sm font-medium text-gray-700">
+          Weekly Curriculum Introduction
+        </label>
+        <Textarea
+          id="weekly_curriculum_intro"
+          name="weekly_curriculum_intro"
+          value={formData.weekly_curriculum_intro || ''}
+          onChange={handleInputChange}
+          placeholder="Enter an introduction to the weekly curriculum"
+          rows={3}
+          className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+        />
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-1.5">
             <Globe size={16} className="text-[#AC19AD]" />
             <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-              Language
+              Language <span className="text-red-500">*</span>
             </label>
           </div>
           <Select 
-            value={formData.language || 'en'} 
+            value={formData.language || 'English'} 
             onValueChange={(value) => handleSelectChange('language', value)}
+            required
           >
             <SelectTrigger className="w-full border-gray-300 focus:ring-[#AC19AD] focus:border-[#AC19AD]">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="en">English</SelectItem>
-              <SelectItem value="fr">French</SelectItem>
-              <SelectItem value="es">Spanish</SelectItem>
-              <SelectItem value="de">German</SelectItem>
-              <SelectItem value="zh">Chinese</SelectItem>
+              <SelectItem value="English">English</SelectItem>
+              <SelectItem value="French">French</SelectItem>
+              <SelectItem value="Spanish">Spanish</SelectItem>
+              <SelectItem value="German">German</SelectItem>
+              <SelectItem value="Chinese">Chinese</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -164,39 +213,24 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
           <div className="flex items-center gap-1.5">
             <LayoutGrid size={16} className="text-[#AC19AD]" />
             <label htmlFor="level" className="block text-sm font-medium text-gray-700">
-              Level
+              Level <span className="text-red-500">*</span>
             </label>
           </div>
           <Select 
-            value={formData.level || 'beginner'} 
+            value={formData.level || ''} 
             onValueChange={(value) => handleSelectChange('level', value)}
+            required
           >
             <SelectTrigger className="w-full border-gray-300 focus:ring-[#AC19AD] focus:border-[#AC19AD]">
               <SelectValue placeholder="Select level" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="beginner">Beginner</SelectItem>
-              <SelectItem value="intermediate">Intermediate</SelectItem>
-              <SelectItem value="advanced">Advanced</SelectItem>
+              <SelectItem value="Primary">Primary</SelectItem>
+              <SelectItem value="Beginner">Beginner</SelectItem>
+              <SelectItem value="Intermediate">Intermediate</SelectItem>
+              <SelectItem value="Advanced">Advanced</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex items-center gap-1.5">
-            <Clock size={16} className="text-[#AC19AD]" />
-            <label htmlFor="duration" className="block text-sm font-medium text-gray-700">
-              Duration
-            </label>
-          </div>
-          <Input
-            id="duration"
-            name="duration"
-            value={formData.duration || ''}
-            onChange={handleInputChange}
-            placeholder="e.g. 4 weeks"
-            className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
-          />
         </div>
       </div>
       
@@ -234,6 +268,20 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
             </label>
           </div>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="video_url" className="block text-sm font-medium text-gray-700">
+          Intro Video URL
+        </label>
+        <Input
+          id="video_url"
+          name="video_url"
+          value={formData.video_url || ''}
+          onChange={handleInputChange}
+          placeholder="Enter intro video URL"
+          className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+        />
       </div>
     </div>
   );
