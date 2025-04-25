@@ -18,14 +18,78 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 // API URL from environment variable
 const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 
-// Define a more comprehensive Course interface
+// Category interface
+interface Category {
+  id: number;
+  documentId: string;
+  title: string;
+  description?: string;
+}
+
+// Subcategory interface
+interface Subcategory {
+  id: number;
+  documentId: string;
+  name: string;
+  description?: string;
+}
+
+// Learn List item interface
+interface LearnListItem {
+  id: number;
+  documentId: string;
+  text: string;
+}
+
+// Review interface
+interface Review {
+  id: number;
+  documentId: string;
+  reviewer_name: string;
+  review_text: string;
+  rating: number;
+  date?: string;
+}
+
+// Instructor interface
+interface Instructor {
+  id: number;
+  documentId: string;
+  name: string;
+  bio?: string;
+  avatar_url?: string;
+}
+
+// Requirement interface
+interface Requirement {
+  id: number;
+  documentId: string;
+  text: string;
+}
+
+// Feature interface
+interface Feature {
+  id: number;
+  documentId: string;
+  title: string;
+  description?: string;
+}
+
+// Target Group interface
+interface TargetGroup {
+  id: number;
+  documentId: string;
+  description: string;
+}
+
+// Define a comprehensive Course interface
 interface Course {
   id: number;
   documentId: string;
@@ -43,7 +107,14 @@ interface Course {
   curriculum_overview?: string;
   duration?: string;
   intro_video_url?: string;
-  course_categories?: number[];
+  course_categories?: Category[];
+  course_subcategories?: Subcategory[];
+  course_learn_lists?: LearnListItem[];
+  course_reviews?: Review[];
+  courses_instructors?: Instructor[];
+  course_requirements?: Requirement[];
+  courses_features?: Feature[];
+  course_target_groups?: TargetGroup[];
 }
 
 // Comprehensive form data interface
@@ -63,12 +134,13 @@ interface CourseFormData {
   duration?: string;
   intro_video_url?: string;
   course_categories?: number[];
-}
-
-// Category interface
-interface Category {
-  id: number;
-  name: string;
+  course_subcategories?: number[];
+  course_learn_lists?: number[];
+  course_reviews?: number[];
+  courses_instructors?: number[];
+  course_requirements?: number[];
+  courses_features?: number[];
+  course_target_groups?: number[];
 }
 
 interface EditCourseDialogProps {
@@ -100,11 +172,37 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
     duration: '',
     intro_video_url: '',
     course_categories: [],
+    course_subcategories: [],
+    course_learn_lists: [],
+    course_reviews: [],
+    courses_instructors: [],
+    course_requirements: [],
+    courses_features: [],
+    course_target_groups: [],
   });
   
+  // Local state for managing new text entries
+  const [newLearnItem, setNewLearnItem] = useState('');
+  const [newRequirement, setNewRequirement] = useState('');
+  const [newTargetGroup, setNewTargetGroup] = useState('');
+  const [newFeatureTitle, setNewFeatureTitle] = useState('');
+  const [newFeatureDesc, setNewFeatureDesc] = useState('');
+  
+  // States for storing related data
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const [learnLists, setLearnLists] = useState<LearnListItem[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [instructors, setInstructors] = useState<Instructor[]>([]);
+  const [requirements, setRequirements] = useState<Requirement[]>([]);
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [targetGroups, setTargetGroups] = useState<TargetGroup[]>([]);
+  
+  // Loading states
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [isLoadingSubcategories, setIsLoadingSubcategories] = useState(false);
+  const [isLoadingInstructors, setIsLoadingInstructors] = useState(false);
   
   // Fetch categories
   const fetchCategories = async () => {
@@ -120,7 +218,9 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
       if (response.data && response.data.data) {
         const formattedCategories = response.data.data.map((item: any) => ({
           id: item.id,
-          name: item.attributes?.name || `Category ${item.id}`,
+          documentId: item.documentId,
+          title: item.attributes?.name || item.title || `Category ${item.id}`,
+          description: item.attributes?.description || item.description,
         }));
         setCategories(formattedCategories);
       }
@@ -131,10 +231,99 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
       setIsLoadingCategories(false);
     }
   };
+
+  // Fetch subcategories
+  const fetchSubcategories = async () => {
+    setIsLoadingSubcategories(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/course-subcategories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (response.data && response.data.data) {
+        const formattedSubcategories = response.data.data.map((item: any) => ({
+          id: item.id,
+          documentId: item.documentId,
+          name: item.attributes?.name || item.name || `Subcategory ${item.id}`,
+          description: item.attributes?.description || item.description,
+        }));
+        setSubcategories(formattedSubcategories);
+      }
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      toast.error('Failed to load subcategories');
+    } finally {
+      setIsLoadingSubcategories(false);
+    }
+  };
+
+  // Fetch instructors
+  const fetchInstructors = async () => {
+    setIsLoadingInstructors(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/courses-instructors`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (response.data && response.data.data) {
+        const formattedInstructors = response.data.data.map((item: any) => ({
+          id: item.id,
+          documentId: item.documentId,
+          name: item.attributes?.name || item.name || `Instructor ${item.id}`,
+          bio: item.attributes?.bio || item.bio,
+          avatar_url: item.attributes?.avatar_url || item.avatar_url,
+        }));
+        setInstructors(formattedInstructors);
+      }
+    } catch (error) {
+      console.error('Error fetching instructors:', error);
+      toast.error('Failed to load instructors');
+    } finally {
+      setIsLoadingInstructors(false);
+    }
+  };
+  
+  // Process local data from selected course
+  const processLocalDataFromCourse = (course: Course) => {
+    if (course.course_learn_lists && course.course_learn_lists.length > 0) {
+      setLearnLists(course.course_learn_lists);
+    }
+    
+    if (course.course_reviews && course.course_reviews.length > 0) {
+      setReviews(course.course_reviews);
+    }
+    
+    if (course.course_requirements && course.course_requirements.length > 0) {
+      setRequirements(course.course_requirements);
+    }
+    
+    if (course.courses_features && course.courses_features.length > 0) {
+      setFeatures(course.courses_features);
+    }
+    
+    if (course.course_target_groups && course.course_target_groups.length > 0) {
+      setTargetGroups(course.course_target_groups);
+    }
+  };
   
   // Update form data when selected course changes
   useEffect(() => {
     if (selectedCourse) {
+      const categoryIds = selectedCourse.course_categories?.map(category => category.id) || [];
+      const subcategoryIds = selectedCourse.course_subcategories?.map(subcat => subcat.id) || [];
+      const learnListIds = selectedCourse.course_learn_lists?.map(item => item.id) || [];
+      const reviewIds = selectedCourse.course_reviews?.map(review => review.id) || [];
+      const instructorIds = selectedCourse.courses_instructors?.map(instructor => instructor.id) || [];
+      const requirementIds = selectedCourse.course_requirements?.map(req => req.id) || [];
+      const featureIds = selectedCourse.courses_features?.map(feature => feature.id) || [];
+      const targetGroupIds = selectedCourse.course_target_groups?.map(target => target.id) || [];
+      
       setFormData({
         course_name: selectedCourse.course_name || '',
         course_outline: selectedCourse.course_outline || '',
@@ -150,11 +339,24 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
         curriculum_overview: selectedCourse.curriculum_overview || '',
         duration: selectedCourse.duration || '',
         intro_video_url: selectedCourse.intro_video_url || '',
-        course_categories: selectedCourse.course_categories || [],
+        course_categories: categoryIds,
+        course_subcategories: subcategoryIds,
+        course_learn_lists: learnListIds,
+        course_reviews: reviewIds,
+        courses_instructors: instructorIds,
+        course_requirements: requirementIds,
+        courses_features: featureIds,
+        course_target_groups: targetGroupIds,
       });
+      
+      // Process local data
+      processLocalDataFromCourse(selectedCourse);
     }
     
+    // Fetch data for dropdowns
     fetchCategories();
+    fetchSubcategories();
+    fetchInstructors();
   }, [selectedCourse]);
   
   // Handle text input change
@@ -179,6 +381,89 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
     setFormData(prev => ({ ...prev, [name]: value }));
   };
   
+  // Add new learn list item
+  const handleAddLearnItem = () => {
+    if (!newLearnItem.trim()) return;
+    
+    // Create a temporary ID for UI purposes
+    const tempId = Date.now();
+    const newItem = {
+      id: tempId * -1, // Use negative ID to indicate it's new and not from DB
+      documentId: `temp-${tempId}`,
+      text: newLearnItem.trim()
+    };
+    
+    setLearnLists(prev => [...prev, newItem]);
+    setFormData(prev => ({
+      ...prev,
+      course_learn_lists: [...(prev.course_learn_lists || []), newItem.id]
+    }));
+    
+    setNewLearnItem('');
+  };
+  
+  // Add new requirement
+  const handleAddRequirement = () => {
+    if (!newRequirement.trim()) return;
+    
+    const tempId = Date.now();
+    const newItem = {
+      id: tempId * -1,
+      documentId: `temp-${tempId}`,
+      text: newRequirement.trim()
+    };
+    
+    setRequirements(prev => [...prev, newItem]);
+    setFormData(prev => ({
+      ...prev,
+      course_requirements: [...(prev.course_requirements || []), newItem.id]
+    }));
+    
+    setNewRequirement('');
+  };
+  
+  // Add new target group
+  const handleAddTargetGroup = () => {
+    if (!newTargetGroup.trim()) return;
+    
+    const tempId = Date.now();
+    const newItem = {
+      id: tempId * -1,
+      documentId: `temp-${tempId}`,
+      description:newTargetGroup.trim()
+    };
+    
+    setTargetGroups(prev => [...prev, newItem]);
+    setFormData(prev => ({
+      ...prev,
+      course_target_groups: [...(prev.course_target_groups || []), newItem.id]
+    }));
+    
+    setNewTargetGroup('');
+  };
+  
+  // Add new feature
+  const handleAddFeature = () => {
+    if (!newFeatureTitle.trim()) return;
+    
+    const tempId = Date.now();
+    const newItem = {
+      id: tempId * -1,
+      documentId: `temp-${tempId}`,
+      title: newFeatureTitle.trim(),
+      description: newFeatureDesc
+    };
+    
+    setFeatures(prev => [...prev, newItem]);
+    setFormData(prev => ({
+      ...prev,
+      courses_features: [...(prev.courses_features || []), newItem.id]
+    }));
+    
+    setNewFeatureTitle('');
+    setNewFeatureDesc('');
+  };
+  
   // Handle category selection
   const handleCategoryChange = (value: string) => {
     const categoryId = parseInt(value, 10);
@@ -198,11 +483,101 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
     });
   };
   
+  // Handle subcategory selection
+  const handleSubcategoryChange = (value: string) => {
+    const subcategoryId = parseInt(value, 10);
+    
+    setFormData(prev => {
+      const currentSubcategories = prev.course_subcategories || [];
+      
+      // Only add if not already selected
+      if (!currentSubcategories.includes(subcategoryId)) {
+        return {
+          ...prev,
+          course_subcategories: [...currentSubcategories, subcategoryId]
+        };
+      }
+      
+      return prev;
+    });
+  };
+  
+  // Handle instructor selection
+  const handleInstructorChange = (value: string) => {
+    const instructorId = parseInt(value, 10);
+    
+    setFormData(prev => {
+      const currentInstructors = prev.courses_instructors || [];
+      
+      // Only add if not already selected
+      if (!currentInstructors.includes(instructorId)) {
+        return {
+          ...prev,
+          courses_instructors: [...currentInstructors, instructorId]
+        };
+      }
+      
+      return prev;
+    });
+  };
+  
   // Handle category removal
   const handleRemoveCategory = (id: number) => {
     setFormData(prev => ({
       ...prev,
       course_categories: (prev.course_categories || []).filter(catId => catId !== id)
+    }));
+  };
+  
+  // Handle subcategory removal
+  const handleRemoveSubcategory = (id: number) => {
+    setFormData(prev => ({
+      ...prev,
+      course_subcategories: (prev.course_subcategories || []).filter(subId => subId !== id)
+    }));
+  };
+  
+  // Handle learn item removal
+  const handleRemoveLearnItem = (id: number) => {
+    setLearnLists(prev => prev.filter(item => item.id !== id));
+    setFormData(prev => ({
+      ...prev,
+      course_learn_lists: (prev.course_learn_lists || []).filter(itemId => itemId !== id)
+    }));
+  };
+  
+  // Handle requirement removal
+  const handleRemoveRequirement = (id: number) => {
+    setRequirements(prev => prev.filter(req => req.id !== id));
+    setFormData(prev => ({
+      ...prev,
+      course_requirements: (prev.course_requirements || []).filter(reqId => reqId !== id)
+    }));
+  };
+  
+  // Handle target group removal
+  const handleRemoveTargetGroup = (id: number) => {
+    setTargetGroups(prev => prev.filter(target => target.id !== id));
+    setFormData(prev => ({
+      ...prev,
+      course_target_groups: (prev.course_target_groups || []).filter(targetId => targetId !== id)
+    }));
+  };
+  
+  // Handle feature removal
+  const handleRemoveFeature = (id: number) => {
+    setFeatures(prev => prev.filter(feature => feature.id !== id));
+    setFormData(prev => ({
+      ...prev,
+      courses_features: (prev.courses_features || []).filter(featureId => featureId !== id)
+    }));
+  };
+  
+  // Handle instructor removal
+  const handleRemoveInstructor = (id: number) => {
+    setFormData(prev => ({
+      ...prev,
+      courses_instructors: (prev.courses_instructors || []).filter(instId => instId !== id)
     }));
   };
   
@@ -259,6 +634,37 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   // Define language options
   const languageOptions = ['English', 'French', 'Spanish', 'German', 'Swahili', 'Arabic', 'Chinese', 'Other'];
   
+  // Helper functions to get names by ID
+  const getCategoryName = (id: number) => {
+    const category = categories.find(cat => cat.id === id);
+    return category?.title || `Category ${id}`;
+  };
+  
+  const getSubcategoryName = (id: number) => {
+    const subcategory = subcategories.find(subcat => subcat.id === id);
+    return subcategory?.name || `Subcategory ${id}`;
+  };
+  
+  const getInstructorName = (id: number) => {
+    const instructor = instructors.find(inst => inst.id === id);
+    return instructor?.name || `Instructor ${id}`;
+  };
+  
+  const getLearnItemText = (id: number) => {
+    const item = learnLists.find(item => item.id === id);
+    return item?.text || '';
+  };
+  
+  const getRequirementText = (id: number) => {
+    const item = requirements.find(req => req.id === id);
+    return item?.text || '';
+  };
+  
+  const getTargetGroupText = (id: number) => {
+    const item = targetGroups.find(target => target.id === id);
+    return item?.description || '';
+  };
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
@@ -266,7 +672,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
           <DialogTitle>Edit Course</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+        <form onSubmit={handleSubmit} className="space-y-6 py-4">
           {/* Basic Information Section */}
           <div className="space-y-4">
             <h3 className="font-medium text-lg">Basic Information</h3>
@@ -412,34 +818,46 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
               
               {/* Display selected categories */}
               <div className="flex flex-wrap gap-2 mb-2">
-                {formData.course_categories?.map((categoryId) => {
-                  const category = categories.find(cat => cat.id === categoryId);
-                  return (
-                    <div key={categoryId} className="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-2">
-                      <span>{category?.name || `Category ${categoryId}`}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCategory(categoryId)}
-                        className="text-slate-500 hover:text-red-500"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  );
-                })}
+                {formData.course_categories?.map((categoryId) => (
+                  <div 
+                    key={categoryId} 
+                    className="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-2"
+                  >
+                    <span>{getCategoryName(categoryId)}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCategory(categoryId)}
+                      className="text-slate-500 hover:text-red-500"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+                
+                {(!formData.course_categories || formData.course_categories.length === 0) && (
+                  <p className="text-sm text-slate-500">No categories selected</p>
+                )}
               </div>
               
               {/* Category selection dropdown */}
               <Select onValueChange={handleCategoryChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder="Add a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id.toString()}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
+                  {categories
+                    .filter(category => 
+                      !(formData.course_categories || []).includes(category.id)
+                    )
+                    .map((category) => (
+                      <SelectItem key={category.id} value={category.id.toString()}>
+                        {category.title}
+                      </SelectItem>
+                    ))}
+                  
+                  {categories.length === 0 && (
+                    <SelectItem value="none" disabled>No categories available</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               
@@ -447,11 +865,331 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
             </div>
           </div>
           
-          {/* Additional Information Section */}
+          {/* Subcategories Section */}
           <div className="space-y-4 pt-4 border-t">
-            <h3 className="font-medium text-lg">Additional Information</h3>
+            <h3 className="font-medium text-lg">Subcategories</h3>
+            
+            <div className="space-y-2">
+              <Label htmlFor="course_subcategories">Course Subcategories</Label>
+              
+              {/* Display selected subcategories */}
+              <div className="flex flex-wrap gap-2 mb-2">
+                {formData.course_subcategories?.map((subcategoryId) => (
+                  <div 
+                    key={subcategoryId} 
+                    className="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-2"
+                  >
+                    <span>{getSubcategoryName(subcategoryId)}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSubcategory(subcategoryId)}
+                      className="text-slate-500 hover:text-red-500"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+                
+                {(!formData.course_subcategories || formData.course_subcategories.length === 0) && (
+                  <p className="text-sm text-slate-500">No subcategories selected</p>
+                )}
+              </div>
+              
+              {/* Subcategory selection dropdown */}
+              <Select onValueChange={handleSubcategoryChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Add a subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subcategories
+                    .filter(subcategory => 
+                      !(formData.course_subcategories || []).includes(subcategory.id)
+                    )
+                    .map((subcategory) => (
+                      <SelectItem key={subcategory.id} value={subcategory.id.toString()}>
+                        {subcategory.name}
+                      </SelectItem>
+                    ))}
+                  
+                  {subcategories.length === 0 && (
+                    <SelectItem value="none" disabled>No subcategories available</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              
+              {isLoadingSubcategories && <p className="text-sm text-slate-500">Loading subcategories...</p>}
+            </div>
+          </div>
+          
+          {/* What You'll Learn Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="font-medium text-lg">What You'll Learn</h3>
+            
+            <div className="space-y-2">
+              <Label>Learning Outcomes</Label>
+              
+              {/* Display learning items */}
+              <div className="space-y-2 mb-4">
+                {learnLists.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="flex items-start gap-2 bg-slate-50 p-3 rounded-md"
+                  >
+                    <div className="flex-1">{item.text}</div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveLearnItem(item.id)}
+                      className="text-slate-500 hover:text-red-500 mt-1"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+                
+                {learnLists.length === 0 && (
+                  <p className="text-sm text-slate-500">No learning outcomes added</p>
+                )}
+              </div>
+              
+              {/* Add new learn item form */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add what students will learn"
+                  value={newLearnItem}
+                  onChange={(e) => setNewLearnItem(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  onClick={handleAddLearnItem}
+                  variant="outline"
+                >
+                  <Plus size={16} className="mr-1" /> Add
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Requirements Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="font-medium text-lg">Requirements</h3>
+            
+            <div className="space-y-2">
+              <Label>Course Prerequisites</Label>
+              
+              {/* Display requirements */}
+              <div className="space-y-2 mb-4">
+                {requirements.map((req) => (
+                  <div 
+                    key={req.id} 
+                    className="flex items-start gap-2 bg-slate-50 p-3 rounded-md"
+                  >
+                    <div className="flex-1">{req.text}</div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveRequirement(req.id)}
+                      className="text-slate-500 hover:text-red-500 mt-1"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+                
+                {requirements.length === 0 && (
+                  <p className="text-sm text-slate-500">No requirements added</p>
+                )}
+              </div>
+              
+              {/* Add new requirement form */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add a prerequisite"
+                  value={newRequirement}
+                  onChange={(e) => setNewRequirement(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  onClick={handleAddRequirement}
+                  variant="outline"
+                >
+                  <Plus size={16} className="mr-1" /> Add
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Target Audience Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="font-medium text-lg">Target Audience</h3>
+            
+            <div className="space-y-2">
+              <Label>Who is this course for?</Label>
+              
+              {/* Display target groups */}
+              <div className="space-y-2 mb-4">
+                {targetGroups.map((target) => (
+                  <div 
+                    key={target.id} 
+                    className="flex items-start gap-2 bg-slate-50 p-3 rounded-md"
+                  >
+                    <div className="flex-1">{target.description}</div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTargetGroup(target.id)}
+                      className="text-slate-500 hover:text-red-500 mt-1"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+                
+                {targetGroups.length === 0 && (
+                  <p className="text-sm text-slate-500">No target groups added</p>
+                )}
+              </div>
+              
+              {/* Add new target group form */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add a target audience group"
+                  value={newTargetGroup}
+                  onChange={(e) => setNewTargetGroup(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  onClick={handleAddTargetGroup}
+                  variant="outline"
+                >
+                  <Plus size={16} className="mr-1" /> Add
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Features Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="font-medium text-lg">Course Features</h3>
+            
+            <div className="space-y-2">
+              <Label>Special Features</Label>
+              
+              {/* Display features */}
+              <div className="space-y-3 mb-4">
+                {features.map((feature) => (
+                  <div 
+                    key={feature.id} 
+                    className="bg-slate-50 p-3 rounded-md"
+                  >
+                    <div className="flex items-start justify-between">
+                      <h4 className="font-medium">{feature.title}</h4>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFeature(feature.id)}
+                        className="text-slate-500 hover:text-red-500"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                    {feature.description && (
+                      <p className="text-sm text-slate-600 mt-1">{feature.description}</p>
+                    )}
+                  </div>
+                ))}
+                
+                {features.length === 0 && (
+                  <p className="text-sm text-slate-500">No features added</p>
+                )}
+              </div>
+              
+              {/* Add new feature form */}
+              <div className="space-y-2">
+                <Input
+                  placeholder="Feature title"
+                  value={newFeatureTitle}
+                  onChange={(e) => setNewFeatureTitle(e.target.value)}
+                />
+                <Textarea
+                  placeholder="Feature description (optional)"
+                  value={newFeatureDesc}
+                  onChange={(e) => setNewFeatureDesc(e.target.value)}
+                  rows={2}
+                />
+                <Button 
+                  type="button" 
+                  onClick={handleAddFeature}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Plus size={16} className="mr-1" /> Add Feature
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Instructors Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="font-medium text-lg">Instructors</h3>
+            
+            <div className="space-y-2">
+              <Label>Course Instructors</Label>
+              
+              {/* Display selected instructors */}
+              <div className="flex flex-wrap gap-2 mb-2">
+                {formData.courses_instructors?.map((instructorId) => (
+                  <div 
+                    key={instructorId} 
+                    className="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-2"
+                  >
+                    <span>{getInstructorName(instructorId)}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveInstructor(instructorId)}
+                      className="text-slate-500 hover:text-red-500"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+                
+                {(!formData.courses_instructors || formData.courses_instructors.length === 0) && (
+                  <p className="text-sm text-slate-500">No instructors selected</p>
+                )}
+              </div>
+              
+              {/* Instructor selection dropdown */}
+              <Select onValueChange={handleInstructorChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Add an instructor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {instructors
+                    .filter(instructor => 
+                      !(formData.courses_instructors || []).includes(instructor.id)
+                    )
+                    .map((instructor) => (
+                      <SelectItem key={instructor.id} value={instructor.id.toString()}>
+                        {instructor.name}
+                      </SelectItem>
+                    ))}
+                  
+                  {instructors.length === 0 && (
+                    <SelectItem value="none" disabled>No instructors available</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              
+              {isLoadingInstructors && <p className="text-sm text-slate-500">Loading instructors...</p>}
+            </div>
+          </div>
+          
+          {/* Additional Settings Section */}
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="font-medium text-lg">Additional Settings</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Rating Count */}
               <div className="space-y-2">
                 <Label htmlFor="rating_count">Rating Count</Label>
                 <Input
@@ -461,9 +1199,11 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
                   placeholder="0"
                   value={formData.rating_count || 0}
                   onChange={handleNumberChange}
+                  min={0}
                 />
               </div>
               
+              {/* Sort Order */}
               <div className="space-y-2">
                 <Label htmlFor="sort_order">Sort Order</Label>
                 <Input
@@ -473,56 +1213,59 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
                   placeholder="0"
                   value={formData.sort_order || 0}
                   onChange={handleNumberChange}
+                  min={0}
                 />
               </div>
               
+              {/* Intro Video URL */}
               <div className="space-y-2">
                 <Label htmlFor="intro_video_url">Intro Video URL</Label>
                 <Input
                   id="intro_video_url"
                   name="intro_video_url"
-                  placeholder="https://example.com/video"
+                  placeholder="https://..."
                   value={formData.intro_video_url || ''}
                   onChange={handleFormChange}
                 />
               </div>
             </div>
             
-            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6">
+            <div className="flex items-center space-x-8">
+              {/* Certificate Option */}
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="certificate"
-                  checked={formData.certificate || false}
-                  onCheckedChange={(checked) => handleCheckboxChange('certificate', checked === true)}
+                <Checkbox 
+                  id="certificate" 
+                  checked={formData.certificate} 
+                  onCheckedChange={(checked) => 
+                    handleCheckboxChange('certificate', checked === true)
+                  }
                 />
-                <Label htmlFor="certificate">Certificate Available</Label>
+                <Label htmlFor="certificate" className="cursor-pointer">
+                  Includes Certificate
+                </Label>
               </div>
               
+              {/* Quizzes Option */}
               <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="quizes"
-                  checked={formData.quizes === true}
-                  onCheckedChange={(checked) => handleCheckboxChange('quizes', checked === true)}
+                <Checkbox 
+                  id="quizes" 
+                  checked={formData.quizes === true} 
+                  onCheckedChange={(checked) => 
+                    handleCheckboxChange('quizes', checked === true)
+                  }
                 />
-                <Label htmlFor="quizes">Includes Quizzes</Label>
+                <Label htmlFor="quizes" className="cursor-pointer">
+                  Includes Quizzes
+                </Label>
               </div>
             </div>
           </div>
           
-          <DialogFooter className="pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              className="bg-[#AC19AD] hover:bg-[#8A1489] text-white" 
-              disabled={isSubmitting}
-            >
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>

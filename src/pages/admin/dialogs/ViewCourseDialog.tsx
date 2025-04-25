@@ -17,8 +17,86 @@ import {
   AlertCircle,
   Tag,
   PlayCircle,
-  CalendarIcon
+  CalendarIcon,
+  Layers,
+  CheckCircle,
+  Users,
+  TargetIcon,
+  ListChecks,
+  BookmarkIcon
 } from "lucide-react";
+
+interface CourseCategory {
+  id: number;
+  documentId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  description: string | null;
+}
+
+interface CourseSubcategory {
+  id: number;
+  documentId?: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string;
+  description?: string | null;
+}
+
+interface CourseLearnList {
+  id: number;
+  documentId?: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CourseReview {
+  id: number;
+  documentId?: string;
+  rating: number;
+  comment: string;
+  user_name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CourseInstructor {
+  id: number;
+  documentId?: string;
+  instructor_name: string;
+  bio?: string;
+  profile_image?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CourseRequirement {
+  id: number;
+  documentId?: string;
+  requirement: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CourseFeature {
+  id: number;
+  documentId?: string;
+  feature: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CourseTargetGroup {
+  id: number;
+  documentId?: string;
+  target_group: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface Course {
   id: number;
@@ -40,6 +118,14 @@ interface Course {
   createdAt: string;
   updatedAt: string;
   publishedAt?: string | null;
+  course_categories?: CourseCategory[];
+  course_subcategories?: CourseSubcategory[];
+  course_learn_lists?: CourseLearnList[];
+  course_reviews?: CourseReview[];
+  courses_instructors?: CourseInstructor[];
+  course_requirements?: CourseRequirement[];
+  courses_features?: CourseFeature[];
+  course_target_groups?: CourseTargetGroup[];
 }
 
 interface ViewCourseDialogProps {
@@ -66,6 +152,16 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
         <p className="text-gray-900">{value || "Not specified"}</p>
       </div>
     </div>
+  );
+
+  // Helper component for list items with icons
+  const ListItem = ({ icon, text }) => (
+    <li className="flex items-start gap-2 mb-2">
+      <div className="flex-shrink-0 mt-1">
+        {React.cloneElement(icon, { size: 16, className: "text-purple-600" })}
+      </div>
+      <span>{text}</span>
+    </li>
   );
   
   return (
@@ -107,6 +203,36 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
               </span>
             </div>
           </div>
+
+          {/* Course Categories */}
+          {(course.course_categories && course.course_categories.length > 0) && (
+            <div className="flex flex-wrap gap-2 bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2 mr-4">
+                <Layers size={18} className="text-purple-600" />
+                <span className="font-medium">Categories:</span>
+              </div>
+              {course.course_categories.map((category) => (
+                <span key={category.id} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                  {category.title}
+                </span>
+              ))}
+              
+              {(course.course_subcategories && course.course_subcategories.length > 0) && (
+                <>
+                  <div className="w-full mt-2"></div>
+                  <div className="flex items-center gap-2 mr-4">
+                    <Layers size={18} className="text-purple-600" />
+                    <span className="font-medium">Subcategories:</span>
+                  </div>
+                  {course.course_subcategories.map((subcategory) => (
+                    <span key={subcategory.id} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                      {subcategory.title}
+                    </span>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
           
           {/* Course metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-purple-50 p-4 rounded-lg">
@@ -159,6 +285,113 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           </div>
           
+          {/* Course Requirements */}
+          {course.course_requirements && course.course_requirements.length > 0 && (
+            <div className="bg-white rounded-lg border p-5">
+              <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
+                <ListChecks size={20} className="text-purple-600 mr-2" />
+                Course Requirements
+              </h4>
+              <ul className="list-none pl-0">
+                {course.course_requirements.map((req) => (
+                  <ListItem 
+                    key={req.id} 
+                    icon={<CheckCircle />} 
+                    text={req.requirement} 
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {/* What You'll Learn */}
+          {course.course_learn_lists && course.course_learn_lists.length > 0 && (
+            <div className="bg-white rounded-lg border p-5">
+              <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
+                <BookmarkIcon size={20} className="text-purple-600 mr-2" />
+                What You'll Learn
+              </h4>
+              <ul className="list-none pl-0">
+                {course.course_learn_lists.map((item) => (
+                  <ListItem 
+                    key={item.id} 
+                    icon={<CheckCircle />} 
+                    text={item.title} 
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {/* Course Features */}
+          {course.courses_features && course.courses_features.length > 0 && (
+            <div className="bg-white rounded-lg border p-5">
+              <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
+                <Star size={20} className="text-purple-600 mr-2" />
+                Course Features
+              </h4>
+              <ul className="list-none pl-0">
+                {course.courses_features.map((feature) => (
+                  <ListItem 
+                    key={feature.id} 
+                    icon={<CheckCircle />} 
+                    text={feature.feature} 
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {/* Target Audience */}
+          {course.course_target_groups && course.course_target_groups.length > 0 && (
+            <div className="bg-white rounded-lg border p-5">
+              <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
+                <TargetIcon size={20} className="text-purple-600 mr-2" />
+                Target Audience
+              </h4>
+              <ul className="list-none pl-0">
+                {course.course_target_groups.map((group) => (
+                  <ListItem 
+                    key={group.id} 
+                    icon={<Users />} 
+                    text={group.target_group} 
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {/* Instructors */}
+          {course.courses_instructors && course.courses_instructors.length > 0 && (
+            <div className="bg-white rounded-lg border p-5">
+              <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
+                <Users size={20} className="text-purple-600 mr-2" />
+                Instructors
+              </h4>
+              <div className="grid gap-6">
+                {course.courses_instructors.map((instructor) => (
+                  <div key={instructor.id} className="flex items-start gap-3 border-b last:border-0 pb-4 last:pb-0">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {instructor.profile_image ? (
+                        <img 
+                          src={instructor.profile_image} 
+                          alt={instructor.instructor_name} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Users size={24} className="text-purple-600" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{instructor.instructor_name}</p>
+                      {instructor.bio && <p className="text-gray-600 text-sm mt-1">{instructor.bio}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {/* Descriptions */}
           <div className="bg-white rounded-lg border p-5">
             <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
@@ -203,6 +436,38 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
               )}
             </div>
           </div>
+          
+          {/* Reviews */}
+          {course.course_reviews && course.course_reviews.length > 0 && (
+            <div className="bg-white rounded-lg border p-5">
+              <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
+                <Star size={20} className="text-purple-600 mr-2" />
+                Student Reviews
+              </h4>
+              <div className="grid gap-4">
+                {course.course_reviews.map((review) => (
+                  <div key={review.id} className="border-b last:border-0 pb-4 last:pb-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-medium">{review.user_name}</p>
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            size={16} 
+                            className={i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-200"} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-gray-600">{review.comment}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           {/* Video URLs */}
           {course.intro_video_url && (
