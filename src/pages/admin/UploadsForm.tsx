@@ -46,7 +46,7 @@ const UploadsForm: React.FC<FormStepProps> = ({
         <Input
           id="video_url"
           name="video_url"
-          value={formData.video_url || ''}
+          value={formData.intro_video_url || ''}
           onChange={handleInputChange}
           placeholder="Enter video URL (YouTube, Vimeo, etc.)"
           className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"

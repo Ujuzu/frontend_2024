@@ -21,7 +21,7 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
-import { Search, Eye, Edit, Trash2 } from "lucide-react";
+import { Search, Eye, Edit, Trash2, RefreshCw } from "lucide-react";
 // Import dialog components
 import CourseCreation from './CourseCreation';
 import EditCourseDialog from './dialogs/EditCourseDialog';
@@ -61,6 +61,9 @@ interface Course {
     lastname: string;
   };
   localizations: any[];
+  // Add additional populated fields as needed
+  categories?: any[];
+  instructors?: any[];
 }
 // Define pagination metadata interface
 interface Meta {
@@ -100,6 +103,7 @@ const ContentManagement: React.FC = () => {
   const [meta, setMeta] = useState<Meta | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filterText, setFilterText] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   // Dialog states
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
@@ -109,11 +113,11 @@ const ContentManagement: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   
   // Form state
-  const [formData, setFormData] = useState<CourseFormData>({
+  const [, setFormData] = useState<CourseFormData>({
     locale: 'en' // Set default locale
   });
   
-  // Function to fetch courses from Strapi
+  // Function to fetch courses from Strapi with populate
   const fetchCourses = async (page = 1, filter = '') => {
     setIsLoading(true);
     try {
@@ -123,12 +127,17 @@ const ContentManagement: React.FC = () => {
       // Build query params
       let queryParams = `pagination[page]=${page}&pagination[pageSize]=10`;
       
+      // Add populate parameter to fetch related data
+      queryParams += '&populate=*'; // Use populate=* to include all relations
+      // For specific relations, you could use:
+      // queryParams += '&populate[0]=categories&populate[1]=instructors';
+      
       // Add filter if provided
       if (filter) {
         queryParams += `&filters[$or][0][course_name][$containsi]=${filter}&filters[$or][1][documentId][$containsi]=${filter}`;
       }
       
-      // Fetch courses with pagination
+      // Fetch courses with pagination and populate
       const response = await axios.get<StrapiResponse>(
         `${API_URL}/api/courses?${queryParams}`,
         {
@@ -146,7 +155,14 @@ const ContentManagement: React.FC = () => {
       toast.error('Failed to load courses. Please try again.');
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
+  };
+  
+  // Function to refresh the data
+  const refreshData = () => {
+    setIsRefreshing(true);
+    fetchCourses(currentPage, filterText);
   };
   
   // Initial fetch
@@ -170,6 +186,13 @@ const ContentManagement: React.FC = () => {
     });
     setIsAddCourseOpen(true);
   };
+  
+  const handleEditSuccess = () => {
+    setIsEditCourseOpen(false);
+    // Refresh content list
+    fetchCourses(currentPage, filterText);
+    toast.success('Course updated successfully!');
+  }; 
   
   const handleViewCourse = (course: Course) => {
     setSelectedCourse(course);
@@ -203,85 +226,14 @@ const ContentManagement: React.FC = () => {
     setSelectedCourse(course);
     setIsDeleteCourseOpen(true);
   };
-  
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-  
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-  
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.checked
-    });
-  };
-  
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: parseInt(e.target.value, 10)
-    });
-  };
-  
-  const saveCourse = async () => {
-    try {
-      const token = localStorage.getItem('token');
       
-      // Prepare the data structure required by the API
-      const apiData = {
-        data: {
-          ...formData,
-          quizes: typeof formData.quizes === 'number' ? Boolean(formData.quizes) : formData.quizes
-        }
-      };
-      
-      if (isEditCourseOpen && selectedCourse) {
-        // Update existing course
-        await axios.put(
-          `${API_URL}/api/courses/${selectedCourse.id}`,
-          apiData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        
-        toast.success('Course updated successfully!');
-        setIsEditCourseOpen(false);
-      }
-      
-      // Refresh content list
-      fetchCourses(currentPage, filterText);
-      
-    } catch (error) {
-      console.error('Error saving course:', error);
-      toast.error('Failed to save course. Please try again.');
-    }
-    
-    setFormData({
-      locale: 'en'
-    });
-    setSelectedCourse(null);
-  };
-  
   const confirmDelete = async () => {
     if (selectedCourse) {
       try {
         const token = localStorage.getItem('token');
         
         await axios.delete(
-          `${API_URL}/api/courses/${selectedCourse.id}`,
+          `${API_URL}/api/courses/${selectedCourse.documentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -291,8 +243,7 @@ const ContentManagement: React.FC = () => {
         
         toast.success('Course deleted successfully!');
         
-        // Refresh the course list
-        fetchCourses(currentPage, filterText);
+         fetchCourses(currentPage, filterText);
         
       } catch (error) {
         console.error('Error deleting course:', error);
@@ -413,18 +364,30 @@ const ContentManagement: React.FC = () => {
           </Button>
         </div>
         
-        {/* Filter bar using shadcn Input component */}
+        {/* Filter and Refresh bar */}
         <div className="flex justify-between items-center mb-4">
-          <div className="relative w-64">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="h-4 w-4 text-gray-500" />
+          <div className="flex items-center space-x-2">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Search className="h-4 w-4 text-gray-500" />
+              </div>
+              <Input
+                className="pl-10 py-2 pr-4 border rounded-md"
+                placeholder="Filter by name or ID"
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+              />
             </div>
-            <Input
-              className="pl-10 py-2 pr-4 border rounded-md"
-              placeholder="Filter by name or ID"
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-            />
+            <Button 
+              onClick={refreshData} 
+              variant="outline"
+              size="icon"
+              className={`${isRefreshing ? 'animate-spin' : ''}`}
+              title="Refresh data"
+              disabled={isLoading || isRefreshing}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
           </div>
         </div>
         
@@ -562,12 +525,7 @@ const ContentManagement: React.FC = () => {
         isOpen={isEditCourseOpen}
         onClose={() => setIsEditCourseOpen(false)}
         selectedCourse={selectedCourse}
-        onSave={saveCourse}
-        formData={formData}
-        handleFormChange={handleFormChange}
-        handleSelectChange={handleSelectChange}
-        handleCheckboxChange={handleCheckboxChange}
-        handleNumberChange={handleNumberChange}
+        onSave={handleEditSuccess}
       />
       
       {/* Delete Course Dialog - Using the DeleteCourseDialog component */}

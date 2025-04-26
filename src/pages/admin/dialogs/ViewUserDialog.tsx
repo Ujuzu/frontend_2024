@@ -3,8 +3,11 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, User, Calendar, Mail, Shield, ExternalLink } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface User {
   id: number;
@@ -41,7 +44,7 @@ const ViewUserDialog: React.FC<ViewUserDialogProps> = ({
   error = null,
 }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
+  
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('en-US', {
       year: 'numeric',
@@ -51,13 +54,17 @@ const ViewUserDialog: React.FC<ViewUserDialogProps> = ({
       minute: '2-digit',
     });
   };
-
+  
   const copyToClipboard = async (text: string, field: string) => {
     await navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
   };
-
+  
+  const getUserInitials = (username: string) => {
+    return username.substring(0, 2).toUpperCase();
+  };
+  
   if (error) {
     return (
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -65,9 +72,15 @@ const ViewUserDialog: React.FC<ViewUserDialogProps> = ({
           <DialogHeader>
             <DialogTitle className="text-red-800">Error</DialogTitle>
           </DialogHeader>
-          <div className="py-2 text-red-600 text-sm">{error}</div>
+          <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
           <DialogFooter>
-            <Button onClick={() => onOpenChange(false)} variant="outline" size="sm">
+            <Button 
+              onClick={() => onOpenChange(false)} 
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              size="sm"
+            >
               Close
             </Button>
           </DialogFooter>
@@ -75,105 +88,148 @@ const ViewUserDialog: React.FC<ViewUserDialogProps> = ({
       </Dialog>
     );
   }
-
+  
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-white border border-gray-200 rounded-lg shadow-sm">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold text-gray-900">User Details</DialogTitle>
+      <DialogContent className="sm:max-w-md bg-white border border-gray-200 rounded-lg shadow-md max-h-[85vh] overflow-y-auto">
+        <DialogHeader className="border-b pb-3">
+          <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            <User className="h-5 w-5 text-purple-600" />
+            User Details
+          </DialogTitle>
         </DialogHeader>
         {isLoading || !user ? (
-          <div className="py-4 space-y-3">
-            <Skeleton className="h-6 w-full" />
+          <div className="py-6 space-y-4">
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </div>
+            <Skeleton className="h-24 w-full rounded-lg" />
             <Skeleton className="h-6 w-full" />
             <Skeleton className="h-6 w-full" />
           </div>
         ) : (
           <div className="py-4 transition-opacity duration-300">
-            <TooltipProvider>
-              <div className="space-y-3">
-                {[
-                  { label: 'ID', value: user.id.toString(), field: 'id' },
-                  { label: 'Username', value: user.username, field: 'username' },
-                  { label: 'Email', value: user.email, field: 'email' },
-                  { label: 'Provider', value: user.provider, field: 'provider' },
-                ].map((item) => (
-                  <div key={item.field} className="grid grid-cols-3 gap-2 items-center group">
-                    <div className="font-medium text-gray-600 text-sm">{item.label}</div>
-                    <div className="col-span-2 flex items-center space-x-1">
-                      <span className="text-gray-900 text-sm truncate">{item.value}</span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => copyToClipboard(item.value, item.field)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1"
-                          >
-                            {copiedField === item.field ? (
-                              <Check className="h-3 w-3 text-green-500" />
-                            ) : (
-                              <Copy className="h-3 w-3 text-gray-500" />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {copiedField === item.field ? 'Copied!' : `Copy ${item.label}`}
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  </div>
-                ))}
-
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="font-medium text-gray-600 text-sm">Status</div>
-                  <div className="col-span-2 flex space-x-1">
-                    <span
-                      className={`px-2 py-0.5 inline-flex text-xs font-semibold rounded-full transition-transform duration-200 ${
-                        user.confirmed
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {user.confirmed ? 'Confirmed' : 'Not Confirmed'}
-                    </span>
-                    <span
-                      className={`px-2 py-0.5 inline-flex text-xs font-semibold rounded-full transition-transform duration-200 ${
-                        user.blocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                      }`}
-                    >
-                      {user.blocked ? 'Blocked' : 'Active'}
-                    </span>
-                  </div>
+            <div className="mb-6 flex items-center space-x-4">
+              <Avatar className="h-14 w-14 bg-purple-100">
+                <AvatarFallback className="text-purple-600 font-medium">
+                  {getUserInitials(user.username)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{user.username}</h3>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  <Badge className={cn(
+                    "px-2 text-xs font-medium",
+                    user.confirmed ? "bg-green-100 text-green-800 hover:bg-green-200" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  )}>
+                    {user.confirmed ? 'Confirmed' : 'Not Confirmed'}
+                  </Badge>
+                  <Badge className={cn(
+                    "px-2 text-xs font-medium",
+                    user.blocked ? "bg-red-100 text-red-800 hover:bg-red-200" : "bg-green-100 text-green-800 hover:bg-green-200"
+                  )}>
+                    {user.blocked ? 'Blocked' : 'Active'}
+                  </Badge>
+                  {user.role && (
+                    <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 px-2 text-xs font-medium">
+                      {user.role.name}
+                    </Badge>
+                  )}
                 </div>
-
+              </div>
+            </div>
+            
+            <TooltipProvider>
+              <div className="space-y-5 divide-y divide-gray-100">
+                <div className="space-y-3 pb-2">
+                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wide">Account Information</h4>
+                  
+                  {[
+                    { label: 'ID', value: user.id.toString(), field: 'id', icon: <Shield className="h-4 w-4 text-gray-500" /> },
+                    { label: 'Email', value: user.email, field: 'email', icon: <Mail className="h-4 w-4 text-gray-500" /> },
+                    { label: 'Provider', value: user.provider, field: 'provider', icon: <ExternalLink className="h-4 w-4 text-gray-500" /> },
+                  ].map((item) => (
+                    <div key={item.field} className="group bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          {item.icon}
+                          <span className="font-medium text-gray-700 text-sm">{item.label}</span>
+                        </div>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => copyToClipboard(item.value, item.field)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 hover:bg-purple-100 hover:text-purple-600"
+                            >
+                              {copiedField === item.field ? (
+                                <Check className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <Copy className="h-4 w-4 text-gray-500" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {copiedField === item.field ? 'Copied!' : `Copy ${item.label}`}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <p className="text-gray-900 text-sm mt-1 break-all">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+                
                 {user.role && (
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="font-medium text-gray-600 text-sm">Role</div>
-                    <div className="col-span-2">
-                      <div className="text-gray-900 text-sm font-medium">{user.role.name}</div>
-                      <div className="text-xs text-gray-500">{user.role.description}</div>
+                  <div className="pt-4 pb-2">
+                    <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Role Details</h4>
+                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
+                      <h5 className="text-sm font-medium text-purple-800">{user.role.name}</h5>
+                      <p className="text-sm text-gray-700 mt-1">{user.role.description}</p>
+                      <div className="mt-2 text-xs text-gray-500">Type: {user.role.type}</div>
                     </div>
                   </div>
                 )}
-
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="font-medium text-gray-600 text-sm">Created</div>
-                  <div className="col-span-2 text-gray-900 text-sm">{formatDate(user.createdAt)}</div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="font-medium text-gray-600 text-sm">Last Updated</div>
-                  <div className="col-span-2 text-gray-900 text-sm">{formatDate(user.updatedAt)}</div>
+                
+                <div className="pt-4">
+                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Timestamps</h4>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-700">Created</span>
+                      </div>
+                      <span className="text-sm text-gray-900">{formatDate(user.createdAt)}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm font-medium text-gray-700">Last Updated</span>
+                      </div>
+                      <span className="text-sm text-gray-900">{formatDate(user.updatedAt)}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </TooltipProvider>
           </div>
         )}
-        <DialogFooter>
+        <DialogFooter className="gap-2 mt-2">
           <Button
             onClick={() => onOpenChange(false)}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 transition-all duration-200"
+            variant="outline"
+            size="sm"
+            className="text-gray-700 border-gray-300 hover:bg-gray-100"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => onOpenChange(false)}
+            className="bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 transition-all duration-200"
             size="sm"
           >
             Close

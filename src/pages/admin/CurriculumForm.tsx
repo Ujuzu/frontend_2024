@@ -63,7 +63,7 @@ const CurriculumForm: React.FC<FormStepProps> = ({
         <Textarea
           id="weekly_curriculum_intro"
           name="weekly_curriculum_intro"
-          value={formData.weekly_curriculum_intro || ''}
+          value={formData.curriculum_overview || ''}
           onChange={handleInputChange}
           placeholder="Introduce your curriculum"
           rows={3}
