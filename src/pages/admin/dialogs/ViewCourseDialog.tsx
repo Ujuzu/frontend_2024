@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { 
   BookOpen, 
-  Calendar, 
   Clock, 
   Award, 
   Info, 
@@ -134,6 +133,23 @@ interface ViewCourseDialogProps {
   course: Course | null;
 }
 
+interface IconProps {
+  size?: number;
+  className?: string;
+}
+
+interface InfoItemProps {
+  icon: React.ReactElement<IconProps>;
+  label: string;
+  value: string | number | boolean | null | undefined;
+  className?: string;
+}
+
+interface ListItemProps {
+  icon: React.ReactElement<IconProps>;
+  text: string;
+}
+
 const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
   isOpen,
   onClose,
@@ -141,8 +157,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
 }) => {
   if (!course) return null;
   
-  // Helper component for showing items with icons
-  const InfoItem = ({ icon, label, value, className = "" }) => (
+  const InfoItem: React.FC<InfoItemProps> = ({ icon, label, value, className = "" }) => (
     <div className={`flex items-start gap-3 ${className}`}>
       <div className="flex-shrink-0 mt-1">
         {React.cloneElement(icon, { size: 18, className: "text-purple-600" })}
@@ -154,8 +169,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
     </div>
   );
 
-  // Helper component for list items with icons
-  const ListItem = ({ icon, text }) => (
+  const ListItem: React.FC<ListItemProps> = ({ icon, text }) => (
     <li className="flex items-start gap-2 mb-2">
       <div className="flex-shrink-0 mt-1">
         {React.cloneElement(icon, { size: 16, className: "text-purple-600" })}
@@ -175,7 +189,6 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
         </DialogHeader>
         
         <div className="grid gap-6 py-6">
-          {/* Header with status badge */}
           <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
             <div className="flex items-center gap-3">
               <Tag size={20} className="text-purple-600" />
@@ -185,7 +198,6 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {/* Status Badge */}
               <span className={`px-3 py-1 flex items-center gap-2 text-sm font-medium rounded-full ${
                 course.publishedAt ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
               }`}>
@@ -203,8 +215,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
               </span>
             </div>
           </div>
-
-          {/* Course Categories */}
+          
           {(course.course_categories && course.course_categories.length > 0) && (
             <div className="flex flex-wrap gap-2 bg-gray-50 p-4 rounded-lg">
               <div className="flex items-center gap-2 mr-4">
@@ -234,7 +245,6 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           )}
           
-          {/* Course metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-purple-50 p-4 rounded-lg">
             <div className="flex flex-col items-center py-2">
               <Clock size={20} className="text-purple-600 mb-2" />
@@ -258,7 +268,6 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           </div>
           
-          {/* Course details */}
           <div className="bg-white rounded-lg border p-5">
             <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
               <Info size={20} className="text-purple-600 mr-2" />
@@ -285,8 +294,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           </div>
           
-          {/* Course Requirements */}
-          {course.course_requirements && course.course_requirements.length > 0 && (
+          {(course.course_requirements && course.course_requirements.length > 0) && (
             <div className="bg-white rounded-lg border p-5">
               <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
                 <ListChecks size={20} className="text-purple-600 mr-2" />
@@ -304,8 +312,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           )}
           
-          {/* What You'll Learn */}
-          {course.course_learn_lists && course.course_learn_lists.length > 0 && (
+          {(course.course_learn_lists && course.course_learn_lists.length > 0) && (
             <div className="bg-white rounded-lg border p-5">
               <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
                 <BookmarkIcon size={20} className="text-purple-600 mr-2" />
@@ -323,8 +330,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           )}
           
-          {/* Course Features */}
-          {course.courses_features && course.courses_features.length > 0 && (
+          {(course.courses_features && course.courses_features.length > 0) && (
             <div className="bg-white rounded-lg border p-5">
               <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
                 <Star size={20} className="text-purple-600 mr-2" />
@@ -342,8 +348,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           )}
           
-          {/* Target Audience */}
-          {course.course_target_groups && course.course_target_groups.length > 0 && (
+          {(course.course_target_groups && course.course_target_groups.length > 0) && (
             <div className="bg-white rounded-lg border p-5">
               <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
                 <TargetIcon size={20} className="text-purple-600 mr-2" />
@@ -361,8 +366,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           )}
           
-          {/* Instructors */}
-          {course.courses_instructors && course.courses_instructors.length > 0 && (
+          {(course.courses_instructors && course.courses_instructors.length > 0) && (
             <div className="bg-white rounded-lg border p-5">
               <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
                 <Users size={20} className="text-purple-600 mr-2" />
@@ -392,7 +396,6 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           )}
           
-          {/* Descriptions */}
           <div className="bg-white rounded-lg border p-5">
             <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
               <FileText size={20} className="text-purple-600 mr-2" />
@@ -437,8 +440,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           </div>
           
-          {/* Reviews */}
-          {course.course_reviews && course.course_reviews.length > 0 && (
+          {(course.course_reviews && course.course_reviews.length > 0) && (
             <div className="bg-white rounded-lg border p-5">
               <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
                 <Star size={20} className="text-purple-600 mr-2" />
@@ -469,7 +471,6 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           )}
           
-          {/* Video URLs */}
           {course.intro_video_url && (
             <div className="bg-white rounded-lg border p-5">
               <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
@@ -487,7 +488,6 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             </div>
           )}
           
-          {/* System Information */}
           <div className="bg-white rounded-lg border p-5">
             <h4 className="flex items-center text-lg font-medium mb-4 text-purple-800">
               <CalendarIcon size={20} className="text-purple-600 mr-2" />

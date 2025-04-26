@@ -52,43 +52,6 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
         </div>
         
         <div className="space-y-2">
-          <label htmlFor="subtitle" className="block text-sm font-medium text-gray-700">
-            Subtitle
-          </label>
-          <Input
-            id="subtitle"
-            name="subtitle"
-            value={formData.subtitle || ''}
-            onChange={handleInputChange}
-            placeholder="Enter subtitle"
-            className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <label htmlFor="course_category" className="block text-sm font-medium text-gray-700">
-            Course Category <span className="text-red-500">*</span>
-          </label>
-          <Select 
-            value={formData.course_category || ''} 
-            onValueChange={(value) => handleSelectChange('course_category', value)}
-            required
-          >
-            <SelectTrigger className="w-full border-gray-300 focus:ring-[#AC19AD] focus:border-[#AC19AD]">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="development">Development</SelectItem>
-              <SelectItem value="business">Business</SelectItem>
-              <SelectItem value="design">Design</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
-              <SelectItem value="it">IT & Software</SelectItem>
-              <SelectItem value="personal-development">Personal Development</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
           <div className="flex items-center gap-1.5">
             <Clock size={16} className="text-[#AC19AD]" />
             <label htmlFor="duration" className="block text-sm font-medium text-gray-700">
@@ -122,10 +85,9 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
           required
         />
       </div>
-
       <div className="space-y-2">
         <label htmlFor="short_desc_2" className="block text-sm font-medium text-gray-700">
-          Alternative Description 1
+          Alternative Description 1 <span className="text-red-500">*</span>
         </label>
         <Textarea
           id="short_desc_2"
@@ -135,12 +97,12 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
           placeholder="Enter an alternative description for your course"
           rows={3}
           className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+          required
         />
       </div>
-
       <div className="space-y-2">
         <label htmlFor="short_desc_3" className="block text-sm font-medium text-gray-700">
-          Alternative Description 2
+          Alternative Description 2 <span className="text-red-500">*</span>
         </label>
         <Textarea
           id="short_desc_3"
@@ -150,12 +112,13 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
           placeholder="Enter another alternative description for your course"
           rows={3}
           className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+          required
         />
       </div>
       
       <div className="space-y-2">
         <label htmlFor="course_outline" className="block text-sm font-medium text-gray-700">
-          Course Outline
+          Course Outline <span className="text-red-500">*</span>
         </label>
         <Textarea
           id="course_outline"
@@ -165,21 +128,23 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
           placeholder="Enter course outline"
           rows={4}
           className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+          required
         />
       </div>
-
+      
       <div className="space-y-2">
-        <label htmlFor="weekly_curriculum_intro" className="block text-sm font-medium text-gray-700">
-          Weekly Curriculum Introduction
+        <label htmlFor="curriculum_overview" className="block text-sm font-medium text-gray-700">
+          Curriculum Overview <span className="text-red-500">*</span>
         </label>
         <Textarea
-          id="weekly_curriculum_intro"
-          name="weekly_curriculum_intro"
-          value={formData.weekly_curriculum_intro || ''}
+          id="curriculum_overview"
+          name="curriculum_overview"
+          value={formData.curriculum_overview || ''}
           onChange={handleInputChange}
-          placeholder="Enter an introduction to the weekly curriculum"
+          placeholder="Enter an overview of the curriculum"
           rows={3}
           className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+          required
         />
       </div>
       
@@ -269,18 +234,61 @@ const BasicInfoForm: React.FC<FormStepProps> = ({ formData, setFormData }) => {
           </div>
         </div>
       </div>
-
+      
       <div className="space-y-2">
-        <label htmlFor="video_url" className="block text-sm font-medium text-gray-700">
-          Intro Video URL
+        <label htmlFor="intro_video_url" className="block text-sm font-medium text-gray-700">
+          Intro Video URL <span className="text-red-500">*</span>
         </label>
         <Input
-          id="video_url"
-          name="video_url"
-          value={formData.video_url || ''}
+          id="intro_video_url"
+          name="intro_video_url"
+          value={formData.intro_video_url || ''}
           onChange={handleInputChange}
           placeholder="Enter intro video URL"
           className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+          required
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <label htmlFor="sort_order" className="block text-sm font-medium text-gray-700">
+          Sort Order <span className="text-red-500">*</span>
+        </label>
+        <Input
+          id="sort_order"
+          name="sort_order"
+          type="number"
+          value={formData.sort_order || 0}
+          onChange={(e) => {
+            setFormData({
+              ...formData,
+              sort_order: parseInt(e.target.value) || 0
+            });
+          }}
+          placeholder="Enter sort order"
+          className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+          required
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <label htmlFor="rating_count" className="block text-sm font-medium text-gray-700">
+          Rating Count <span className="text-red-500">*</span>
+        </label>
+        <Input
+          id="rating_count"
+          name="rating_count"
+          type="number"
+          value={formData.rating_count || 0}
+          onChange={(e) => {
+            setFormData({
+              ...formData,
+              rating_count: parseInt(e.target.value) || 0
+            });
+          }}
+          placeholder="Enter rating count"
+          className="w-full focus:ring-[#AC19AD] focus:border-[#AC19AD]"
+          required
         />
       </div>
     </div>

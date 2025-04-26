@@ -38,11 +38,6 @@ const ReviewForm: React.FC<FormStepProps> = ({
             </div>
             
             <div>
-              <p className="text-sm font-medium text-gray-500">Document ID</p>
-              <p className="mt-1 text-md">{formData.documentId || 'Not provided'}</p>
-            </div>
-            
-            <div>
               <p className="text-sm font-medium text-gray-500">Language</p>
               <p className="mt-1 text-md flex items-center">
                 <Globe size={16} className="text-[#AC19AD] mr-2" />

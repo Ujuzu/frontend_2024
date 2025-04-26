@@ -1,6 +1,29 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
 
+/* Add this to your global CSS file (like globals.css) */
+
+/* For all scrollbars in the application */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #a855f7;
+  border-radius: 10px;
+  border: 2px solid #f3f4f6;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #9333ea;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 * {

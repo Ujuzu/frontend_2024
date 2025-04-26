@@ -94,13 +94,7 @@ const CourseCreation: React.FC<CourseCreationProps> = ({ onClose, onSuccess }) =
     try {
       setIsSubmitting(true);
       
-      // Create the request payload
-      const courseData = {
-        ...formData,
-        // Convert boolean to number for quizes if needed
-        quizes: formData.quizes === true ? 1 : 0
-      };
-      
+            
       // Here you would typically have API call logic
       // For example:
       // const response = await fetch('/api/courses', {

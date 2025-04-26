@@ -113,7 +113,7 @@ const ContentManagement: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   
   // Form state
-  const [formData, setFormData] = useState<CourseFormData>({
+  const [, setFormData] = useState<CourseFormData>({
     locale: 'en' // Set default locale
   });
   
@@ -226,78 +226,7 @@ const ContentManagement: React.FC = () => {
     setSelectedCourse(course);
     setIsDeleteCourseOpen(true);
   };
-  
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-  
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-  
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.checked
-    });
-  };
-  
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: parseInt(e.target.value, 10)
-    });
-  };
-  
-  const saveCourse = async () => {
-    try {
-      const token = localStorage.getItem('token');
       
-      // Prepare the data structure required by the API
-      const apiData = {
-        data: {
-          ...formData,
-          quizes: typeof formData.quizes === 'number' ? Boolean(formData.quizes) : formData.quizes
-        }
-      };
-      
-      if (isEditCourseOpen && selectedCourse) {
-        // Update existing course
-        await axios.put(
-          `${API_URL}/api/courses/${selectedCourse.documentId}`,
-          apiData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        
-        toast.success('Course updated successfully!');
-        setIsEditCourseOpen(false);
-      }
-      
-      // Refresh content list
-      fetchCourses(currentPage, filterText);
-      
-    } catch (error) {
-      console.error('Error saving course:', error);
-      toast.error('Failed to save course. Please try again.');
-    }
-    
-    setFormData({
-      locale: 'en'
-    });
-    setSelectedCourse(null);
-  };
-  
   const confirmDelete = async () => {
     if (selectedCourse) {
       try {

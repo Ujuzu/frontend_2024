@@ -62,7 +62,7 @@ interface Review {
 interface Instructor {
   id: number;
   documentId: string;
-  name: string;
+  instructor_name: string;
   bio?: string;
   avatar_url?: string;
 }
@@ -193,7 +193,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [learnLists, setLearnLists] = useState<LearnListItem[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [, setReviews] = useState<Review[]>([]);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [features, setFeatures] = useState<Feature[]>([]);
@@ -275,7 +275,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
         const formattedInstructors = response.data.data.map((item: any) => ({
           id: item.id,
           documentId: item.documentId,
-          name: item.attributes?.name || item.name || `Instructor ${item.id}`,
+          instructor_name: item.attributes?.instructor_name || item.instructor_name || `Instructor ${item.id}`,
           bio: item.attributes?.bio || item.bio,
           avatar_url: item.attributes?.avatar_url || item.avatar_url,
         }));
@@ -647,24 +647,10 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   
   const getInstructorName = (id: number) => {
     const instructor = instructors.find(inst => inst.id === id);
-    return instructor?.name || `Instructor ${id}`;
+    return instructor?.instructor_name || `Instructor ${id}`;
   };
   
-  const getLearnItemText = (id: number) => {
-    const item = learnLists.find(item => item.id === id);
-    return item?.text || '';
-  };
-  
-  const getRequirementText = (id: number) => {
-    const item = requirements.find(req => req.id === id);
-    return item?.text || '';
-  };
-  
-  const getTargetGroupText = (id: number) => {
-    const item = targetGroups.find(target => target.id === id);
-    return item?.description || '';
-  };
-  
+    
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
@@ -1170,7 +1156,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
                     )
                     .map((instructor) => (
                       <SelectItem key={instructor.id} value={instructor.id.toString()}>
-                        {instructor.name}
+                        {instructor.instructor_name}
                       </SelectItem>
                     ))}
                   
