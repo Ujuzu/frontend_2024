@@ -1,5 +1,5 @@
 // src/pages/admin/dialogs/EditUserDialog.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ interface EditUserDialogProps {
   onOpenChange: (open: boolean) => void;
   formData: UserFormData;
   onFormChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSave: () => void;
+  onSave: () => Promise<void> | void;
 }
 
 const EditUserDialog: React.FC<EditUserDialogProps> = ({
@@ -25,8 +25,26 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
   onFormChange,
   onSave
 }) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await onSave();
+      // If onSave completes successfully, dialog will be closed by the parent component
+    } catch (error) {
+      console.error("Error saving user:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      // Prevent closing dialog while saving
+      if (isSaving && !open) return;
+      onOpenChange(open);
+    }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit User</DialogTitle>
@@ -42,6 +60,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
               value={formData.username || ''}
               onChange={onFormChange}
               className="col-span-3"
+              disabled={isSaving}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -55,6 +74,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
               value={formData.email || ''}
               onChange={onFormChange}
               className="col-span-3"
+              disabled={isSaving}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -69,15 +89,24 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({
               value={formData.password || ''}
               onChange={onFormChange}
               className="col-span-3"
+              disabled={isSaving}
             />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            disabled={isSaving}
+          >
             Cancel
           </Button>
-          <Button onClick={onSave} className="bg-[#AC19AD] hover:bg-[#8A1489] text-white">
-            Save Changes
+          <Button 
+            onClick={handleSave} 
+            className="bg-[#AC19AD] hover:bg-[#8A1489] text-white"
+            disabled={isSaving}
+          >
+            {isSaving ? 'Saving...' : 'Save Changes'}
           </Button>
         </DialogFooter>
       </DialogContent>
