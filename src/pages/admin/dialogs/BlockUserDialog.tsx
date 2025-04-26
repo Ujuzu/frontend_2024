@@ -1,8 +1,8 @@
 // src/pages/admin/dialogs/BlockUserDialog.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { User, Shield, Mail, AlertTriangle, Unlock, Lock } from 'lucide-react';
+import { User, Shield, Mail, AlertTriangle, Unlock, Lock, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,7 @@ interface BlockUserDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   selectedUser: User | null;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void> | void;
 }
 
 const BlockUserDialog: React.FC<BlockUserDialogProps> = ({
@@ -39,15 +39,38 @@ const BlockUserDialog: React.FC<BlockUserDialogProps> = ({
   selectedUser,
   onConfirm
 }) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  
   if (!selectedUser) return null;
   
   const getUserInitials = (username: string) => {
     return username.substring(0, 2).toUpperCase();
   };
+  
   const isActivation = selectedUser.blocked;
   
+  const handleConfirm = async () => {
+    setIsProcessing(true);
+    try {
+      await onConfirm();
+      // Successfully processed - dialog will close via parent component
+    } catch (error) {
+      console.error("Error processing user action:", error);
+      // Show error feedback if needed
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        // Prevent closing during processing
+        if (isProcessing && !open) return;
+        onOpenChange(open);
+      }}
+    >
       <DialogContent className="sm:max-w-md bg-white border border-gray-200 rounded-lg shadow-md scrollbar-container max-h-[85vh] overflow-y-auto">
         <DialogHeader className="border-b pb-4">
           <div className="flex items-center space-x-2">
@@ -157,19 +180,29 @@ const BlockUserDialog: React.FC<BlockUserDialogProps> = ({
             variant="outline" 
             onClick={() => onOpenChange(false)}
             className="border-gray-300 text-gray-700 hover:bg-gray-100 rounded-full"
+            disabled={isProcessing}
           >
             Cancel
           </Button>
           <Button 
-            onClick={onConfirm}
+            onClick={handleConfirm}
+            disabled={isProcessing}
             className={cn(
               "text-white font-medium px-6 py-2 transition-all duration-200 rounded-full shadow-sm hover:shadow",
-              isActivation
-                ? "bg-purple-600 hover:bg-purple-700" 
-                : "bg-purple-600 hover:bg-purple-700"
+              isProcessing ? "bg-gray-400 cursor-not-allowed" : 
+                isActivation
+                  ? "bg-purple-600 hover:bg-purple-700" 
+                  : "bg-purple-600 hover:bg-purple-700"
             )}
           >
-            {isActivation ? 'Activate User' : 'Block User'}
+            {isProcessing ? (
+              <span className="flex items-center">
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                {isActivation ? 'Activating...' : 'Blocking...'}
+              </span>
+            ) : (
+              isActivation ? 'Activate User' : 'Block User'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
