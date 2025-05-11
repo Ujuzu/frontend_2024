@@ -1,14 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import logo from "@/assets/images/logo.png";
+import logo from '@/assets/images/logo.png';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { AxiosError } from 'axios';
+
+// Success Response Type
+type LoginSuccessResponse = {
+  jwt: string;
+  user: {
+id: number;
+    username: string;
+    email: string;
+    provider: string;
+    confirmed: boolean;
+    blocked: boolean;
+    createdAt: string;
+    updatedAt: string;
+    [key: string]: unknown;
+  };
+};
+
+// Error Response Type
+type StrapiErrorResponse = {
+  error: {
+    status: number;
+    name: string;
+    message: string;
+    details?: unknown;
+  };
+};
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -19,119 +43,80 @@ const AdminLogin: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const navigate = useNavigate();
   const { login } = useAuth();
-  
-  // Define the API URL
-  const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
-  
-  // Check for existing token on component mount
+
+const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       navigate('/u/');
     }
-    
-    // Check for remembered email
+
     const rememberedEmail = localStorage.getItem('rememberedEmail');
     if (rememberedEmail) {
       setEmail(rememberedEmail);
       setRememberMe(true);
     }
   }, [navigate]);
-  
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Clear previous error messages
     setErrorMessage('');
-    
-    // Validate input fields
-    if (!email.trim()) {
-      setErrorMessage('Email is required');
-      toast.error('Email is required');
-      return;
-    }
-    
-    if (!password.trim()) {
-      setErrorMessage('Password is required');
-      toast.error('Password is required');
-      return;
-    }
-    
-    // Email validation
+
+    // Validation
+    if (!email.trim()) return toast.error('Email is required');
+    if (!password.trim()) return toast.error('Password is required');
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrorMessage('Please enter a valid email address');
-      toast.error('Please enter a valid email address');
-      return;
-    }
-    
+    if (!emailRegex.test(email)) return toast.error('Please enter a valid email address');
+
     setIsLoading(true);
-    
+
     try {
-      const response = await axios.post(`${API_URL}/api/auth/local`, {
+      const response = await axios.post<LoginSuccessResponse>(`${API_URL}/api/auth/local`, {
         identifier: email,
-        password: password
+        password: password,
       });
-      
-      // Check if response contains expected data
-      if (!response.data || !response.data.jwt || !response.data.user) {
-        throw new Error('Invalid response from server');
-      }
-      
-      login(response.data.jwt, response.data.user);
-      
-      // Store the token and user info
-      localStorage.setItem('token', response.data.jwt);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      // If remember me is checked, store the email
+
+      const { jwt, user } = response.data;
+
+      login(jwt, { ...user, id: user.id.toString() });
+      localStorage.setItem('token', jwt);
+      localStorage.setItem('user', JSON.stringify(user));
+
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', email);
       } else {
         localStorage.removeItem('rememberedEmail');
       }
-      
-      // Set session storage for newly logged in state
+
       sessionStorage.setItem('isAuthenticated', 'true');
       sessionStorage.setItem('justLoggedIn', 'true');
-      
+
       toast.success('Login successful!');
-      
-      // Redirect to admin dashboard using React Router
       navigate('/u/');
     } catch (error) {
-      console.error('Login error:', error);
-      
-      // Handle different types of errors
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError<any>;
-        
-        if (!axiosError.response) {
-          setErrorMessage('Network error. Please check your internet connection.');
+      if (axios.isAxiosError<StrapiErrorResponse>(error)) {
+        const { response } = error;
+
+        if (!response) {
           toast.error('Network error. Please check your internet connection.');
         } else {
-          const status = axiosError.response.status;
-          const errorData = axiosError.response.data;
-          
+          const { status, data } = response;
+
           if (status === 400) {
-            setErrorMessage('Invalid email or password');
             toast.error('Invalid email or password');
           } else if (status === 401 || status === 403) {
-            setErrorMessage('Unauthorized. Please check your credentials.');
             toast.error('Unauthorized. Please check your credentials.');
           } else if (status === 429) {
-            setErrorMessage('Too many login attempts. Please try again later.');
             toast.error('Too many login attempts. Please try again later.');
-          } else if (errorData && errorData.error && errorData.error.message) {
-            setErrorMessage(errorData.error.message);
-            toast.error(errorData.error.message);
+          } else if (data?.error?.message) {
+            toast.error(data.error.message);
           } else {
-            setErrorMessage('Login failed. Please try again later.');
             toast.error('Login failed. Please try again later.');
           }
         }
       } else {
-        setErrorMessage('An unexpected error occurred. Please try again.');
         toast.error('An unexpected error occurred. Please try again.');
       }
     } finally {
