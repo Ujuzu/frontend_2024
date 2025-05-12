@@ -30,14 +30,7 @@ export default function TopBar() {
   const navigate = useNavigate();
 
   const { user,token  } = useAuth();
-console.log('user', user);
-  console.log('token', token);  
-
-  //   const userProfileUrl = useCallback(() => {
-  //   return user ? `${API_URL}/api/users/${user.id}?populate=profilePic` : '';
-  // }, [user]);
-   
-
+  
  // Fetch user profile picture
   const processUserAvatar = useCallback((userData: IUserWithPic) => {
     if (!userData?.profilePic) return;
@@ -78,7 +71,7 @@ console.log('user', user);
     };
 
     fetchUserProfile();
-  }, [user?.id, token, processUserAvatar]);
+  }, [token, processUserAvatar, user]);
  
 
   useEffect(() => {

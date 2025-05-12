@@ -59,8 +59,11 @@ const UserManagement: React.FC = () => {
   const [filteredUsers, setFilteredUsers] = useState<IUserWithRole[]>([]);
   
  const { user, isAuthenticated,token } = useAuth();
- console.log('User from context:', user);
-  console.log('Is authenticated:', isAuthenticated);
+
+ console.log('user', user); 
+  console.log('token', token);
+  console.log('isAuthenticated', isAuthenticated);
+  // Check if user is authenticated
   // Function to fetch all users from Strapi
   
   const fetchUsers = async (filter = '') => {
