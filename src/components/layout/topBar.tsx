@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Bell, MessageSquare, ChevronDown, ChevronUp, Search, LogOut, User, Settings, X } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,98 +14,72 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from 'react-router-dom';
-
-const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
-
-interface UserData {
-  id: number;
-  username: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  fullName?: string;
-  avatar?: string;
-  firstname?: string;
-  lastname?: string;
-  documentId?: string;
-  profilePic?: {
-    id: number;
-    name: string;
-    url: string;
-    formats?: {
-      thumbnail?: {
-        url: string;
-      };
-      small?: {
-        url: string;
-      };
-      medium?: {
-        url: string;
-      };
-      large?: {
-        url: string;
-      };
-    };
-  };
-}
+import { useAuth } from '@/context/AuthContext';
+// import { useFetch } from '@/hooks/useFetch';
+import { IUserWithPic } from '@/Interfaces/IUserLoginInterfaces';
+import { API_URL } from '@/helper/hooks/endPoints';
+import { getGreeting, getInitials, getUserDisplayName } from '@/utils/getUserDisplayName';
+import axios from 'axios';
 
 export default function TopBar() {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [user, setUser] = useState<UserData | null>(null);
+  // const [user, setUser] = useState<UserData | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null!);
   const navigate = useNavigate();
- 
-  useEffect(() => {
-    // Load user data from localStorage
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        
-        // Fetch avatar if user exists
-        if (parsedUser && parsedUser.id) {
-          fetchUserAvatar(parsedUser.id);
-        }
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
+
+  const { user,token  } = useAuth();
+console.log('user', user);
+  console.log('token', token);  
+
+  //   const userProfileUrl = useCallback(() => {
+  //   return user ? `${API_URL}/api/users/${user.id}?populate=profilePic` : '';
+  // }, [user]);
+   
+
+ // Fetch user profile picture
+  const processUserAvatar = useCallback((userData: IUserWithPic) => {
+    if (!userData?.profilePic) return;
+
+    const profilePic = userData.profilePic;
+    const baseUrl = API_URL;
+
+    // Prefer medium format if available
+    if (profilePic.formats?.medium?.url) {
+      const imageUrl = profilePic.formats.medium.url.startsWith('/')
+        ? `${baseUrl}${profilePic.formats.medium.url}`
+        : profilePic.formats.medium.url;
+      setAvatarUrl(imageUrl);
+    } else if (profilePic.url) {
+      const imageUrl = profilePic.url.startsWith('/')
+        ? `${baseUrl}${profilePic.url}`
+        : profilePic.url;
+      setAvatarUrl(imageUrl);
     }
   }, []);
 
-  const fetchUserAvatar = async (userId: number) => {
-    try {
-      const response = await fetch(`${API_URL}/api/users/${userId}?populate=profilePic`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch user avatar');
+
+    useEffect(() => {
+    if (!user || !token) return;
+
+    const fetchUserProfile = async () => {
+      try {
+        const url = `${API_URL}/api/users/${user.id}?populate=profilePic`;
+        const response = await axios.get<IUserWithPic>(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        processUserAvatar(response.data);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
       }
-      
-      const userData = await response.json();
-      
-      if (userData.profilePic) {
-        // Select the most appropriate image format - preferring medium size
-        if (userData.profilePic.formats && userData.profilePic.formats.medium) {
-          // Need to add base URL if the returned URL is relative
-          const baseUrl = 'https://backend-2024-8fxl.onrender.com';
-          const imageUrl = userData.profilePic.formats.medium.url.startsWith('/')
-            ? `${baseUrl}${userData.profilePic.formats.medium.url}`
-            : userData.profilePic.formats.medium.url;
-          setAvatarUrl(imageUrl);
-        } else if (userData.profilePic.url) {
-          // Use main URL if formats aren't available
-          const baseUrl = 'https://backend-2024-8fxl.onrender.com';
-          const imageUrl = userData.profilePic.url.startsWith('/')
-            ? `${baseUrl}${userData.profilePic.url}`
-            : userData.profilePic.url;
-          setAvatarUrl(imageUrl);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching user avatar:', error);
-    }
-  };
+    };
+
+    fetchUserProfile();
+  }, [user?.id, token, processUserAvatar]);
+ 
 
   useEffect(() => {
     if (showMobileSearch && searchInputRef.current) {
@@ -113,75 +87,22 @@ export default function TopBar() {
     }
   }, [showMobileSearch]);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
-  };
+
 
   const toggleMobileSearch = () => {
     setShowMobileSearch(!showMobileSearch);
   };
 
-  const getInitials = () => {
-    if (!user) return '?';
-    
-    // Check for firstname/lastname first (API response format)
-    if (user.firstname && user.lastname) {
-      return `${user.firstname.charAt(0)}${user.lastname.charAt(0)}`;
-    }
-    
-    // Then check for firstName/lastName (localStorage format)
-    if (user.firstName && user.lastName) {
-      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
-    }
-    
-    if (user.fullName) {
-      const nameParts = user.fullName.split(' ');
-      if (nameParts.length >= 2) {
-        return `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`;
-      }
-      return nameParts[0].charAt(0);
-    }
-    
-    if (user.username) {
-      return user.username.substring(0, 2).toUpperCase();
-    }
-    
-    return user.email.charAt(0).toUpperCase();
-  };
-
   const handleLogout = () => {
     navigate('/u/logout');
   };
-
-  const getUserDisplayName = () => {
-    if (!user) return 'User';
-    
-    // Check for firstname/lastname first (API response format)
-    if (user.firstname && user.lastname) {
-      return `${user.firstname} ${user.lastname}`;
-    }
-    
-    // Then check for firstName/lastName (localStorage format)
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
-    }
-    
-    if (user.fullName) {
-      return user.fullName;
-    }
-    
-    return user.username || user.email.split('@')[0];
-  };
-
+  
   return (
     <header className="bg-white border-b border-gray-100 sticky top-0 z-20 shadow-sm">
       <nav className="h-16 md:h-18 px-4 md:px-8 max-w-screen-2xl mx-auto md:ml-16">
         <div className="flex justify-between items-center h-full">
           <div className="hidden md:block">
-            <p className="text-gray-500 text-sm font-light">{getGreeting()}, {getUserDisplayName()}</p>
+            <p className="text-gray-500 text-sm font-light">{getGreeting()}, {user ? getUserDisplayName(user!) : 'Guest'}</p>
             <h1 className="font-medium text-gray-800">Dashboard</h1>
           </div>
           
@@ -261,10 +182,10 @@ export default function TopBar() {
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8 md:h-9 md:w-9">
                         {avatarUrl ? (
-                          <AvatarImage src={avatarUrl} alt={getUserDisplayName()} />
+                          <AvatarImage src={avatarUrl} alt={user ? getUserDisplayName(user!) : 'Guest'} />
                         ) : null}
                         <AvatarFallback className="bg-purple-600 text-white">
-                          {getInitials()}
+                          {user ? getInitials(user!) : '?'}
                         </AvatarFallback>
                       </Avatar>
                       {dropdownOpen ? (
@@ -277,7 +198,7 @@ export default function TopBar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-48" align="end">
                   <DropdownMenuLabel>
-                    <p className="text-sm font-medium text-gray-800">{getUserDisplayName()}</p>
+                    <p className="text-sm font-medium text-gray-800">{user ? getUserDisplayName(user!) : 'Guest'}</p>
                     <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />

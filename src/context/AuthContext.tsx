@@ -1,29 +1,15 @@
+import { IAuthContextType, ILoginToken, IUser } from '@/Interfaces/IUserLoginInterfaces';
+import { emptyLocalStorage, getLocalstorage, setLocalStorage } from '@/utils/localStorageHelper';
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-interface User {
-  id: string;
-  email?: string;
-  name?: string;
-  // Add other user properties as needed
-}
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  isInitializing: boolean;
-  login: (token: string, user: User) => Promise<void>;
-  logout: () => void;
-  setUser: (user: User | null) => void;
-  setIsLoading: (loading: boolean) => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const navigate = useNavigate(); // Now this will work since we're inside Router context
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
+  const [token, setToken] = useState<ILoginToken | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -31,13 +17,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        const token = getLocalstorage<ILoginToken>('token');
+        const storedUser = getLocalstorage<IUser>('user');
         
         if (token && storedUser) {
           // Optionally validate token with backend here
           
-          setUser(JSON.parse(storedUser));
+          setToken(token);
+          setUser(storedUser);
           setIsAuthenticated(true);
         }
       } catch (error) {
@@ -52,14 +39,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     checkAuth();
   }, []);
 
-  const login = async (token: string, userData: User) => {
+  const login = async (token: ILoginToken, userData: IUser) => {
     setIsLoading(true);
     
     try {
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
+      setLocalStorage<ILoginToken>('token', token);
+      setLocalStorage<IUser>('user', userData);
       
       setUser(userData);
+      setToken(token);
       setIsAuthenticated(true);
       
       // Redirect to saved URL or default
@@ -79,7 +67,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    sessionStorage.clear();
+    emptyLocalStorage();
     
     setIsAuthenticated(false);
     setUser(null);
@@ -96,6 +84,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isLoading,
     isInitializing,
     login,
+    token,
     logout,
     setUser,
     setIsLoading
@@ -104,7 +93,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = (): IAuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

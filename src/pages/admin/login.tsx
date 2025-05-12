@@ -7,22 +7,12 @@ import { Button } from '@/components/ui/button';
 import logo from '@/assets/images/logo.png';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { getLocalstorage, RemoveStorageItem, setLocalStorage } from '@/utils/localStorageHelper';
+import { ILoginEmail, ILoginSuccessResponse, ILoginToken } from '@/Interfaces/IUserLoginInterfaces';
 
 // Success Response Type
-type LoginSuccessResponse = {
-  jwt: string;
-  user: {
-id: number;
-    username: string;
-    email: string;
-    provider: string;
-    confirmed: boolean;
-    blocked: boolean;
-    createdAt: string;
-    updatedAt: string;
-    [key: string]: unknown;
-  };
-};
+
+
 
 // Error Response Type
 type StrapiErrorResponse = {
@@ -35,7 +25,7 @@ type StrapiErrorResponse = {
 };
 
 const AdminLogin: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState<ILoginEmail>({ identifier: '' });
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -47,12 +37,12 @@ const AdminLogin: React.FC = () => {
 const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = getLocalstorage<ILoginToken>('token');
     if (token) {
       navigate('/u/');
     }
 
-    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    const rememberedEmail = getLocalstorage<ILoginEmail>('rememberedEmail');
     if (rememberedEmail) {
       setEmail(rememberedEmail);
       setRememberMe(true);
@@ -60,34 +50,39 @@ const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
+    console.log('Login form submitted' , { email, password });
     e.preventDefault();
     setErrorMessage('');
 
     // Validation
-    if (!email.trim()) return toast.error('Email is required');
+    if (!email.identifier.trim()) return toast.error('Email is required');
     if (!password.trim()) return toast.error('Password is required');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return toast.error('Please enter a valid email address');
+    if (!emailRegex.test(email.identifier)) return toast.error('Please enter a valid email address');
 
     setIsLoading(true);
 
     try {
-      const response = await axios.post<LoginSuccessResponse>(`${API_URL}/api/auth/local`, {
-        identifier: email,
+      const response = await axios.post<ILoginSuccessResponse>(`${API_URL}/api/auth/local`, {
+        identifier: email.identifier,
         password: password,
       });
+console.log('Login response:', response);
+      if (response.status !== 200) {
+        throw new Error('Login failed');
+      } 
 
       const { jwt, user } = response.data;
 
-      login(jwt, { ...user, id: user.id.toString() });
-      localStorage.setItem('token', jwt);
-      localStorage.setItem('user', JSON.stringify(user));
+      login(jwt, { ...user });
+      setLocalStorage('token', jwt);
+      setLocalStorage('user', JSON.stringify(user));
 
       if (rememberMe) {
-        localStorage.setItem('rememberedEmail', email);
+        setLocalStorage<ILoginEmail>('rememberedEmail', email);
       } else {
-        localStorage.removeItem('rememberedEmail');
+        RemoveStorageItem('rememberedEmail');
       }
 
       sessionStorage.setItem('isAuthenticated', 'true');
@@ -150,8 +145,8 @@ const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
                 type="email"
                 autoComplete="off"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={email.identifier}
+                onChange={(e) => setEmail({ ...email, identifier: e.target.value })}
                 required
                 className="w-full"
               />

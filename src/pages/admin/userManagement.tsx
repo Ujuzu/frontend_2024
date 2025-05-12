@@ -25,27 +25,11 @@ import AddUserDialog from './dialogs/AddUserDialog';
 import EditUserDialog from './dialogs/EditUserDialog';
 import BlockUserDialog from './dialogs/BlockUserDialog';
 import ViewUserDialog from './dialogs/ViewUserDialog';
+import { IUserWithRole } from '@/Interfaces/IUserLoginInterfaces';
+import { useAuth } from '@/context/AuthContext';
 
 const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  provider: string;
-  confirmed: boolean;
-  blocked: boolean;
-  createdAt: string;
-  updatedAt: string;
-  role?: {
-    id: number;
-    name: string;
-    description: string;
-    type: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-}
 
 interface UserFormData {
   username?: string;
@@ -54,9 +38,9 @@ interface UserFormData {
 }
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<IUserWithRole[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [allUsers, setAllUsers] = useState<User[]>([]); // Store all fetched users
+  const [allUsers, setAllUsers] = useState<IUserWithRole[]>([]); // Store all fetched users
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 10;
   
@@ -65,22 +49,26 @@ const UserManagement: React.FC = () => {
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
   const [isBlockUserOpen, setIsBlockUserOpen] = useState(false);
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<IUserWithRole | null>(null);
   
   // Form state
   const [formData, setFormData] = useState<UserFormData>({});
   
   // Filter state
   const [filterText, setFilterText] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<IUserWithRole[]>([]);
   
+ const { user, isAuthenticated,token } = useAuth();
+ console.log('User from context:', user);
+  console.log('Is authenticated:', isAuthenticated);
   // Function to fetch all users from Strapi
+  
   const fetchUsers = async (filter = '') => {
     setIsLoading(true);
     try {
       // Get auth token from localStorage
-      const token = localStorage.getItem('token');
-      
+      // const token = localStorage.getItem('token');
+      console.log('Token from localStorage:', token);
       // First try to get total count to determine pagination strategy
       const countResponse = await axios.get(`${API_URL}/api/users/count`, {
         headers: {
@@ -88,11 +76,11 @@ const UserManagement: React.FC = () => {
         },
       }).catch(() => ({ data: null })); // Gracefully handle if count endpoint doesn't exist
       
-      let allFetchedUsers: User[] = [];
+      let allFetchedUsers: IUserWithRole[] = [];
       
       // If filter is provided, use search query
       if (filter) {
-        const response = await axios.get<User[]>(
+        const response = await axios.get<IUserWithRole[]>(
           `${API_URL}/api/users?filters[$or][0][username][$containsi]=${filter}&filters[$or][1][email][$containsi]=${filter}`,
           {
             headers: {
@@ -104,7 +92,7 @@ const UserManagement: React.FC = () => {
       } else {
         // If total count is small enough or count endpoint doesn't exist, fetch all users at once
         if (!countResponse.data || countResponse.data < 100) {
-          const response = await axios.get<User[]>(
+          const response = await axios.get<IUserWithRole[]>(
             `${API_URL}/api/users?pagination[pageSize]=100`, // Get a reasonably large batch
             {
               headers: {
@@ -119,7 +107,7 @@ const UserManagement: React.FC = () => {
           let hasMore = true;
           
           while (hasMore) {
-            const response = await axios.get<User[]>(
+            const response = await axios.get<IUserWithRole[]>(
               `${API_URL}/api/users?pagination[page]=${page}&pagination[pageSize]=100`,
               {
                 headers: {
@@ -157,7 +145,7 @@ const UserManagement: React.FC = () => {
   };
   
   // Apply pagination to the filtered users array
-  const applyPagination = (usersList: User[], page: number) => {
+  const applyPagination = (usersList: IUserWithRole[], page: number) => {
     const startIndex = (page - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
     setUsers(usersList.slice(startIndex, endIndex));
@@ -201,7 +189,7 @@ const UserManagement: React.FC = () => {
     setIsAddUserOpen(true);
   };
   
-  const handleEditUser = (user: User) => {
+  const handleEditUser = (user: IUserWithRole) => {
     setSelectedUser(user);
     setFormData({
       username: user.username,
@@ -210,12 +198,12 @@ const UserManagement: React.FC = () => {
     setIsEditUserOpen(true);
   };
   
-  const handleToggleBlockUser = (user: User) => {
+  const handleToggleBlockUser = (user: IUserWithRole) => {
     setSelectedUser(user);
     setIsBlockUserOpen(true);
   };
   
-  const handleViewUser = (user: User) => {
+  const handleViewUser = (user: IUserWithRole) => {
     setSelectedUser(user);
     setIsViewUserOpen(true);
   };
