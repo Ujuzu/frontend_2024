@@ -27,6 +27,7 @@ import CourseCreation from './CourseCreation';
 import EditCourseDialog from './dialogs/EditCourseDialog';
 import DeleteCourseDialog from './dialogs/DeleteCourseDialog';
 import ViewCourseDialog from './dialogs/ViewCourseDialog';
+import { useAuth } from '@/context/AuthContext';
 const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 // Define the Course interface based on your structure
 interface Course {
@@ -60,10 +61,10 @@ interface Course {
     firstname: string;
     lastname: string;
   };
-  localizations: any[];
+  localizations: unknown[];
   // Add additional populated fields as needed
-  categories?: any[];
-  instructors?: any[];
+  categories?: unknown[];
+  instructors?: unknown[];
 }
 // Define pagination metadata interface
 interface Meta {
@@ -111,7 +112,7 @@ const ContentManagement: React.FC = () => {
   const [isDeleteCourseOpen, setIsDeleteCourseOpen] = useState(false);
   const [isViewCourseOpen, setIsViewCourseOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  
+  const {token} = useAuth();
   // Form state
   const [, setFormData] = useState<CourseFormData>({
     locale: 'en' // Set default locale
@@ -122,7 +123,7 @@ const ContentManagement: React.FC = () => {
     setIsLoading(true);
     try {
       // Get auth token from localStorage
-      const token = localStorage.getItem('token');
+      // const token = localStorage.getItem('token');
       
       // Build query params
       let queryParams = `pagination[page]=${page}&pagination[pageSize]=10`;

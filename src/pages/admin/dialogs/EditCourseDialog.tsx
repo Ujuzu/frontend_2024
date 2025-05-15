@@ -21,6 +21,7 @@ import {
 import { X, Plus } from "lucide-react";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '@/context/AuthContext';
 
 // API URL from environment variable
 const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
@@ -198,7 +199,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [features, setFeatures] = useState<Feature[]>([]);
   const [targetGroups, setTargetGroups] = useState<TargetGroup[]>([]);
-  
+  const {token} = useAuth();
   // Loading states
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [isLoadingSubcategories, setIsLoadingSubcategories] = useState(false);
@@ -208,8 +209,8 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   const fetchCategories = async () => {
     setIsLoadingCategories(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/api/course-categories`, {
+      
+      const response = await axios.get(`${API_URL}/api/coursecategories`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -236,7 +237,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   const fetchSubcategories = async () => {
     setIsLoadingSubcategories(true);
     try {
-      const token = localStorage.getItem('token');
+     
       const response = await axios.get(`${API_URL}/api/course-subcategories`, {
         headers: {
           Authorization: `Bearer ${token}`,
