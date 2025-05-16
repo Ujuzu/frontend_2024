@@ -1,3 +1,4 @@
+// UI lifted from original code by Brian
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<Record<string, any>>({});
   
-  // Reset form when course changes
+  // Reset fields
   useEffect(() => {
     if (selectedCourse) {
       setFormData({
@@ -111,7 +112,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
               />
             </div>
             
-            {/* Document ID */}
+            {/* Document ID // yess the p key*/}
             <div className="space-y-2">
               <Label htmlFor="documentId">Document ID</Label>
               <Input

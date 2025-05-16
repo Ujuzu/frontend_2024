@@ -44,7 +44,7 @@ const CoursesIndex = () => {
           </Button>
         </div>
         
-        {/* Filter and Refresh bar */}
+        {/* Filter and Refresh bar lifted from brian */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-2">
             <div className="relative">
@@ -71,7 +71,7 @@ const CoursesIndex = () => {
           </div>
         </div>
         
-        {/* Course Table */}
+        {/* Course Table, lifted from Brian */}
         <CourseTable 
           courses={courses}
           isLoading={isLoading}
@@ -80,7 +80,7 @@ const CoursesIndex = () => {
           onDelete={handleDeleteCourse}
         />
         
-        {/* Pagination */}
+        {/* Pagination I have to test this once data is enough, for noe kariko works*/}
         <CoursePagination 
           meta={meta}
           currentPage={currentPage}
