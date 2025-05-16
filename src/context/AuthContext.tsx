@@ -19,12 +19,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         const token = getLocalstorage<ILoginToken>('token');
         const storedUser = getLocalstorage<IUser>('user');
+        // const storedUser = getLocalstorage<IUser>('user');
+
         
         if (token && storedUser) {
           // Optionally validate token with backend here
           
           setToken(token);
-          setUser(storedUser);
+          const parsedUser = typeof storedUser === 'string' ? JSON.parse(storedUser) : storedUser;
+setUser(parsedUser);
           setIsAuthenticated(true);
         }
       } catch (error) {

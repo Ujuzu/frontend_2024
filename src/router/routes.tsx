@@ -12,6 +12,7 @@ import PlatformMonitoring from '@/pages/admin/platformMonitoring';
 import ContentManagement from '@/pages/admin/contentManagement';
 import SubcriptionManagement from '@/pages/admin/subscriptionManagement';
 import LogoutPage from '@/pages/LogoutPage'; // Import the LogoutPage component
+import CoursesIndex from '@/pages/courses/Index';
 
 export const routes: RouteObject[] = [
   {
@@ -71,6 +72,10 @@ export const routes: RouteObject[] = [
       {
         path:'content-management',
         element: <ContentManagement />,
+      },
+            {
+        path:'courses',
+        element: <CoursesIndex />,
       },
       {
         path:'subscription-management',

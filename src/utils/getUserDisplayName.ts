@@ -1,7 +1,6 @@
 import { IUser } from "@/Interfaces/IUserLoginInterfaces";
 
 export const getUserDisplayName = (user:IUser): string => {
-  console.log('User object:', user);
 
   if (!user) return 'User';
 

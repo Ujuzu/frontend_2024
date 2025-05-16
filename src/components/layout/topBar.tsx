@@ -51,14 +51,13 @@ export default function TopBar() {
       setAvatarUrl(imageUrl);
     }
   }, []);
-
-
+  const userId = user?.id;
     useEffect(() => {
     if (!user || !token) return;
 
     const fetchUserProfile = async () => {
       try {
-        const url = `${API_URL}/api/users/${user.id}?populate=profilePic`;
+        const url = `${API_URL}/api/users/${userId}?populate=profilePic`;
         const response = await axios.get<IUserWithPic>(url, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -71,7 +70,7 @@ export default function TopBar() {
     };
 
     fetchUserProfile();
-  }, [token, processUserAvatar, user]);
+  }, [token, processUserAvatar, userId, user]);
  
 
   useEffect(() => {

@@ -48,12 +48,14 @@ export function getLocalstorage<T>(key: string): T | null {
   try {
     const bytes = CryptoJS.AES.decrypt(encrypted, sessionKey);
     const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-    return JSON.parse(decrypted) as T;
+    return typeof decrypted === 'string' ? JSON.parse(decrypted) as T : decrypted;
+    
   } catch (err) {
     console.error(`Decryption failed for key "${key}":`, err);
     return null;
   }
 }
+
 
 /**
  * Clears a specific key from localStorage.

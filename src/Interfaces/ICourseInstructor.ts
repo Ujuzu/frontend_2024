@@ -1,7 +1,16 @@
 
 import { IMedia } from "./IMedia";
+import { IMeta } from "./IMeta";
 
-export interface ICoursesInstructor {
+ export interface ICoursesInstructor {
+  id: number;  
+  attributes: ICoursesInstructorAttributes;
+}
+export interface ICoursesInstructorResponse {
+  data: ICoursesInstructor[];
+  meta: IMeta
+}
+export interface ICoursesInstructorAttributes {
   id: number;
   instructor_name: string;
   instructor_title?: string;
@@ -14,4 +23,9 @@ export interface ICoursesInstructor {
   instructor_img?: IMedia;
   country?: string;
   contact?: string;
+  createdAt?: string | null;
+  updatedAt?: string;
+  publishedAt?: string;
 }
+
+

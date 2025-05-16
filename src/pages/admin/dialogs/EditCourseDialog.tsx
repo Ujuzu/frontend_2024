@@ -265,7 +265,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   const fetchInstructors = async () => {
     setIsLoadingInstructors(true);
     try {
-      const token = localStorage.getItem('token');
+      
       const response = await axios.get(`${API_URL}/api/courses-instructors`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -588,7 +588,6 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
     setIsSubmitting(true);
     
     try {
-      const token = localStorage.getItem('token');
       
       if (!selectedCourse?.documentId) {
         toast.error('Course document ID is missing');
