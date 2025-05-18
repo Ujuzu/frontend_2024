@@ -1,4 +1,13 @@
+import { ICourseCategoryResponse } from "./ICourseCategory";
+import { ICourseFeatureResponse } from "./ICourseFeature";
+import { ICoursesInstructorResponse } from "./ICourseInstructor";
+import { ICourseSubcategoryResponse } from "./ICourseSubcategory";
+import { ILearnListResponse } from "./ILearnList";
 import { IMeta } from "./IMeta";
+import { ICourseQualificationReqResponse } from "./IQualificationRequirement";
+import { ISubscriptionPackageResponse } from "./ISubscriptionPackage";
+import { ICourseTargetGroupResponse } from "./ITargetGroup";
+import { IWeeklyCurriculumResponse } from "./IWeeklyCurriculum";
 
 export interface IStrapiResponse {
   data: ICourseResponse[];
@@ -31,18 +40,18 @@ export interface ICourseAttributes {
   updatedBy?:string;
     createdAt?: string;
     updatedAt?: string;
-  courses_subcategories?: RelationData<unknown>;
-  courses_categories?: RelationData<unknown>;
-  courses_instructors?: RelationData<Instructor[]>;
+  courses_subcategories?: ICourseSubcategoryResponse[];
+  courses_categories?: ICourseCategoryResponse[];
+  courses_instructors?: ICoursesInstructorResponse[];
   course_intro_video?: NullableMediaData;
   course_intro_img?: MediaData;
-  course_target_groups?: RelationData<TargetGroup[]>;
-  course_learn_lists?: RelationData<LearnItem[]>;
-  course_qualification_equirements?: RelationData<Qualification[]>;
-  subscription_packages?: RelationData<SubscriptionPackage[]>;
+  course_target_groups?: ICourseTargetGroupResponse[];
+  course_learn_lists?: ILearnListResponse[];
+  course_qualification_equirements?: ICourseQualificationReqResponse[];
+  subscription_packages?: ISubscriptionPackageResponse[];
   course_reviews?: RelationData<unknown>;
-  courses_features?: RelationData<Feature[]>;
-  courses_weekly_curricula?: RelationData<WeeklyCurriculum[]>;
+  courses_features?: ICourseFeatureResponse[];
+  courses_weekly_curricula?: IWeeklyCurriculumResponse[];
 }
 
  export interface DialogState {
@@ -53,10 +62,22 @@ export interface ICourseAttributes {
   selectedCourse: ICourseResponse | null;
 }
 
+export interface ICourseDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (course: ICourseResponse) => void;
+  initialData?: ICourseAttributes;
+  isEdit?: boolean;
+  course_Id?: number;
+}
+
+export interface IFormStepProps {
+courseId: number;
+}
+
 interface RelationData<T> {
   data: T;
 }
-
 interface MediaData {
   data: {
     id: number;
@@ -91,83 +112,4 @@ interface MediaAttributes {
   };
   createdAt: string;
   updatedAt: string;
-}
-
-interface Instructor {
-  id: number;
-  attributes: {
-    instructor_name: string;
-    instructor_title: string;
-    instructor_desc: string;
-    instructor_linkedIn: string;
-    instructor_x: string;
-    instructor_fb: string;
-    instructor_youtube: string;
-    instructor_email: string;
-    country: string;
-    contact: string;
-    createdAt: string | null;
-    updatedAt: string;
-    publishedAt: string;
-  };
-}
-
-interface TargetGroup {
-  id: number;
-  attributes: {
-    target_group_name: string;
-    createdAt: string | null;
-    updatedAt: string;
-    publishedAt: string;
-  };
-}
-
-interface LearnItem {
-  id: number;
-  
-}
-
-interface Qualification {
-  id: number;
-  attributes: {
-    qualification_name: string;
-    createdAt: string | null;
-    updatedAt: string;
-    publishedAt: string;
-  };
-}
-
-interface SubscriptionPackage {
-  id: number;
-  attributes: {
-    isActive: boolean;
-    totalMaxUsers: number;
-    createdAt: string;
-    updatedAt: string;
-    publishedAt: string;
-    packageName: string;
-    duration: string;
-    descritpion: string;
-  };
-}
-
-interface Feature {
-  id: number;
-  attributes: {
-    course_features_name: string;
-    createdAt: string | null;
-    updatedAt: string | null;
-    publishedAt: string;
-  };
-}
-
-interface WeeklyCurriculum {
-  id: number;
-  attributes: {
-    curriculum_title: string;
-    curriculum_reg: string;
-    curriculum_desc: string;
-    createdAt: string;
-  
-  };
 }

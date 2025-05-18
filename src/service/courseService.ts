@@ -1,16 +1,22 @@
-import {  ICourseResponse, IStrapiResponse } from '@/Interfaces/ICourseRespone';
+import {  ICourseResponse } from '@/Interfaces/ICourseRespone';
+import { ICourseTargetGroupResponse } from '@/Interfaces/ITargetGroup';
 import { ILoginToken } from '@/Interfaces/IUserLoginInterfaces';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+const coursesUrl = `${API_URL}/api/courses`;
+const targetGroupsUrl = `${API_URL}/api/course-target-groups`;
 
 export const courseService = {
+
+  //
+  // ALL GET REQUESTS
   /**
    * Get courses with pagination and optional filtering
    */
-  getCourses: async (token: ILoginToken, page = 1, filter = '') => {
+  getCourses: async <IStrapiResponse>(token: ILoginToken, page = 1, filter = '') => {
     // Build query params
-    let queryParams = `pagination[page]=${page}&pagination[pageSize]=10`;
+    let queryParams = `?pagination[page]=${page}&pagination[pageSize]=10`;
     
     // Add populate parameter to fetch related data
     queryParams += '&populate=*';
@@ -22,7 +28,7 @@ export const courseService = {
     
     // Fetch courses with pagination and populate
     const response = await axios.get<IStrapiResponse>(
-      `${API_URL}/api/courses?${queryParams}`,
+      `${coursesUrl}/${queryParams}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -32,7 +38,41 @@ export const courseService = {
     
     return response.data;
   },
-  
+
+
+
+  getTargetGroups: async (token: ILoginToken, page = 1, queryParams = '') => {
+ const paginng = `pagination[page]=${page}&pagination[pageSize]=10`;
+    
+    // Add populate parameter to fetch related data
+    queryParams += paginng;
+    
+    // Fetch courses with pagination and populate
+    const response = await axios.get<ICourseTargetGroupResponse[]>(
+      `${targetGroupsUrl}/?${queryParams}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    
+    return response.data;
+    },
+
+    getCourseTargetGroups: async (token: ILoginToken, courseId: number) => {
+          const response = await axios.get<ICourseTargetGroupResponse[]>(
+      `${targetGroupsUrl}/?populate=*&filters[$eq][0][courses][$containsi]=${courseId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+    },
+
+  // ALL DELETE REQUESTS
   /**
    * Delete a course by documentId
    */
@@ -47,13 +87,27 @@ export const courseService = {
     );
   },
   
+
+  // ALL POST REQUESTS
   /**
    * Create a new course
    */
-  createCourse: async (token: ILoginToken, courseData: unknown) => {
+  createCourse: async (token: ILoginToken | null, courseData: unknown) => {
+    if (!token) {
+      throw new Error('Token is required for creating a course');
+    }
+
+    if (!courseData) {
+      throw new Error('Course data is required for creating a course');
+    }
+    if (typeof courseData !== 'object') {
+      throw new Error('Course data must be an object');
+    }
+    
+
     return axios.post(
       `${API_URL}/api/courses`,
-      { data: courseData },
+      { data: courseData as ICourseResponse },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -62,10 +116,47 @@ export const courseService = {
     );
   },
   
+  createTargetGroup: async (token: ILoginToken | null, targetGroupData: unknown) => {
+    if (!token) {
+      throw new Error('Token is required for creating a course');
+    }
+
+    if (!targetGroupData) {
+      throw new Error('Course data is required for creating a course');
+    }
+    if (typeof targetGroupData !== 'object') {
+      throw new Error('Course data must be an object');
+    }
+    
+
+    return axios.post(
+      `${targetGroupsUrl}`,
+      { data: targetGroupData },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  },
+  // ALL PUT REQUESTS
   /**
    * Update an existing course
    */
-  updateCourse: async (token:ILoginToken, courseId: number, courseData: unknown) => {
+  updateCourse: async (token:ILoginToken | null, courseId: number, courseData: unknown) => {
+    if (!token) {
+      throw new Error('Token is required for updating a course');
+    } 
+    if (!courseId) {
+      throw new Error('Course ID is required for updating a course');
+    } 
+    if (!courseData) {
+      throw new Error('Course data is required for updating a course');
+    }
+    if (typeof courseData !== 'object') {
+      throw new Error('Course data must be an object');
+    }
+
     return axios.put(
       `${API_URL}/api/courses/${courseId}`,
       { data: courseData },
@@ -76,6 +167,34 @@ export const courseService = {
       }
     );
   },
+
+  linkTargetGroupToCourse: async (token: ILoginToken | null, courseId: number, targetGroupId: number) => {
+    if (!token) {
+      throw new Error('Token is required for linking target group to course');
+    } 
+    if (!courseId) {
+      throw new Error('Course ID is required for linking target group to course');
+    }
+    if (!targetGroupId) {
+      throw new Error('Target group ID is required for linking target group to course');
+    }
+    if (typeof targetGroupId !== 'number') {
+      throw new Error('Target group ID must be a number');
+    }
+    return axios.put(
+      `${targetGroupsUrl}/${targetGroupId}`,
+      { data:{
+        courses: [courseId],
+       },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+},
+
   
   /**
    * Get a single course by ID

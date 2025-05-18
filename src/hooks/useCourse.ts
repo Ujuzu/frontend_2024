@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
-import { DialogState, ICourseAttributes, ICourseResponse } from '@/Interfaces/ICourseRespone';
+import { DialogState, ICourseAttributes, ICourseResponse, IStrapiResponse } from '@/Interfaces/ICourseRespone';
 import { IMeta } from '@/Interfaces/IMeta';
 import { courseService } from '@/service/courseService';
 
@@ -36,7 +36,7 @@ export const useCourse = () => {
     
     setIsLoading(true);
     try {
-      const response = await courseService.getCourses(token, page, filter);
+      const response = await courseService.getCourses<IStrapiResponse>(token, page, filter);
       setCourses(response.data);
       setMeta(response.meta);
     } catch (error) {

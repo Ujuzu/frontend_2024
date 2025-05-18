@@ -38,6 +38,11 @@ const links = [
     path: "/u/content-management",
   },
   {
+    title: "Course Management",
+    icon: <FileText className="w-5 h-5" />,
+    path: "/u/courses",
+  },
+  {
     title: "Subscription Management",
     icon: <CreditCard className="w-5 h-5" />,
     path: "/u/subscription-management",

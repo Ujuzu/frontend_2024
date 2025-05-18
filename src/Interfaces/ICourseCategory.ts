@@ -1,13 +1,19 @@
+import { IMeta } from "./IMeta";
 
 export interface ICourseCategory {
-  id: number;
   title: string;
   description?: string; // Optional richtext field
-
+  publishedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface ICourseCategoryResponse {
+  id: number;
+  attributes: ICourseCategory;
+}
+export interface ICourseCategoryStrapiResponse {
+  data: ICourseCategoryResponse[];
+  meta: IMeta;
 }
 
-export interface ICourseCategoryInputForm extends Omit<ICourseCategory, 'id'> {
-  pic?: number; // Single media upload
-  introVideo?: number[]; // Multiple video uploads
-}
 

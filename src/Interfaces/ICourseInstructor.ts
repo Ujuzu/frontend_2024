@@ -2,12 +2,12 @@
 import { IMedia } from "./IMedia";
 import { IMeta } from "./IMeta";
 
- export interface ICoursesInstructor {
+ export interface ICoursesInstructorResponse {
   id: number;  
   attributes: ICoursesInstructorAttributes;
 }
-export interface ICoursesInstructorResponse {
-  data: ICoursesInstructor[];
+export interface ICoursesInstructorStrapiResponse {
+  data: ICoursesInstructorResponse[];
   meta: IMeta
 }
 export interface ICoursesInstructorAttributes {

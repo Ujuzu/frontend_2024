@@ -1,3 +1,4 @@
+import { IMeta } from "./IMeta";
 
 export interface ILearnListResponse {
     id: number;
@@ -10,3 +11,8 @@ export interface ILearnListAttributes {
     updatedAt: string;
     publishedAt: string;
 };
+
+export interface ILearnListStrapiResponse {
+    data: ILearnListResponse[];
+    meta:IMeta;
+}
