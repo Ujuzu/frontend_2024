@@ -18,6 +18,7 @@ interface CourseTableProps {
   onView: (course: ICourseResponse) => void;
   onEdit: (course: ICourseResponse) => void;
   onDelete: (course: ICourseResponse) => void;
+  onFullEdit: (course: ICourseResponse) => void;
 }
 
 const CourseTable: React.FC<CourseTableProps> = ({
@@ -25,7 +26,8 @@ const CourseTable: React.FC<CourseTableProps> = ({
   isLoading,
   onView,
   onEdit,
-  onDelete
+  onDelete,
+  onFullEdit
 }) => {
   if (isLoading) {
     return (
@@ -56,7 +58,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
               <TableCell className="font-medium">
                 <button 
                   className="text-blue-600 hover:text-blue-900 hover:underline text-left"
-                  onClick={() => onView(course)}
+                  onClick={() => onFullEdit(course)}
                 >
                   {course.attributes.course_name}
                 </button>

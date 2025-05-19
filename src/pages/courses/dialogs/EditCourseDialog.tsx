@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from '@/context/AuthContext';
-import { ICourseResponse } from '@/Interfaces/ICourseRespone';
+import { ICourseAttributes, ICourseResponse } from '@/Interfaces/ICourseRespone';
 import { courseService } from '@/service/courseService';
 
 interface EditCourseDialogProps {
@@ -17,7 +17,9 @@ interface EditCourseDialogProps {
   selectedCourse: ICourseResponse | null;
   onSave: () => void;
 }
+// postgresql://default:fwqIWgxbo49A@ep-gentle-moon-25496026.us-east-1.aws.neon.tech/verceldb?sslmode=require
 
+// postgres://default:fwqIWgxbo49A@ep-gentle-moon-25496026-pooler.us-east-1.postgres.vercel-storage.com:5432/verceldb
 const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   isOpen,
   onClose,
@@ -75,12 +77,13 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault();
     if (!selectedCourse || !token) return;
     
     setIsSubmitting(true);
     try {
-      await courseService.updateCourse(token, selectedCourse.id, formData);
+      await courseService.updateCourse(token, selectedCourse.id, formData as ICourseAttributes);
       onSave();
     } catch (error) {
       console.error('Error updating course:', error);
@@ -120,6 +123,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
                 name="documentId"
                 value={formData.documentId || ''}
                 onChange={handleChange}
+                disabled
                 required
               />
             </div>

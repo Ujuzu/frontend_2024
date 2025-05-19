@@ -1,3 +1,4 @@
+// src\Interfaces\ICourseRespone.ts
 import { ICourseCategoryResponse } from "./ICourseCategory";
 import { ICourseFeatureResponse } from "./ICourseFeature";
 import { ICoursesInstructorResponse } from "./ICourseInstructor";
@@ -66,13 +67,15 @@ export interface ICourseDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (course: ICourseResponse) => void;
-  initialData?: ICourseAttributes;
+  initialData?: ICourseResponse | null;
   isEdit?: boolean;
   course_Id?: number;
 }
 
 export interface IFormStepProps {
 courseId: number;
+  formData: ICourseAttributes;
+  setFormData: React.Dispatch<React.SetStateAction<ICourseAttributes>>;
 }
 
 interface RelationData<T> {

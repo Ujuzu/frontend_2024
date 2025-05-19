@@ -6,16 +6,51 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { BookOpen } from "lucide-react";
 
+import React, { useEffect, useState } from "react";
+import CategorySelector from "../../components/AddCategories";
+import { ICourseCategoryResponse } from "@/Interfaces/ICourseCategory";
+import { ICourseSubcategoryResponse } from "@/Interfaces/ICourseSubcategory";
+import { courseService } from "@/service/courseService";
+import { useAuth } from "@/context/AuthContext";
+
 const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
+  // Ensure formData is initialized
+   const [categories, setCategories] = useState<ICourseCategoryResponse[]>([]);
+  const [subcategories, setSubcategories] = useState<ICourseSubcategoryResponse[]>([]);
+  const {token} = useAuth();
+  
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoryData = await courseService.getCourseCatergories(token);
+        setCategories(categoryData.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    const fetchSubcategories = async () => {
+      try {
+        const subcategoryData = await courseService.getCourseSubCategories(token);
+        setSubcategories(subcategoryData.data);
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+      }
+    };
+
+    fetchCategories();
+    fetchSubcategories();
+  }, [token]);
+
   // Handle text input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+   if (!formData) return;
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value ?? ""
     });
   };
-
   // Handle switch toggle changes
   const handleSwitchChange = (name: string, checked: boolean) => {
     setFormData({
@@ -33,16 +68,14 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
   };
 
   // Handle numeric input changes
-  const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    // Convert to number or use 0 if empty
-    const numericValue = value === '' ? 0 : parseInt(value, 10);
-    
-    setFormData({
-      ...formData,
-      [name]: isNaN(numericValue) ? 0 : numericValue
-    });
-  };
+const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+  setFormData({
+    ...formData,
+    [name]: Number(value) || 0, // Converts to number safely
+  });
+};
+
 
   return (
     <div className="space-y-6">
@@ -257,6 +290,31 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
           />
         </div>
       </div>
+<CategorySelector
+  availableCategories={categories}
+  availableSubcategories={subcategories}
+  selectedCategories={formData.courses_categories?.map(cat => cat.id) ?? []} 
+  selectedSubcategories={formData.courses_subcategories?.map(sub => sub.id) ?? []} 
+setSelectedCategories={(ids) =>
+  setFormData({
+    ...formData,
+    courses_categories: ids.map(id => 
+      categories.find(category => category.id === id) || { id, attributes: { title: "Unknown Category" } }
+    ) // 🔥 Finds the full category object
+  })
+}
+setSelectedSubcategories={(ids) =>
+  setFormData({
+    ...formData,
+    courses_subcategories: ids.map(id => 
+      subcategories.find(subcategory => subcategory.id === id) || { id, attributes: { title: "Unknown Subcategory" } }
+    ) // 🔥 Finds the full subcategory object
+  })
+}
+
+/>
+
+
 
       {/* Course Features */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">

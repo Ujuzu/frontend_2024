@@ -1,3 +1,4 @@
+import { ICourseSubcategoryResponse } from "./ICourseSubcategory";
 import { IMeta } from "./IMeta";
 
 export interface ICourseCategory {
@@ -17,3 +18,11 @@ export interface ICourseCategoryStrapiResponse {
 }
 
 
+export interface ICategorySelectorProps {
+  availableCategories: ICourseCategoryResponse[];
+  availableSubcategories: ICourseSubcategoryResponse[];
+  selectedCategories: number[];
+  selectedSubcategories: number[];
+  setSelectedCategories: (ids: number[]) => void;
+  setSelectedSubcategories: (ids: number[]) => void;
+}

@@ -16,117 +16,137 @@ import BasicInfoForm from "./BasicInfoForm";
 
 
 const AddCourseDialog: React.FC<ICourseDialogProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  initialData,
-  isEdit = false,
-  course_Id,
+   isOpen,
+   onClose,
+   onSuccess,
+   initialData,
+   isEdit = false,
+   course_Id,
 }) => {
+
   const [activeStep, setActiveStep] = useState('basic-info');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<ICourseAttributes>({
-    locale: 'en',
-    course_name: '',
-    certificate: false,
-    quizes: false,
-    sort_order: 0,
-    rating_count: 0,
-    //  relationships
-    courses_instructors: [],
-    course_target_groups: [],
-    course_learn_lists: [],
-    course_qualification_equirements: [],
-    courses_features: [],
-    courses_weekly_curricula: [],
-    courses_categories: [],
-    courses_subcategories: [],
-    subscription_packages: [],
-  });
+const [formData, setFormData] = useState<ICourseAttributes>(() => {
+  return initialData && isEdit 
+    ? initialData.attributes 
+    : { 
+        locale: "en",
+        course_name: "",
+        certificate: false,
+        quizes: false,
+        sort_order: 0,
+        rating_count: 0,
+        courses_instructors: [],
+        course_target_groups: [],
+        course_learn_lists: [],
+        course_qualification_equirements: [],
+        courses_features: [],
+        courses_weekly_curricula: [],
+        courses_categories: [],
+        courses_subcategories: [],
+        subscription_packages: [],
+      };
+});
   const [courseId, setCourseId] = useState<number>(course_Id || 0);
 const {token} = useAuth();
-  // Reset form or load initial data when dialog opens
-  useEffect(() => {
-    if (isOpen) {
-      if (initialData && isEdit) {
-        setFormData(initialData);
-      } else {
-        // Reset form for new course
-        setFormData({
-          locale: 'en',
-          course_name: '',
-          certificate: false,
-          quizes: false,
-          sort_order: 0,
-          rating_count: 0,
-          courses_instructors: [],
-          course_target_groups:  [] ,
-          course_learn_lists:  [] ,
-          course_qualification_equirements: [],
-          courses_features: [],
-          courses_weekly_curricula: [],
-          courses_categories:[],
-          courses_subcategories: [],
-          subscription_packages: []
-        });
-      }
-      setActiveStep('basic-info');
-    }
-  }, [isOpen, initialData, isEdit]);
 
-  const handleSubmit = async () => {
+useEffect(() => {
+  if (isOpen) {
+    setActiveStep("basic-info");
+  }
+}, [isOpen, initialData, isEdit, courseId, token, formData]);
+
+ const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
-      
-      // Validate required fields
+
       if (!formData.course_name) {
-        toast.error('Course name is required');
-        setActiveStep('basic-info');
+        toast.error("Course name is required");
+        setActiveStep("basic-info");
         setIsSubmitting(false);
         return;
       }
 
-      const payload = {
-        data: {
-          ...formData,
-          // Handle specific format requirements for relationships if needed
-        }
-      };
-
+      // const payload = { data: { ...formData } };
       let response;
 
-        if (isEdit && courseId) {
-            // Update existing course
-            response = await courseService.updateCourse(token, courseId, JSON.stringify(payload))
-        } else {
-           response = await courseService.createCourse(token, payload)
-        }
-
+      if (isEdit && courseId) {
+        response = await courseService.updateCourse(token, courseId, { ...formData });
+      } else {
+        response = await courseService.createCourse(token, { ...formData });
+      }
 
       if (!response) {
-        throw new Error(`Failed to ${isEdit ? 'update' : 'create'} course`);
+        throw new Error(`Failed to ${isEdit ? "update" : "create"} course`);
       }
 
       const result = await response.data;
-      toast.success(`Course ${isEdit ? 'updated' : 'created'} successfully!`);
+      toast.success(`Course ${isEdit ? "updated" : "created"} successfully!`);
       setCourseId(result.data.id);
+      setFormData(result.data.attributes); // Update form data
       onSuccess(result.data);
+
     } catch (error) {
-      console.error('Error saving course:', error);
-      toast.error(`Failed to ${isEdit ? 'update' : 'create'} course. Please try again.`);
+      console.error("Error saving course:", error);
+      toast.error(`Failed to ${isEdit ? "update" : "create"} course. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const nextStep = () => {
-    const currentIndex = steps.findIndex(step => step.id === activeStep);
-    if (currentIndex < steps.length - 1) {
-      setActiveStep(steps[currentIndex + 1].id);
+  const nextStep = async () => {
+  if (activeStep === "basic-info") {
+    // Ensure course name exists before proceeding
+    if (!formData.course_name) {
+      toast.error("Course name is required before proceeding.");
+      return;
     }
-  };
 
+    try {
+      setIsSubmitting(true);
+
+     
+      let response;
+
+      if (isEdit && courseId) {
+        response = await courseService.updateCourse(token, courseId, { ...formData  });
+      } else {
+        response = await courseService.createCourse(token, { ...formData } );
+      }
+
+      console.log("Response:", response);
+
+      if (!response) {
+        throw new Error(`Failed to ${isEdit ? "update" : "create"} course`);
+      }
+
+      const result = await response.data;
+      toast.success(`Course ${isEdit ? "updated" : "created"} successfully!`);
+      setCourseId(result.data.id);
+      setFormData(result.data.attributes);
+
+    } catch (error) {
+      console.error("Error saving course:", error);
+      toast.error(`Failed to ${isEdit ? "update" : "create"} course. Please try again.`);
+      return; // Prevent moving to the next step if save fails
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  // 🔥 Proceed to the next step only after successful save
+  const currentIndex = steps.findIndex(step => step.id === activeStep);
+  if (currentIndex < steps.length - 1) {
+    setActiveStep(steps[currentIndex + 1].id);
+  }
+};
   const prevStep = () => {
+     if (!courseId) {
+    toast.error("Please create a course before proceeding.");
+    setActiveStep("basic-info");
+    return;
+  }
+     
     const currentIndex = steps.findIndex(step => step.id === activeStep);
     if (currentIndex > 0) {
       setActiveStep(steps[currentIndex - 1].id);
@@ -156,44 +176,44 @@ const {token} = useAuth();
           </TabsList>
           
           <TabsContent value="basic-info">
-            <BasicInfoForm formData={formData} setFormData={setFormData} />
+            <BasicInfoForm formData={formData} setFormData={setFormData} courseId={courseId} />
           </TabsContent>
-          
+{/*           
           <TabsContent value="categories">
-            <CategoriesForm formData={formData} setFormData={setFormData} />
-          </TabsContent>
+            <CategoriesForm formData={formData} setFormData={setFormData} courseId={courseId} />
+          </TabsContent> */}
           
           <TabsContent value="instructors">
-            <InstructorsForm formData={formData} setFormData={setFormData} />
+            <InstructorsForm formData={formData} setFormData={setFormData} courseId={courseId} />
           </TabsContent>
           
-          <TabsContent value="media">
-            <MediaForm formData={formData} setFormData={setFormData} />
-          </TabsContent>
+          {/* <TabsContent value="media">
+            <MediaForm formData={formData} setFormData={setFormData} courseId={courseId} />
+          </TabsContent> */}
           
           <TabsContent value="target-groups">
-            <TargetGroupsForm courseId={courseId}/>
+            <TargetGroupsForm courseId={courseId} formData={formData} setFormData={setFormData} />
           </TabsContent>
           
-          <TabsContent value="learn-list">
-            <LearnListForm formData={formData} setFormData={setFormData} />
-          </TabsContent>
+          {/* <TabsContent value="learn-list">
+            <LearnListForm formData={formData} setFormData={setFormData} courseId={courseId}  />
+          </TabsContent> */}
           
-          <TabsContent value="qualifications">
-            <QualificationsForm formData={formData} setFormData={setFormData} />
-          </TabsContent>
+          {/* <TabsContent value="qualifications">
+            <QualificationsForm formData={formData} setFormData={setFormData} courseId={courseId} />
+          </TabsContent> */}
           
-          <TabsContent value="features">
-            <FeaturesForm formData={formData} setFormData={setFormData} />
-          </TabsContent>
+          {/* <TabsContent value="features">
+            <FeaturesForm formData={formData} setFormData={setFormData} courseId={courseId} />
+          </TabsContent> */}
           
           <TabsContent value="weekly-curricula">
-            <WeeklyCurriculaForm formData={formData} setFormData={setFormData} />
+            <WeeklyCurriculaForm formData={formData} setFormData={setFormData} courseId={courseId} />
           </TabsContent>
           
-          <TabsContent value="packages">
-            <PackagesForm formData={formData} setFormData={setFormData} />
-          </TabsContent>
+          {/* <TabsContent value="packages">
+            <PackagesForm formData={formData} setFormData={setFormData} courseId={courseId} />
+          </TabsContent> */}
         </Tabs>
         
         <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">

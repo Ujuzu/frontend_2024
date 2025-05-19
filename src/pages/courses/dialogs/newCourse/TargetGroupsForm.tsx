@@ -21,8 +21,10 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
     const fetchTargetGroups = async () => {
       if (!token || !courseId) return;
       try {
-        const allGroupsResponse = await courseService.getTargetGroups(token);
-        const courseGroupsResponse = await courseService.getCourseTargetGroups(token, courseId);
+        const allGroupsResponse = await courseService.getTargetGroups(token) || [];
+        const courseGroupsResponse = await courseService.getCourseTargetGroups(token, courseId) || [];
+
+
 
         setTargetGroups(allGroupsResponse); // All available target groups
         setCourseTargetGroups(courseGroupsResponse); // Groups already linked to this course

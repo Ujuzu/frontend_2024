@@ -82,10 +82,23 @@ export const useCourse = () => {
   };
 
   // Dialog handlers
-  const handleAddCourse = () => {
-    setFormData({ locale: 'en', course_name: '' });
-    setDialogState(prev => ({ ...prev, isAddCourseOpen: true }));
-  };
+const handleAddCourse = (course?: ICourseResponse) => {
+  if (course) {
+    setFormData(course.attributes); // Load existing course data
+    setDialogState(prev => ({
+      ...prev,
+      isAddCourseOpen: true,
+      selectedCourse: course, // Store the selected course for editing
+    }));
+  } else {
+    setFormData({ locale: "en", course_name: "" }); // Default empty values
+    setDialogState(prev => ({
+      ...prev,
+      isAddCourseOpen: true,
+      selectedCourse: null, // No course, so we're adding a new one
+    }));
+  }
+};
   
   const handleViewCourse = (course: ICourseResponse) => {
     setDialogState(prev => ({ 

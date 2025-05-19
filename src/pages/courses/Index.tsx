@@ -36,7 +36,7 @@ const CoursesIndex = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Course Management</h1>
           <Button 
-            onClick={handleAddCourse}
+            onClick={()=>handleAddCourse()}
             className="bg-[#AC19AD] hover:bg-[#8A1489] text-white"
           >
             Add Course
@@ -78,6 +78,7 @@ const CoursesIndex = () => {
           onView={handleViewCourse}
           onEdit={handleEditCourse}
           onDelete={handleDeleteCourse}
+          onFullEdit={handleAddCourse}
         />
         
         {/* Pagination I have to test this once data is enough, for noe kariko works*/}

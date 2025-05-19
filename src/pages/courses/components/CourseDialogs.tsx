@@ -1,3 +1,4 @@
+// src/pages/courses/components/CourseDialogs.tsx
 import React from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -6,6 +7,7 @@ import { DialogState } from '@/Interfaces/ICourseRespone';
 import EditCourseDialog from '../dialogs/EditCourseDialog';
 import DeleteCourseDialog from '../dialogs/DeleteCourseDialog';
 import ViewCourseDialog from '../dialogs/ViewCourseDialog';
+import AddCourseDialog from '../dialogs/newCourse/AddCourseDialog';
 
 
 interface CourseDialogsProps {
@@ -36,10 +38,14 @@ export const CourseDialogs: React.FC<CourseDialogsProps> = ({
       {/* Add Course Dialog */}
       <Dialog open={isAddCourseOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent className="sm:max-w-[80vw] w-full max-h-[95vh] p-0">
-          {/* <CourseCreation 
-            onClose={onClose} 
-            onSuccess={onSuccess} 
-          /> */}
+          <AddCourseDialog 
+            isOpen={isAddCourseOpen}
+            onClose={onClose}  
+            onSuccess={onEditSuccess} 
+            initialData={selectedCourse} 
+            isEdit={!!selectedCourse}
+            course_Id={selectedCourse?.id} 
+          />
         </DialogContent>
       </Dialog>
       

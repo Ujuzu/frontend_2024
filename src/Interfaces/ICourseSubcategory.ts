@@ -3,7 +3,6 @@ import { IMeta } from "./IMeta";
 
 
 export interface ICourseSubcategory {
- id: number;
   title: string;
   description?: string;
   introVideo?: IMedia; // Single video upload
