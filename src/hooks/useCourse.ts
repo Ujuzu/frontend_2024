@@ -84,7 +84,6 @@ export const useCourse = () => {
 
   // Dialog handlers
 const handleAddCourse = (course?:ICourseResponse) => {
-  console.log('Adding course:', course);
   if (!token) return; 
   if (course) {
     const attrbs = course.attributes;

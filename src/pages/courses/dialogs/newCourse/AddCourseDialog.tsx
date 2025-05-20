@@ -10,10 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
 import { courseService } from "@/service/courseService";
 import TargetGroupsForm from "./TargetGroupsForm";
-import InstructorsForm from "./InstructorsForm";
 import WeeklyCurriculaForm from "./WeeklyCurriculaForm";
 import BasicInfoForm from "./BasicInfoForm";
 import { unwrapRelation } from "@/service/relationUnwrapper";
+import CourseInstructorsForm from "./CourseInstructorsForm";
 
 
 const AddCourseDialog: React.FC<ICourseDialogProps> = ({
@@ -238,7 +238,7 @@ useEffect(() => {
           </TabsContent> */}
           
           <TabsContent value="instructors">
-            <InstructorsForm formData={formData} setFormData={setFormData} courseId={courseId} />
+            <CourseInstructorsForm formData={formData} setFormData={setFormData} courseId={courseId} />
           </TabsContent>
           
           {/* <TabsContent value="media">
