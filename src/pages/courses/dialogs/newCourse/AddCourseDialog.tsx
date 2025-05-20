@@ -4,7 +4,7 @@ import { Loader2, ChevronLeft, ChevronRight, Save } from "lucide-react";
 import { steps } from "@/staticData/addCourseSteps";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { ICourseAttributes, ICourseDialogProps } from "@/Interfaces/ICourseRespone";
+import { ICourseAttributesDataPayload, ICourseDialogProps } from "@/Interfaces/ICourseRespone";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
@@ -13,6 +13,7 @@ import TargetGroupsForm from "./TargetGroupsForm";
 import InstructorsForm from "./InstructorsForm";
 import WeeklyCurriculaForm from "./WeeklyCurriculaForm";
 import BasicInfoForm from "./BasicInfoForm";
+import { unwrapRelation } from "@/service/relationUnwrapper";
 
 
 const AddCourseDialog: React.FC<ICourseDialogProps> = ({
@@ -26,9 +27,41 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
 
   const [activeStep, setActiveStep] = useState('basic-info');
   const [isSubmitting, setIsSubmitting] = useState(false);
-const [formData, setFormData] = useState<ICourseAttributes>(() => {
-  return initialData && isEdit 
-    ? initialData.attributes 
+const [formData, setFormData] = useState<ICourseAttributesDataPayload>(() => {
+  const attrbs = initialData?.attributes;
+  return attrbs && isEdit 
+    ? {
+    // 🔹 Non-array fields first
+    course_name: attrbs.course_name,
+    short_desc: attrbs.short_desc,
+    short_desc_2: attrbs.short_desc_2,
+    short_desc_3: attrbs.short_desc_3,
+    course_outline: attrbs.course_outline,
+    rating_count: attrbs.rating_count,
+    language: attrbs.language,
+    certificate: attrbs.certificate,
+    level: attrbs.level,
+    sort_order: attrbs.sort_order,
+    weekly_curriculum_intro: attrbs.weekly_curriculum_intro,
+    duration: attrbs.duration,
+    video_url: attrbs.video_url,
+    locale: attrbs.locale || "en",
+
+    // boolean fields
+    
+     quizes: !!attrbs.quizes,
+    // 🔹 Relational array fields last (processed using `unwrapRelation`)
+    courses_instructors: unwrapRelation(attrbs.courses_instructors),
+    course_target_groups: unwrapRelation(attrbs.course_target_groups),
+    course_learn_lists: unwrapRelation(attrbs.course_learn_lists),
+    course_qualification_equirements: unwrapRelation(attrbs.course_qualification_equirements),
+    courses_features: unwrapRelation(attrbs.courses_features),
+    courses_weekly_curricula: unwrapRelation(attrbs.courses_weekly_curricula),
+    courses_categories: unwrapRelation(attrbs.courses_categories),
+    courses_subcategories: unwrapRelation(attrbs.courses_subcategories),
+    subscription_packages: unwrapRelation(attrbs.subscription_packages),
+    }
+
     : { 
         locale: "en",
         course_name: "",
@@ -114,16 +147,37 @@ useEffect(() => {
         response = await courseService.createCourse(token, { ...formData } );
       }
 
-      console.log("Response:", response);
-
       if (!response) {
         throw new Error(`Failed to ${isEdit ? "update" : "create"} course`);
       }
 
       const result = await response.data;
       toast.success(`Course ${isEdit ? "updated" : "created"} successfully!`);
+      console.log("submitiing result Course:", result.data);
+      // Update courseId and formData with the response
+
       setCourseId(result.data.id);
-      setFormData(result.data.attributes);
+       const attrbs = result.data.attributes;
+      setFormData({
+        // 🔹 Non-array fields first
+        ... attrbs,
+
+    // boolean fields
+    quizes: !!attrbs.quizes,
+
+    // 🔹 Relational array fields last (processed using `unwrapRelation`)
+    courses_instructors: unwrapRelation(attrbs.courses_instructors),
+    course_target_groups: unwrapRelation(attrbs.course_target_groups),
+    course_learn_lists: unwrapRelation(attrbs.course_learn_lists),
+    course_qualification_equirements: unwrapRelation(attrbs.course_qualification_equirements),
+    courses_features: unwrapRelation(attrbs.courses_features),
+    courses_weekly_curricula: unwrapRelation(attrbs.courses_weekly_curricula),
+    courses_categories: unwrapRelation(attrbs.courses_categories),
+    courses_subcategories: unwrapRelation(attrbs.courses_subcategories),
+    subscription_packages: unwrapRelation(attrbs.subscription_packages),
+      }
+        
+      );
 
     } catch (error) {
       console.error("Error saving course:", error);

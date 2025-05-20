@@ -7,23 +7,23 @@ import { Label } from "@/components/ui/label";
 import { BookOpen } from "lucide-react";
 
 import React, { useEffect, useState } from "react";
-import CategorySelector from "../../components/AddCategories";
 import { ICourseCategoryResponse } from "@/Interfaces/ICourseCategory";
 import { ICourseSubcategoryResponse } from "@/Interfaces/ICourseSubcategory";
 import { courseService } from "@/service/courseService";
 import { useAuth } from "@/context/AuthContext";
+import CategorySelector from "../../components/AddCategories";
 
 const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
   // Ensure formData is initialized
    const [categories, setCategories] = useState<ICourseCategoryResponse[]>([]);
   const [subcategories, setSubcategories] = useState<ICourseSubcategoryResponse[]>([]);
   const {token} = useAuth();
-  
+  // console.log("formData", formData);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categoryData = await courseService.getCourseCatergories(token);
-        setCategories(categoryData.data);
+        const categoryData = await courseService.getCourseCatergories(token) || [];
+        setCategories(categoryData.data? categoryData.data : []);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -31,8 +31,8 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
 
     const fetchSubcategories = async () => {
       try {
-        const subcategoryData = await courseService.getCourseSubCategories(token);
-        setSubcategories(subcategoryData.data);
+        const subcategoryData = await courseService.getCourseSubCategories(token) || [];
+        setSubcategories(subcategoryData.data ? subcategoryData.data : []);
       } catch (error) {
         console.error("Error fetching subcategories:", error);
       }
@@ -293,24 +293,29 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 <CategorySelector
   availableCategories={categories}
   availableSubcategories={subcategories}
-  selectedCategories={formData.courses_categories?.map(cat => cat.id) ?? []} 
-  selectedSubcategories={formData.courses_subcategories?.map(sub => sub.id) ?? []} 
-setSelectedCategories={(ids) =>
-  setFormData({
-    ...formData,
-    courses_categories: ids.map(id => 
-      categories.find(category => category.id === id) || { id, attributes: { title: "Unknown Category" } }
-    ) // 🔥 Finds the full category object
-  })
-}
-setSelectedSubcategories={(ids) =>
-  setFormData({
-    ...formData,
-    courses_subcategories: ids.map(id => 
-      subcategories.find(subcategory => subcategory.id === id) || { id, attributes: { title: "Unknown Subcategory" } }
-    ) // 🔥 Finds the full subcategory object
-  })
-}
+  selectedCategories={Array.isArray(formData?.courses_categories)
+  ? formData.courses_categories: []} 
+  selectedSubcategories={Array.isArray(formData?.courses_subcategories)
+  ? formData?.courses_subcategories : []} 
+  setSelectedCategories={(ids) => setFormData({ ...formData, courses_categories: ids })}
+  setSelectedSubcategories={(ids) => setFormData({ ...formData, courses_subcategories: ids })}
+
+// setSelectedCategories={(ids) =>
+//   setFormData({
+//     ...formData,
+//     courses_categories: ids.map(id => 
+//       categories.find(category => category.id === id) || { id, attributes: { title: "Unknown Category" } }
+//     ) // 🔥 Finds the full category object
+//   })
+// }
+// setSelectedSubcategories={(ids) =>
+//   setFormData({
+//     ...formData,
+//     courses_subcategories: ids.map(id => 
+//       subcategories.find(subcategory => subcategory.id === id) || { id, attributes: { title: "Unknown Subcategory" } }
+//     ) // 🔥 Finds the full subcategory object
+//   })
+// }
 
 />
 
