@@ -2,9 +2,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
-import { DialogState, ICourseAttributes, ICourseResponse, IStrapiResponse } from '@/Interfaces/ICourseRespone';
+import { DialogState, ICourseAttributesDataPayload, ICourseResponse, IStrapiResponse } from '@/Interfaces/ICourseRespone';
 import { IMeta } from '@/Interfaces/IMeta';
 import { courseService } from '@/service/courseService';
+import { unwrapRelation } from '@/service/relationUnwrapper';
 
 export const useCourse = () => {
   const [courses, setCourses] = useState<ICourseResponse[]>([]);
@@ -16,7 +17,7 @@ export const useCourse = () => {
   const { token } = useAuth();
   
   // Form state
-  const [formData, setFormData] = useState<ICourseAttributes>({
+  const [formData, setFormData] = useState<ICourseAttributesDataPayload>({
     locale: 'en', // Set default locale
     course_name:''
   });
@@ -82,9 +83,41 @@ export const useCourse = () => {
   };
 
   // Dialog handlers
-const handleAddCourse = (course?: ICourseResponse) => {
+const handleAddCourse = (course?:ICourseResponse) => {
+  console.log('Adding course:', course);
+  if (!token) return; 
   if (course) {
-    setFormData(course.attributes); // Load existing course data
+    const attrbs = course.attributes;
+   setFormData({
+    // 🔹 Non-array fields first
+    course_name: attrbs.course_name,
+    short_desc: attrbs.short_desc,
+    short_desc_2: attrbs.short_desc_2,
+    short_desc_3: attrbs.short_desc_3,
+    course_outline: attrbs.course_outline,
+    rating_count: attrbs.rating_count,
+    language: attrbs.language,
+    certificate: attrbs.certificate,
+    quizes: typeof attrbs.quizes === "boolean" ? attrbs.quizes : Boolean(attrbs.quizes),
+    level: attrbs.level,
+    sort_order: attrbs.sort_order,
+    weekly_curriculum_intro: attrbs.weekly_curriculum_intro,
+    duration: attrbs.duration,
+    video_url: attrbs.video_url,
+    locale: attrbs.locale || "en",
+
+    // 🔹 Relational array fields last (processed using `unwrapRelation`)
+    courses_instructors: unwrapRelation(attrbs.courses_instructors),
+    course_target_groups: unwrapRelation(attrbs.course_target_groups),
+    course_learn_lists: unwrapRelation(attrbs.course_learn_lists),
+    course_qualification_equirements: unwrapRelation(attrbs.course_qualification_equirements),
+    courses_features: unwrapRelation(attrbs.courses_features),
+    courses_weekly_curricula: unwrapRelation(attrbs.courses_weekly_curricula),
+    courses_categories: unwrapRelation(attrbs.courses_categories),
+    courses_subcategories: unwrapRelation(attrbs.courses_subcategories),
+    subscription_packages: unwrapRelation(attrbs.subscription_packages),
+  });
+ // Load existing course data
     setDialogState(prev => ({
       ...prev,
       isAddCourseOpen: true,

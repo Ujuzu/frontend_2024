@@ -17,7 +17,7 @@ export interface IStrapiResponse {
 
 export interface ICourseResponse {
   id: number;
-  attributes: ICourseAttributes;
+  attributes: ICourseAttributesStrapiResponse;
 }
 
 export interface ICourseAttributes {
@@ -41,19 +41,38 @@ export interface ICourseAttributes {
   updatedBy?:string;
     createdAt?: string;
     updatedAt?: string;
-  courses_subcategories?: ICourseSubcategoryResponse[];
-  courses_categories?: ICourseCategoryResponse[];
-  courses_instructors?: ICoursesInstructorResponse[];
-  course_intro_video?: NullableMediaData;
-  course_intro_img?: MediaData;
-  course_target_groups?: ICourseTargetGroupResponse[];
-  course_learn_lists?: ILearnListResponse[];
-  course_qualification_equirements?: ICourseQualificationReqResponse[];
-  subscription_packages?: ISubscriptionPackageResponse[];
-  course_reviews?: RelationData<unknown>;
-  courses_features?: ICourseFeatureResponse[];
-  courses_weekly_curricula?: IWeeklyCurriculumResponse[];
+ course_intro_img?: MediaData;
+   course_intro_video?: NullableMediaData;
 }
+
+export interface ICourseAttributesStrapiResponse extends ICourseAttributes {
+courses_subcategories?: RelationData<ICourseSubcategoryResponse[]>;
+  courses_categories?: RelationData<ICourseCategoryResponse[]>;
+  courses_instructors?: RelationData<ICoursesInstructorResponse[]>;
+  course_target_groups?: RelationData<ICourseTargetGroupResponse[]>;
+  course_learn_lists?: RelationData<ILearnListResponse[]>;
+  course_qualification_equirements?: RelationData<ICourseQualificationReqResponse[]>;
+  subscription_packages?: RelationData<ISubscriptionPackageResponse[]>;
+  course_reviews?: RelationData<unknown>;
+  courses_features?: RelationData<ICourseFeatureResponse[]>;
+  courses_weekly_curricula?: RelationData<IWeeklyCurriculumResponse[]>;
+}
+
+export interface ICourseAttributesDataPayload extends ICourseAttributes {
+  courses_subcategories?:number[];
+  courses_categories?:number[];
+  courses_instructors?:number[];
+  course_intro_video?:MediaData;
+  course_intro_img?:MediaData;
+  course_target_groups?:number[];
+  course_learn_lists?:number[];
+  course_qualification_equirements?:number[];
+  subscription_packages?:number[];
+  course_reviews?:number[];
+  courses_features?:number[];
+  courses_weekly_curricula?:number[];
+}
+  
 
  export interface DialogState {
   isAddCourseOpen: boolean;
@@ -74,11 +93,11 @@ export interface ICourseDialogProps {
 
 export interface IFormStepProps {
 courseId: number;
-  formData: ICourseAttributes;
-  setFormData: React.Dispatch<React.SetStateAction<ICourseAttributes>>;
+  formData: ICourseAttributesDataPayload;
+  setFormData: React.Dispatch<React.SetStateAction<ICourseAttributesDataPayload>>;
 }
 
-interface RelationData<T> {
+export interface RelationData<T> {
   data: T;
 }
 interface MediaData {

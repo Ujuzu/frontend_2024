@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 const coursesUrl = `${API_URL}/api/courses`;
 const targetGroupsUrl = `${API_URL}/api/course-target-groups`;
 const courseSubCategoriesURL = `${API_URL}/api/course-subcategories`;
-const courseCategoriesURL = `${API_URL}/api/course-categories`;
+const courseCategoriesURL = `${API_URL}/api/coursecategories`;
 // const courseInstructorsURL = `${API_URL}/api/courses-instructors`;
 // const courseFeaturesURL = `${API_URL}/api/courses-features`;
 // const courseWeeklyCurriculumURL = `${API_URL}/api/courses-weekly-curriculums`;
@@ -72,7 +72,7 @@ export const courseService = {
     if (!token) {
       throw new Error('Token is required for fetching course subcategories');
     }
-    
+
     const response = await axios.get<ICourseSubcategoryStrapiResponse>(
       `${courseSubCategoriesURL}`,
       {
@@ -132,7 +132,7 @@ export const courseService = {
     // return {data:courseData}
 
     return axios.post(
-      `${coursesUrl}`,
+      `${coursesUrl}/?populate=*`,
       { data: courseData as ICourseAttributes },
       {
         headers: {
@@ -184,7 +184,7 @@ export const courseService = {
     }
 
     return axios.put(
-      `${API_URL}/api/courses/${courseId}`,
+      `${API_URL}/api/courses/${courseId}?populate=*`,
       { data: courseData },
       {
         headers: {
