@@ -1,6 +1,17 @@
 // API configuration and endpoints
 export const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 
+// const courseSubCategoriesURL = `${API_URL}/api/course-subcategories`;
+// const courseCategoriesURL = `${API_URL}/api/coursecategories`;
+// const courseInstructorsURL = `${API_URL}/api/courses-instructors`;
+// const courseFeaturesURL = `${API_URL}/api/courses-features`;
+// const courseWeeklyCurriculumURL = `${API_URL}/api/courses-weekly-curriculums`;
+// const courseLearnListURL = `${API_URL}/api/learn-lists`;
+// const courseQualificationRequirementURL = `${API_URL}/api/course-qualification-equirements`;
+// const courseSubscriptionPackagesURL = `${API_URL}/api/subscription-packages`
+// const coursesUrl = `${API_URL}/api/courses`;
+// const targetGroupsUrl = `${API_URL}/api/course-target-groups`;
+
 // Helper :full URLs
 export const getFullUrl = (path: string): string => {
   // path lazima to starts with '/' if not already

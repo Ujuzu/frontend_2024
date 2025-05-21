@@ -1,6 +1,11 @@
 // src/Interfaces/ITargetGroup.ts
 import { IMeta } from "./IMeta";
 
+export interface ITargetGroupStrapiResponse {
+  data: ICourseTargetGroupResponse[];
+  meta: IMeta
+} 
+
 export interface ICourseTargetGroupResponse {
   id: number;
   attributes: ITargetGroupAttributes;
@@ -13,8 +18,3 @@ export interface ITargetGroupAttributes {
   updatedAt?: string;
   courses?:number[];
 }
-
-export interface ITargetGroupStrapiResponse {
-  data: ICourseTargetGroupResponse[];
-  meta: IMeta
-} 

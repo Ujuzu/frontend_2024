@@ -3,7 +3,7 @@ import { IMeta } from "./IMeta";
 
 export interface ICourseCategory {
   title: string;
-  description?: string; // Optional richtext field
+  description?: string; 
   publishedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;

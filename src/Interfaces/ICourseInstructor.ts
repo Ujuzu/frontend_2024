@@ -2,16 +2,16 @@
 import { IMedia } from "./IMedia";
 import { IMeta } from "./IMeta";
 
- export interface ICoursesInstructorResponse {
-  id: number;  
-  attributes: ICoursesInstructorAttributes;
-}
 export interface ICoursesInstructorStrapiResponse {
   data: ICoursesInstructorResponse[];
   meta: IMeta
 }
+
+ export interface ICoursesInstructorResponse {
+  id: number;  
+  attributes: ICoursesInstructorAttributes;
+}
 export interface ICoursesInstructorAttributes {
-  id: number;
   instructor_name: string;
   instructor_title?: string;
   instructor_desc?: string;
@@ -21,6 +21,7 @@ export interface ICoursesInstructorAttributes {
   instructor_youtube?: string;
   instructor_email?: string;
   instructor_img?: IMedia;
+  courses?:number[];
   country?: string;
   contact?: string;
   createdAt?: string | null;
@@ -28,4 +29,10 @@ export interface ICoursesInstructorAttributes {
   publishedAt?: string;
 }
 
+export interface InstructorFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (newInstructorData: ICoursesInstructorAttributes) => Promise<void>;
+  courseId?: number;
+}
 
