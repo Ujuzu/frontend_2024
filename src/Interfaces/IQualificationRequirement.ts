@@ -1,17 +1,27 @@
 import { IMeta } from "./IMeta";
 
-export interface IQualificationReq {
+export interface IQualificationReqStrapiResponse {
+  data: ICourseQualificationReqResponse[];
+  meta: IMeta;
+  };
+  
+export interface IQualificationReqAttributes {
   qualification_name: string;
-  publishedAt?: string | null;
+  description?: string;
+  publishedAt?: string;
+  courses?: number[];
   createdAt?: string;
   updatedAt?: string;
 }
 export interface ICourseQualificationReqResponse {
   id: number;
-  attributes: IQualificationReq;
+  attributes: IQualificationReqAttributes;
 } 
 
-export interface IQualificationReqStrapiResponse {
-  data: ICourseQualificationReqResponse[];
-  meta: IMeta;
-  };
+
+export interface QualificationFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (newQualificationData: IQualificationReqAttributes) => Promise<void>;
+  courseId?: number;
+}
