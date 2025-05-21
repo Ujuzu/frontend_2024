@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
 import { courseService } from "@/service/courseService";
 import TargetGroupsForm from "./TargetGroupsForm";
-import WeeklyCurriculaForm from "./WeeklyCurriculaForm";
+import WeeklyCurriculaForm from "./weekCurriculum/WeeklyCurriculaForm";
 import BasicInfoForm from "./BasicInfoForm";
 import { unwrapRelation } from "@/service/relationUnwrapper";
 import CourseInstructorsForm from "./CourseInstructorsForm";
