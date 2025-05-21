@@ -8,11 +8,11 @@ const targetGroupsUrl = `${API_URL}/api/course-target-groups`;
 
 export const courseTargetGroupService = {
     
-  getTargetGroups: async (token: ILoginToken, page = 1, queryParams = '') => {
-    const paginng = `pagination[page]=${page}&pagination[pageSize]=10`;
+  getTargetGroups: async (token: ILoginToken, page = '', queryParams = '') => {
+    // const paginng = `pagination[page]=${page}&pagination[pageSize]=10`;
 
     // Add populate parameter to fetch related data
-    queryParams += paginng;
+    queryParams += page;
 
     // Fetch courses with pagination and populate
     const response = await axios.get<ITargetGroupStrapiResponse>(

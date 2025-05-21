@@ -44,7 +44,7 @@ console.log("TargetGroupsForm", "allGroupsResponse", allGroupsResponse, "courseG
       // Send request to add selected group to the course in Strapi
       courseTargetGroupService.linkTargetGroupToCourse(token, courseId, id)
         .then(() => toast.success("Target group added successfully!"))
-        .catch((error: any) => {
+        .catch((error) => {
           console.error("Error linking target group:", error);
           toast.error("Failed to link target group to course.");
         });

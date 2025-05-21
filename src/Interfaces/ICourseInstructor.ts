@@ -29,4 +29,10 @@ export interface ICoursesInstructorAttributes {
   publishedAt?: string;
 }
 
+export interface InstructorFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (newInstructorData: ICoursesInstructorAttributes) => Promise<void>;
+  courseId?: number;
+}
 

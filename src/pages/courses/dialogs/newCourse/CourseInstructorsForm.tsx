@@ -7,15 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { courseInstructorService } from "@/service/courseInstructorsService";
-import { ICoursesInstructorResponse } from "@/Interfaces/ICourseInstructor";
+import { ICoursesInstructorAttributes, ICoursesInstructorResponse } from "@/Interfaces/ICourseInstructor";
+import InstructorFormModal from "../../components/InstructorFormModal";
 
 const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
   const { token } = useAuth();
   const [instructors, setInstructors] = useState<ICoursesInstructorResponse[]>([]);
   const [courseInstructors, setCourseInstructors] = useState<ICoursesInstructorResponse[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [newInstructorName, setNewInstructorName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   // Fetch global instructors and course-specific instructors
   useEffect(() => {
@@ -35,11 +37,12 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
     fetchInstructors();
   }, [token, courseId]);
 
-  const filteredInstructors = instructors
-    .filter((instructor) =>
-      instructor.attributes.instructor_name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .slice(0, 5); // 🔥 Limit to top 5 matches
+const filteredInstructors = instructors
+  .filter(instructor =>
+    instructor.attributes.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !courseInstructors.some(courseInstructor => courseInstructor.id === instructor.id) // Exclude already linked instructors
+  )
+  .slice(0, 5); 
 
   // Handle selection of instructors for the course
   const handleSelectInstructor = (id: number) => {
@@ -49,7 +52,7 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
       // Send request to add selected instructor to the course
       courseInstructorService.linkInstructorToCourse(token, courseId, id)
         .then(() => toast.success("Instructor added successfully!"))
-        .catch((error: any) => {
+        .catch((error: unknown) => {
           console.error("Error linking instructor:", error);
           toast.error("Failed to link instructor to course.");
         });
@@ -57,33 +60,28 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
   };
 
   // Handle creating a new instructor and linking them to the course
-  const handleAddNewInstructor = async () => {
-    if (!newInstructorName || !token || !courseId) {
-      toast.error("Course ID is required to add an instructor.");
-      return;
-    }
+ const handleAddNewInstructor = async (newInstructorData: ICoursesInstructorAttributes) => {
+  if (!newInstructorData.instructor_name.trim() || !token || !courseId) {
+    toast.error("instructor name, Course ID and token are required to add an instructor.");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const payload = {
-        instructor_name: newInstructorName,
-        courses: [courseId],
-      };
-      const response = await courseInstructorService.createInstructor(token, payload);
-      const newInstructor = response;
+  try {
+    setLoading(true);
+    const payload = { ...newInstructorData, courses: [courseId] };
+    const response = await courseInstructorService.createInstructor(token, payload);
+    console.log("Instructor created:", response);
+    setInstructors([...instructors, response]);
+    setCourseInstructors([...courseInstructors, response]);
 
-      setInstructors([...instructors, newInstructor]);
-      setCourseInstructors([...courseInstructors, newInstructor]);
-
-      setNewInstructorName("");
-      toast.success("Instructor added successfully!");
-    } catch (error) {
-      console.error("Error creating instructor:", error);
-      toast.error("Failed to add instructor.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("Instructor added successfully!");
+  } catch (error) {
+    console.error("Error creating instructor:", error);
+    toast.error("Failed to add instructor.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Handle removing an instructor from the course
   const handleRemoveInstructor = async (id: number) => {
@@ -157,20 +155,20 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
       {/* Add new instructor */}
       <div className="space-y-2">
-        <Label htmlFor="new-instructor">Add New Instructor</Label>
-        <Input
-          id="new-instructor"
-          value={newInstructorName}
-          onChange={(e) => setNewInstructorName(e.target.value)}
-          placeholder="Enter new instructor name"
-        />
-        <Button
-          onClick={handleAddNewInstructor}
-          className="bg-[#AC19AD] hover:bg-[#8A1489] text-white transition"
-          disabled={!newInstructorName || loading}
-        >
-          {loading ? "Adding..." : "Add Instructor"}
-        </Button>
+
+        <InstructorFormModal 
+  isOpen={isModalOpen} 
+  onClose={() => setIsModalOpen(false)} 
+  onSuccess={handleAddNewInstructor} 
+/>
+
+<Button
+  onClick={() => setIsModalOpen(true)}
+  className="bg-[#AC19AD] hover:bg-[#8A1489] text-white transition"
+  disabled={loading} 
+>
+  {loading ? "Adding..." : "Add Instructor"}
+</Button>
       </div>
     </div>
   );
