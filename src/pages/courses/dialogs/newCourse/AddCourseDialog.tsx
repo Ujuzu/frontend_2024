@@ -14,6 +14,7 @@ import WeeklyCurriculaForm from "./WeeklyCurriculaForm";
 import BasicInfoForm from "./BasicInfoForm";
 import { unwrapRelation } from "@/service/relationUnwrapper";
 import CourseInstructorsForm from "./CourseInstructorsForm";
+import CourseQualificationsForm from "./courseQualificationsForm";
 
 
 const AddCourseDialog: React.FC<ICourseDialogProps> = ({
@@ -253,9 +254,9 @@ useEffect(() => {
             <LearnListForm formData={formData} setFormData={setFormData} courseId={courseId}  />
           </TabsContent> */}
           
-          {/* <TabsContent value="qualifications">
-            <QualificationsForm formData={formData} setFormData={setFormData} courseId={courseId} />
-          </TabsContent> */}
+          <TabsContent value="qualifications">
+            <CourseQualificationsForm formData={formData} setFormData={setFormData} courseId={courseId} />
+          </TabsContent>
           
           {/* <TabsContent value="features">
             <FeaturesForm formData={formData} setFormData={setFormData} courseId={courseId} />

@@ -30,7 +30,7 @@ const handleSubmit = async () => {
     return;
   }
 
-  await onSuccess(formData); // 🔥 Pass full instructor data instead of just the name
+  await onSuccess(formData); 
   onClose(); // Closes the modal after submission
 }
 
