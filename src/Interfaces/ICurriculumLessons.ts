@@ -30,4 +30,5 @@ export interface CurriculumLessonsFormProps {
   onClose: () => void;
   curriculum: IWeeklyCurriculumResponse;
   token: ILoginToken | null;
+  courseTitle?: string;
 }

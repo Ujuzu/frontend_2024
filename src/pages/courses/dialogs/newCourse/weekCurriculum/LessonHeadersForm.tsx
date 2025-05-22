@@ -1,17 +1,29 @@
 // LessonHeadersForm.tsx
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { ILessonHeaderResponse, LessonHeadersFormProps } from "@/Interfaces/ILessonHeaders";
 import { lessonHeaderService } from "@/service/curriculumLessonHeaderService";
+import { LessonHeadersFormProps } from "@/Interfaces/ILessonHeaders";
+import useFetchLessonHeaders from "@/hooks/useFetchLessonHeaders";
 
 
 
-const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ isOpen, onClose, lesson, token }) => {
-  const [headers, setHeaders] = useState<ILessonHeaderResponse[]>([]);
+const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ 
+  isOpen, 
+  onClose, 
+  lesson, 
+  token 
+}) => {
+  // Use the custom hook - only fetch when modal is open
+  const { headers, loading, error, refreshHeaders } = useFetchLessonHeaders(
+    token, 
+    lesson?.id, 
+    isOpen
+  );
+  
   const [isHeaderModalOpen, setIsHeaderModalOpen] = useState(false);
   const [editingHeaderIndex, setEditingHeaderIndex] = useState<number | null>(null);
   const [headerFormData, setHeaderFormData] = useState({
@@ -21,22 +33,6 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ isOpen, onClose, 
     sort_order: 0,
     content_2: ""
   });
-
-  useEffect(() => {
-    const fetchHeaders = async () => {
-      if (!token || !lesson?.id) return;
-      try {
-        const response = await lessonHeaderService.getCurriculumLessonsHeader(token, lesson.id);
-        setHeaders(response.data);
-      } catch (error) {
-        console.error("Error fetching lesson headers:", error);
-        toast.error("Error fetching lesson headers.");
-      }
-    };
-    if (isOpen) {
-      fetchHeaders();
-    }
-  }, [token, lesson, isOpen]);
 
   const handleOpenHeaderModal = (index?: number) => {
     if (index !== undefined) {
@@ -66,27 +62,51 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ isOpen, onClose, 
       toast.error("Enter header title.");
       return;
     }
+    
     try {
       const payload = { ...headerFormData, crs_cur_lessons: [lesson.id] };
-      let savedHeader;
+      // let savedHeader;
+      
       if (editingHeaderIndex !== null) {
-        const updated = await lessonHeaderService.updateCurriculumLessonHeader(token, headers[editingHeaderIndex].id, payload);
-        savedHeader = updated.data;
-        const updatedHeaders = [...headers];
-        updatedHeaders[editingHeaderIndex] = savedHeader;
-        setHeaders(updatedHeaders);
+        // Update existing header
+        await lessonHeaderService.updateCurriculumLessonHeader(
+          token, 
+          headers[editingHeaderIndex].id, 
+          payload
+        );
+        // savedHeader = updated.data;
       } else {
-        const created = await lessonHeaderService.createCurriculumLessonHeader(token, payload);
-        savedHeader = created;
-        setHeaders([...headers, savedHeader]);
+        // Create new header
+        await lessonHeaderService.createCurriculumLessonHeader(token, payload);
+        // savedHeader = created;
       }
+      
       toast.success("Lesson header saved!");
       setIsHeaderModalOpen(false);
+      
+      // Refresh the headers list to get the latest data from the server
+      await refreshHeaders();
+      
     } catch (error) {
       console.error("Error saving header:", error);
       toast.error("Error saving header.");
     }
   };
+
+  // Handle loading and error states
+  if (loading && headers.length === 0 && isOpen) {
+    return <div>Loading lesson headers...</div>;
+  }
+
+  if (error && isOpen) {
+    return (
+      <div>
+        <p>Error loading lesson headers: {error}</p>
+        <button onClick={refreshHeaders}>Retry</button>
+      </div>
+    );
+  }
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

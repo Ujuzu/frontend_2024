@@ -1,5 +1,5 @@
 // CurriculumLessonsForm.tsx
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,37 +8,29 @@ import { toast } from "react-hot-toast";
 import LessonHeadersForm from "./LessonHeadersForm";
 import { curriculumLessonService } from "@/service/curriculumLessonService";
 import { CurriculumLessonsFormProps, ICurriculumLessonAttributes, ICurriculumLessonResponse } from "@/Interfaces/ICurriculumLessons";
+import useFetchCurriculumLessons from "@/hooks/useFetchCurriculumLessons";
 
 
 
 const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, onClose, curriculum, token }) => {
-  const [lessons, setLessons] = useState<ICurriculumLessonResponse[]>([]);
+  const { lessons, loading, error, refreshLessons } = useFetchCurriculumLessons(
+    token, 
+    curriculum?.id, 
+    isOpen
+  );
+  
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [editingLessonIndex, setEditingLessonIndex] = useState<number | null>(null);
   const [lessonFormData, setLessonFormData] = useState<ICurriculumLessonAttributes>(
     { curriculum_lesson_title: "", 
-    curriculum_lesson_desc: "" }
+      curriculum_lesson_desc: "" }
   );
+  
   // For the nested Lesson Headers modal:
   const [openHeadersModal, setOpenHeadersModal] = useState(false);
   const [currentLesson, setCurrentLesson] = useState<ICurriculumLessonResponse>({} as ICurriculumLessonResponse);
-
+  
   console.log("Curriculum Lessons Form Props", { curriculum });
-  useEffect(() => {
-    const fetchLessons = async () => {
-      if (!token || !curriculum?.id) return;
-      try {
-        const response = await curriculumLessonService.getCurriculumLessons(token, curriculum.id);
-        setLessons(response.data);
-      } catch (error) {
-        console.error("Error fetching lessons:", error);
-        toast.error("Error fetching lessons.");
-      }
-    };
-    if (isOpen) {
-      fetchLessons();
-    }
-  }, [token, curriculum, isOpen]);
 
   const handleOpenLessonModal = (index?: number) => {
     if (index !== undefined) {
@@ -56,29 +48,67 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
       toast.error("Enter lesson name.");
       return;
     }
+    
     try {
-      const payload = { ...lessonFormData, curriculum: curriculum.id };
+      const payload = { ...lessonFormData, courses_weekly_curricula: [curriculum.id] };
+
+      console.log("Lesson Form Data",  payload );
+
       let savedLesson;
+      
       if (editingLessonIndex !== null) {
-        const updated = await curriculumLessonService.updateCurriculumLesson(token, lessons[editingLessonIndex].id, payload);
+        // Update existing lesson
+        const updated = await curriculumLessonService.updateCurriculumLesson(
+          token, 
+          lessons[editingLessonIndex].id, 
+          payload
+        );
         savedLesson = updated.data;
-        const updatedLessons = [...lessons];
-        updatedLessons[editingLessonIndex] = savedLesson;
-        setLessons(updatedLessons);
       } else {
+        // Create new lesson
         const created = await curriculumLessonService.createCurriculumLesson(token, payload);
         savedLesson = created;
-        setLessons([...lessons, savedLesson]);
       }
+      
       toast.success("Lesson saved!");
       setIsLessonModalOpen(false);
-      setCurrentLesson(savedLesson);
+      
+      // Refresh the lessons list to get the latest data from the server
+      await refreshLessons();
+      
+      // Find the saved lesson in the refreshed list for the next modal
+      const refreshedLesson = lessons.find(lesson => 
+        lesson.id === (savedLesson.id || savedLesson.data?.id)
+      );
+      
+      if (refreshedLesson) {
+        setCurrentLesson(refreshedLesson);
+      } else {
+        // Fallback: use the saved lesson data directly
+        setCurrentLesson(savedLesson.data || savedLesson);
+      }
+      
       setOpenHeadersModal(true); // open nested Lesson Headers modal
+      
     } catch (error) {
       console.error("Error saving lesson:", error);
       toast.error("Error saving lesson.");
     }
   };
+
+  // Handle loading and error states
+  if (loading && lessons.length === 0 && isOpen) {
+    return <div>Loading lessons...</div>;
+  }
+
+  if (error && isOpen) {
+    return (
+      <div>
+        <p>Error loading lessons: {error}</p>
+        <button onClick={refreshLessons}>Retry</button>
+      </div>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
