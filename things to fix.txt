@@ -8,3 +8,4 @@
 8. fun moment (user interactive UI response) ** Blank for me 
 10 . we skip 9 , hated most. debugging. and go to 10. user testing haha
 11. cheers and deploy.
+12. limit input size, esp description

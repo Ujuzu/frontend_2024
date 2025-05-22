@@ -29,8 +29,6 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
   // For the nested Lesson Headers modal:
   const [openHeadersModal, setOpenHeadersModal] = useState(false);
   const [currentLesson, setCurrentLesson] = useState<ICurriculumLessonResponse>({} as ICurriculumLessonResponse);
-  
-  console.log("Curriculum Lessons Form Props", { curriculum });
 
   const handleOpenLessonModal = (index?: number) => {
     if (index !== undefined) {
@@ -51,8 +49,6 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
     
     try {
       const payload = { ...lessonFormData, courses_weekly_curricula: [curriculum.id] };
-
-      console.log("Lesson Form Data",  payload );
 
       let savedLesson;
       
@@ -96,6 +92,11 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
     }
   };
 
+    const handleOpenLessonsModal = (lesseon:ICurriculumLessonResponse) => {
+      setCurrentLesson(lesseon);
+      setOpenHeadersModal(true);
+    };
+
   // Handle loading and error states
   if (loading && lessons.length === 0 && isOpen) {
     return <div>Loading lessons...</div>;
@@ -119,7 +120,11 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
 
         {lessons.map((lesson, index) => (
           <div key={lesson.id} className="border p-3 rounded flex justify-between items-center mb-2">
-            <span className="text-lg font-medium">{lesson.attributes.curriculum_lesson_title}</span>
+                    <span 
+  className="text-lg font-medium cursor-pointer hover:text-[#AC19AD] transition-colors" 
+  onClick={() => handleOpenLessonsModal(lesson)}
+>{lesson.attributes.curriculum_lesson_title}
+           </span>
             <Button onClick={() => handleOpenLessonModal(index)}>
               <Pencil size={16} />
             </Button>
