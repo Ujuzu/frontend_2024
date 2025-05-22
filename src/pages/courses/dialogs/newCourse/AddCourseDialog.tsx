@@ -237,7 +237,7 @@ useEffect(() => {
             <CategoriesForm formData={formData} setFormData={setFormData} courseId={courseId} />
           </TabsContent> */}
           
-          <TabsContent value="instructors">
+          <TabsContent value="instructors" >
             <CourseInstructorsForm formData={formData} setFormData={setFormData} courseId={courseId} />
           </TabsContent>
           

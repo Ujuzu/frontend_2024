@@ -9,3 +9,4 @@
 10 . we skip 9 , hated most. debugging. and go to 10. user testing haha
 11. cheers and deploy.
 12. limit input size, esp description
+13.   maxFileSize?: number; // in MB, most ithink 5 will wbe max, this later shoeld go to env

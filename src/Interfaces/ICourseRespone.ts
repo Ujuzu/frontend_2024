@@ -4,6 +4,7 @@ import { ICourseFeatureResponse } from "./ICourseFeature";
 import { ICoursesInstructorResponse } from "./ICourseInstructor";
 import { ICourseSubcategoryResponse } from "./ICourseSubcategory";
 import { ILearnListResponse } from "./ILearnList";
+import { IMedia } from "./IMedia";
 import { IMeta } from "./IMeta";
 import { ICourseQualificationReqResponse } from "./IQualificationRequirement";
 import { ISubscriptionPackageResponse } from "./ISubscriptionPackage";
@@ -41,8 +42,7 @@ export interface ICourseAttributes {
   updatedBy?:string;
     createdAt?: string;
     updatedAt?: string;
- course_intro_img?: MediaData;
-   course_intro_video?: NullableMediaData;
+
 }
 
 export interface ICourseAttributesStrapiResponse extends ICourseAttributes {
@@ -56,14 +56,16 @@ courses_subcategories?: RelationData<ICourseSubcategoryResponse[]>;
   course_reviews?: RelationData<unknown>;
   courses_features?: RelationData<ICourseFeatureResponse[]>;
   courses_weekly_curricula?: RelationData<IWeeklyCurriculumResponse[]>;
+  course_intro_img?: IMedia;
+   course_intro_video?: IMedia;
 }
 
 export interface ICourseAttributesDataPayload extends ICourseAttributes {
   courses_subcategories?:number[];
   courses_categories?:number[];
   courses_instructors?:number[];
-  course_intro_video?:MediaData;
-  course_intro_img?:MediaData;
+  course_intro_video_url?:string;
+  course_intro_img?:number;
   course_target_groups?:number[];
   course_learn_lists?:number[];
   course_qualification_equirements?:number[];
@@ -99,39 +101,4 @@ courseId: number;
 
 export interface RelationData<T> {
   data: T;
-}
-interface MediaData {
-  data: {
-    id: number;
-    attributes: MediaAttributes;
-  };
-}
-
-interface NullableMediaData {
-  data: null | {
-    id: number;
-    attributes: MediaAttributes;
-  };
-}
-
-interface MediaAttributes {
-  name: string;
-  alternativeText: string | null;
-  caption: string | null;
-  width: number;
-  height: number;
-  formats: unknown; 
-  hash: string;
-  ext: string;
-  mime: string;
-  size: number;
-  url: string;
-  previewUrl: string | null;
-  provider: string;
-  provider_metadata: {
-    public_id: string;
-    resource_type: string;
-  };
-  createdAt: string;
-  updatedAt: string;
 }

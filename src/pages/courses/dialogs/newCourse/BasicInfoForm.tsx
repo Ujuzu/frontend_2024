@@ -18,6 +18,8 @@ import { ICourseSubcategoryResponse } from "@/Interfaces/ICourseSubcategory";
 import { courseService } from "@/service/courseService";
 import { useAuth } from "@/context/AuthContext";
 import CategorySelector from "../../components/AddCategories";
+import { IStrapiUploadResponse } from "@/Interfaces/IStrapiFileUploader";
+import StrapiFileUploader from "@/components/input/StrapiFileUploader";
 
 const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
   // Ensure formData is initialized
@@ -26,6 +28,7 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
     ICourseSubcategoryResponse[]
   >([]);
   const { token } = useAuth();
+
   // console.log("formData", formData);
   useEffect(() => {
     const fetchCategories = async () => {
@@ -63,6 +66,7 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
       [name]: value ?? "",
     });
   };
+
   // Handle switch toggle changes
   const handleSwitchChange = (name: string, checked: boolean) => {
     setFormData({
@@ -86,6 +90,14 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
       ...formData,
       [name]: Number(value) || 0, // Converts to number safely
     });
+  };
+
+    // Handle file upload changes
+    const handleThumbnailUpload = (fileData: IStrapiUploadResponse) => {
+    setFormData(prev => ({
+      ...prev,
+      course_intro_img: fileData.id
+    }));
   };
 
   return (
@@ -324,6 +336,21 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
           setFormData({ ...formData, courses_subcategories: ids })
         }
       />
+
+{/* Course course intro image*/}
+
+      <div className="space-y-2">
+        
+        <Label htmlFor="course_intro_img" className="text-sm font-medium">
+          Course Intro Image
+        </Label>
+ <StrapiFileUploader
+          onUploadSuccess={handleThumbnailUpload}
+          mediaType="image"
+          multiple={false}
+          maxFileSize={1}
+        />
+      </div>
 
       {/* Course Features */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
