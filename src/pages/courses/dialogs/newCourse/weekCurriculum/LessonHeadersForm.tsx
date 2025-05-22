@@ -1,22 +1,17 @@
 // LessonHeadersForm.tsx
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { lessonHeaderService } from "@/service/lessonHeaderService";
+import { ILessonHeaderResponse, LessonHeadersFormProps } from "@/Interfaces/ILessonHeaders";
+import { lessonHeaderService } from "@/service/curriculumLessonHeaderService";
 
-interface LessonHeadersFormProps {
-  isOpen: boolean;
-  onClose: () => void;
-  lesson: any;
-  token: string;
-}
+
 
 const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ isOpen, onClose, lesson, token }) => {
-  const [headers, setHeaders] = useState<any[]>([]);
+  const [headers, setHeaders] = useState<ILessonHeaderResponse[]>([]);
   const [isHeaderModalOpen, setIsHeaderModalOpen] = useState(false);
   const [editingHeaderIndex, setEditingHeaderIndex] = useState<number | null>(null);
   const [headerFormData, setHeaderFormData] = useState({
@@ -31,7 +26,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ isOpen, onClose, 
     const fetchHeaders = async () => {
       if (!token || !lesson?.id) return;
       try {
-        const response = await lessonHeaderService.getLessonHeaders(token, lesson.id);
+        const response = await lessonHeaderService.getCurriculumLessonsHeader(token, lesson.id);
         setHeaders(response.data);
       } catch (error) {
         console.error("Error fetching lesson headers:", error);
@@ -46,7 +41,13 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ isOpen, onClose, 
   const handleOpenHeaderModal = (index?: number) => {
     if (index !== undefined) {
       setEditingHeaderIndex(index);
-      setHeaderFormData(headers[index]);
+      setHeaderFormData({
+        curriculum_lesson_header_title: headers[index].attributes.curriculum_lesson_header_title ?? "",
+        course_curriculum_lesson_header_content: headers[index].attributes.course_curriculum_lesson_header_content ?? "",
+        video_url: headers[index].attributes.video_url ?? "",
+        sort_order: headers[index].attributes.sort_order ?? 0,
+        content_2: headers[index].attributes.content_2 ?? ""
+      });
     } else {
       setEditingHeaderIndex(null);
       setHeaderFormData({
@@ -69,14 +70,14 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ isOpen, onClose, 
       const payload = { ...headerFormData, crs_cur_lessons: [lesson.id] };
       let savedHeader;
       if (editingHeaderIndex !== null) {
-        const updated = await lessonHeaderService.updateHeader(token, headers[editingHeaderIndex].id, payload);
+        const updated = await lessonHeaderService.updateCurriculumLessonHeader(token, headers[editingHeaderIndex].id, payload);
         savedHeader = updated.data;
         const updatedHeaders = [...headers];
         updatedHeaders[editingHeaderIndex] = savedHeader;
         setHeaders(updatedHeaders);
       } else {
-        const created = await lessonHeaderService.createHeader(token, payload);
-        savedHeader = created.data;
+        const created = await lessonHeaderService.createCurriculumLessonHeader(token, payload);
+        savedHeader = created;
         setHeaders([...headers, savedHeader]);
       }
       toast.success("Lesson header saved!");
@@ -91,12 +92,12 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ isOpen, onClose, 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Lesson Headers for "{lesson.name}"</DialogTitle>
+          <DialogTitle>Lesson Headers for "{lesson?.attributes?.curriculum_lesson_title ? lesson?.attributes?.curriculum_lesson_title : `No Lesson available` } "</DialogTitle>
         </DialogHeader>
 
         {headers.map((header, index) => (
           <div key={header.id} className="border p-3 rounded flex justify-between items-center mb-2">
-            <span className="text-lg font-medium">{header.curriculum_lesson_header_title}</span>
+            <span className="text-lg font-medium">{header?.attributes?.curriculum_lesson_header_title}</span>
             <Button onClick={() => handleOpenHeaderModal(index)}>
               <Pencil size={16} />
             </Button>

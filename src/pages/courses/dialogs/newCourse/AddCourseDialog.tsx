@@ -154,7 +154,6 @@ useEffect(() => {
 
       const result = await response.data;
       toast.success(`Course ${isEdit ? "updated" : "created"} successfully!`);
-      console.log("submitiing result Course:", result.data);
       // Update courseId and formData with the response
 
       setCourseId(result.data.id);
@@ -210,14 +209,14 @@ useEffect(() => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full h-full sm:w-screen sm:h-screen max-w-none max-h-none overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-800">
             {isEdit ? 'Edit Course' : 'Create New Course'}
           </DialogTitle>
         </DialogHeader>
         
-        <Tabs value={activeStep} onValueChange={setActiveStep} className="w-full">
+        <Tabs value={activeStep} onValueChange={setActiveStep} className="w-full h-full">
           <TabsList className="grid grid-cols-5 mb-6 overflow-x-auto">
             {steps.map((step) => (
               <TabsTrigger
@@ -230,7 +229,7 @@ useEffect(() => {
             ))}
           </TabsList>
           
-          <TabsContent value="basic-info">
+          <TabsContent value="basic-info" className="w-full h-full">
             <BasicInfoForm formData={formData} setFormData={setFormData} courseId={courseId} />
           </TabsContent>
 {/*           

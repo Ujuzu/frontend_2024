@@ -2,7 +2,13 @@ import { IFormStepProps } from "@/Interfaces/ICourseRespone";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BookOpen } from "lucide-react";
 
@@ -15,15 +21,18 @@ import CategorySelector from "../../components/AddCategories";
 
 const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
   // Ensure formData is initialized
-   const [categories, setCategories] = useState<ICourseCategoryResponse[]>([]);
-  const [subcategories, setSubcategories] = useState<ICourseSubcategoryResponse[]>([]);
-  const {token} = useAuth();
+  const [categories, setCategories] = useState<ICourseCategoryResponse[]>([]);
+  const [subcategories, setSubcategories] = useState<
+    ICourseSubcategoryResponse[]
+  >([]);
+  const { token } = useAuth();
   // console.log("formData", formData);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categoryData = await courseService.getCourseCatergories(token) || [];
-        setCategories(categoryData.data? categoryData.data : []);
+        const categoryData =
+          (await courseService.getCourseCatergories(token)) || [];
+        setCategories(categoryData.data ? categoryData.data : []);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -31,7 +40,8 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
 
     const fetchSubcategories = async () => {
       try {
-        const subcategoryData = await courseService.getCourseSubCategories(token) || [];
+        const subcategoryData =
+          (await courseService.getCourseSubCategories(token)) || [];
         setSubcategories(subcategoryData.data ? subcategoryData.data : []);
       } catch (error) {
         console.error("Error fetching subcategories:", error);
@@ -43,19 +53,21 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
   }, [token]);
 
   // Handle text input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-   if (!formData) return;
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (!formData) return;
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value ?? ""
+      [name]: value ?? "",
     });
   };
   // Handle switch toggle changes
   const handleSwitchChange = (name: string, checked: boolean) => {
     setFormData({
       ...formData,
-      [name]: checked
+      [name]: checked,
     });
   };
 
@@ -63,22 +75,21 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
   const handleSelectChange = (name: string, value: string) => {
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
   // Handle numeric input changes
-const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = e.target;
-  setFormData({
-    ...formData,
-    [name]: Number(value) || 0, // Converts to number safely
-  });
-};
-
+  const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: Number(value) || 0, // Converts to number safely
+    });
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full h-full">
       <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
         <BookOpen size={20} className="text-[#AC19AD]" />
         <h2 className="text-xl font-semibold">Basic Course Information</h2>
@@ -92,7 +103,7 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         <Input
           id="course_name"
           name="course_name"
-          value={formData.course_name || ''}
+          value={formData.course_name || ""}
           onChange={handleInputChange}
           placeholder="Enter course name"
           className="w-full"
@@ -108,7 +119,7 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         <Textarea
           id="short_desc"
           name="short_desc"
-          value={formData.short_desc || ''}
+          value={formData.short_desc || ""}
           onChange={handleInputChange}
           placeholder="Brief description of the course"
           className="w-full resize-none"
@@ -125,7 +136,7 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           <Textarea
             id="short_desc_2"
             name="short_desc_2"
-            value={formData.short_desc_2 || ''}
+            value={formData.short_desc_2 || ""}
             onChange={handleInputChange}
             placeholder="Additional course description"
             className="w-full resize-none"
@@ -139,7 +150,7 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           <Textarea
             id="short_desc_3"
             name="short_desc_3"
-            value={formData.short_desc_3 || ''}
+            value={formData.short_desc_3 || ""}
             onChange={handleInputChange}
             placeholder="Extra course description"
             className="w-full resize-none"
@@ -156,7 +167,7 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         <Textarea
           id="course_outline"
           name="course_outline"
-          value={formData.course_outline || ''}
+          value={formData.course_outline || ""}
           onChange={handleInputChange}
           placeholder="Detailed outline of the course"
           className="w-full resize-none"
@@ -166,13 +177,16 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
       {/* Weekly Curriculum Intro */}
       <div className="space-y-2">
-        <Label htmlFor="weekly_curriculum_intro" className="text-sm font-medium">
+        <Label
+          htmlFor="weekly_curriculum_intro"
+          className="text-sm font-medium"
+        >
           Weekly Curriculum Introduction
         </Label>
         <Textarea
           id="weekly_curriculum_intro"
           name="weekly_curriculum_intro"
-          value={formData.weekly_curriculum_intro || ''}
+          value={formData.weekly_curriculum_intro || ""}
           onChange={handleInputChange}
           placeholder="Introduction to the weekly curriculum"
           className="w-full resize-none"
@@ -190,7 +204,7 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           <Input
             id="duration"
             name="duration"
-            value={formData.duration || ''}
+            value={formData.duration || ""}
             onChange={handleInputChange}
             placeholder="e.g. 8 weeks, 3 months"
             className="w-full"
@@ -203,8 +217,8 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             Language
           </Label>
           <Select
-            value={formData.language || ''}
-            onValueChange={(value) => handleSelectChange('language', value)}
+            value={formData.language || ""}
+            onValueChange={(value) => handleSelectChange("language", value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select language" />
@@ -226,8 +240,8 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             Difficulty Level
           </Label>
           <Select
-            value={formData.level || ''}
-            onValueChange={(value) => handleSelectChange('level', value)}
+            value={formData.level || ""}
+            onValueChange={(value) => handleSelectChange("level", value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select level" />
@@ -283,43 +297,33 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           <Input
             id="video_url"
             name="video_url"
-            value={formData.video_url || ''}
+            value={formData.video_url || ""}
             onChange={handleInputChange}
             placeholder="https://..."
             className="w-full"
           />
         </div>
       </div>
-<CategorySelector
-  availableCategories={categories}
-  availableSubcategories={subcategories}
-  selectedCategories={Array.isArray(formData?.courses_categories)
-  ? formData.courses_categories: []} 
-  selectedSubcategories={Array.isArray(formData?.courses_subcategories)
-  ? formData?.courses_subcategories : []} 
-  setSelectedCategories={(ids) => setFormData({ ...formData, courses_categories: ids })}
-  setSelectedSubcategories={(ids) => setFormData({ ...formData, courses_subcategories: ids })}
-
-// setSelectedCategories={(ids) =>
-//   setFormData({
-//     ...formData,
-//     courses_categories: ids.map(id => 
-//       categories.find(category => category.id === id) || { id, attributes: { title: "Unknown Category" } }
-//     ) // 🔥 Finds the full category object
-//   })
-// }
-// setSelectedSubcategories={(ids) =>
-//   setFormData({
-//     ...formData,
-//     courses_subcategories: ids.map(id => 
-//       subcategories.find(subcategory => subcategory.id === id) || { id, attributes: { title: "Unknown Subcategory" } }
-//     ) // 🔥 Finds the full subcategory object
-//   })
-// }
-
-/>
-
-
+      <CategorySelector
+        availableCategories={categories}
+        availableSubcategories={subcategories}
+        selectedCategories={
+          Array.isArray(formData?.courses_categories)
+            ? formData.courses_categories
+            : []
+        }
+        selectedSubcategories={
+          Array.isArray(formData?.courses_subcategories)
+            ? formData?.courses_subcategories
+            : []
+        }
+        setSelectedCategories={(ids) =>
+          setFormData({ ...formData, courses_categories: ids })
+        }
+        setSelectedSubcategories={(ids) =>
+          setFormData({ ...formData, courses_subcategories: ids })
+        }
+      />
 
       {/* Course Features */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
@@ -336,7 +340,9 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             id="certificate"
             name="certificate"
             checked={!!formData.certificate}
-            onCheckedChange={(checked) => handleSwitchChange('certificate', checked)}
+            onCheckedChange={(checked) =>
+              handleSwitchChange("certificate", checked)
+            }
           />
         </div>
 
@@ -353,7 +359,7 @@ const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             id="quizes"
             name="quizes"
             checked={!!formData.quizes}
-            onCheckedChange={(checked) => handleSwitchChange('quizes', checked)}
+            onCheckedChange={(checked) => handleSwitchChange("quizes", checked)}
           />
         </div>
       </div>
