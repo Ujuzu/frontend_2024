@@ -3,7 +3,7 @@ import { IMedia } from "./IMedia";
 import { IMeta } from "./IMeta";
 
 export interface ICoursesInstructorStrapiResponse {
-  data: ICoursesInstructorResponse[];
+  data: ICoursesInstructorAttributesWithMedia[];
   meta: IMeta
 }
 
@@ -20,7 +20,7 @@ export interface ICoursesInstructorAttributes {
   instructor_fb?: string;
   instructor_youtube?: string;
   instructor_email?: string;
-  instructor_img?: IMedia;
+  instructor_img?: number;
   courses?:number[];
   country?: string;
   contact?: string;
@@ -35,4 +35,8 @@ export interface InstructorFormModalProps {
   onSuccess: (newInstructorData: ICoursesInstructorAttributes) => Promise<void>;
   courseId?: number;
 }
+
+export type ICoursesInstructorAttributesWithMedia = Omit<ICoursesInstructorAttributes, 'instructor_img'> & {
+  instructor_img?: IMedia;
+};
 

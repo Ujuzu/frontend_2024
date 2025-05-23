@@ -8,7 +8,8 @@ import { toast } from "react-hot-toast";
 import { lessonHeaderService } from "@/service/curriculumLessonHeaderService";
 import { LessonHeadersFormProps } from "@/Interfaces/ILessonHeaders";
 import useFetchLessonHeaders from "@/hooks/useFetchLessonHeaders";
-
+// import ReactQuill from "react-quill";
+// import "react-quill/dist/quill.snow.css";
 
 
 const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({ 
@@ -166,6 +167,15 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
                 setHeaderFormData({ ...headerFormData, sort_order: Number(e.target.value) })
               }
             />
+
+            <label className="text-sm font-medium">Rich Text Content</label>
+            {/* <ReactQuill
+              theme="snow"
+              value={headerFormData.course_curriculum_lesson_header_content}
+              onChange={(content:string) => setHeaderFormData({ ...headerFormData, course_curriculum_lesson_header_content: content })}
+            /> */}
+
+
             <Input
               name="content_2"
               placeholder="Additional Content"

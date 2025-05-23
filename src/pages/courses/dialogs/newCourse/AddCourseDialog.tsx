@@ -30,6 +30,7 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 const [formData, setFormData] = useState<ICourseAttributesDataPayload>(() => {
   const attrbs = initialData?.attributes;
+  
   return attrbs && isEdit 
     ? {
     // 🔹 Non-array fields first
@@ -47,6 +48,7 @@ const [formData, setFormData] = useState<ICourseAttributesDataPayload>(() => {
     duration: attrbs.duration,
     video_url: attrbs.video_url,
     locale: attrbs.locale || "en",
+    course_intro_img:attrbs.course_intro_img?.data?.id,
 
     // boolean fields
     
@@ -82,6 +84,7 @@ const [formData, setFormData] = useState<ICourseAttributesDataPayload>(() => {
       };
 });
   const [courseId, setCourseId] = useState<number>(course_Id || 0);
+  const courseData = initialData?.id && initialData.attributes && isEdit ? initialData : null
 const {token} = useAuth();
 
 useEffect(() => {
@@ -211,8 +214,8 @@ useEffect(() => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-full h-full sm:w-screen sm:h-screen max-w-none max-h-none overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-800">
-            {isEdit ? 'Edit Course' : 'Create New Course'}
+          <DialogTitle className="text-3xl font-bold text-gray-800">
+            {isEdit && initialData?.id && initialData.attributes ? initialData.attributes.course_name : 'Create New Course'}
           </DialogTitle>
         </DialogHeader>
         
@@ -230,7 +233,7 @@ useEffect(() => {
           </TabsList>
           
           <TabsContent value="basic-info" className="w-full h-full">
-            <BasicInfoForm formData={formData} setFormData={setFormData} courseId={courseId} />
+            <BasicInfoForm formData={formData} setFormData={setFormData} courseId={courseId} courseData={courseData} />
           </TabsContent>
 {/*           
           <TabsContent value="categories">
@@ -238,7 +241,7 @@ useEffect(() => {
           </TabsContent> */}
           
           <TabsContent value="instructors" >
-            <CourseInstructorsForm formData={formData} setFormData={setFormData} courseId={courseId} />
+            <CourseInstructorsForm formData={formData} setFormData={setFormData} courseId={courseId} courseData={courseData}/>
           </TabsContent>
           
           {/* <TabsContent value="media">
@@ -246,7 +249,7 @@ useEffect(() => {
           </TabsContent> */}
           
           <TabsContent value="target-groups">
-            <TargetGroupsForm courseId={courseId} formData={formData} setFormData={setFormData} />
+            <TargetGroupsForm courseId={courseId} formData={formData} setFormData={setFormData} courseData={courseData}/>
           </TabsContent>
           
           {/* <TabsContent value="learn-list">
@@ -254,7 +257,7 @@ useEffect(() => {
           </TabsContent> */}
           
           <TabsContent value="qualifications">
-            <CourseQualificationsForm formData={formData} setFormData={setFormData} courseId={courseId} />
+            <CourseQualificationsForm formData={formData} setFormData={setFormData} courseId={courseId} courseData={courseData}/>
           </TabsContent>
           
           {/* <TabsContent value="features">
@@ -262,7 +265,7 @@ useEffect(() => {
           </TabsContent> */}
           
           <TabsContent value="weekly-curricula">
-            <WeeklyCurriculaForm formData={formData} setFormData={setFormData} courseId={courseId} />
+            <WeeklyCurriculaForm formData={formData} setFormData={setFormData} courseId={courseId} courseData={courseData}/>
           </TabsContent>
           
           {/* <TabsContent value="packages">

@@ -5,7 +5,7 @@ data: null | {
   };
 }
 
-interface MediaAttributes {
+export interface MediaAttributes {
   name: string;
   alternativeText: string | null;
   caption: string | null;

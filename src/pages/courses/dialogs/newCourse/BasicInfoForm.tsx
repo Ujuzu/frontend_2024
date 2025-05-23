@@ -21,7 +21,7 @@ import CategorySelector from "../../components/AddCategories";
 import { IStrapiUploadResponse } from "@/Interfaces/IStrapiFileUploader";
 import StrapiFileUploader from "@/components/input/StrapiFileUploader";
 
-const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
+const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData,courseData }) => {
   // Ensure formData is initialized
   const [categories, setCategories] = useState<ICourseCategoryResponse[]>([]);
   const [subcategories, setSubcategories] = useState<
@@ -29,7 +29,7 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
   >([]);
   const { token } = useAuth();
 
-  // console.log("formData", formData);
+  console.log("courseData", courseData);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -104,7 +104,11 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData }) => {
     <div className="space-y-6 w-full h-full">
       <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
         <BookOpen size={20} className="text-[#AC19AD]" />
-        <h2 className="text-xl font-semibold">Basic Course Information</h2>
+        <h2 className="text-xl font-semibold">
+          {courseData?.id && courseData.attributes
+            ? `Editing course for ${courseData.attributes.course_name}`
+            : "Adding new Course Information"}
+        </h2>
       </div>
 
       {/* Course Name */}

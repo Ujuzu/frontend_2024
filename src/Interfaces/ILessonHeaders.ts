@@ -10,7 +10,7 @@ export interface ILessonHeaderStrapiResponse {
 
 export interface ILessonHeaderResponse {
     id: number;
-    attributes: ILessonHeaderAttributes;
+    attributes: ILessonHeaderAttributesWithMedia;
 }
 
 export interface ILessonHeaderAttributes {
@@ -32,3 +32,7 @@ export interface LessonHeadersFormProps {
   lesson: ICurriculumLessonResponse;
   token: ILoginToken | null;
 }
+
+export type ILessonHeaderAttributesWithMedia = Omit<ILessonHeaderAttributes, 'content_img'> & {
+  content_img?: IMedia;
+};

@@ -10,7 +10,7 @@ export interface ICurriculumLessonStrapiResponse {
 
 export interface ICurriculumLessonResponse {
     id: number;
-    attributes: ICurriculumLessonAttributes;
+    attributes: ICurriculumLessonAttributesWithMedia;
 }
 
 export interface ICurriculumLessonAttributes {
@@ -19,7 +19,7 @@ export interface ICurriculumLessonAttributes {
     curriculum_lesson_reg?: string;
     sort_order?: number;
     courses_weekly_curricula?: number[];
-    intro_pic?: IMedia;
+    intro_pic?: number;
     publishedAt?: string | null;
     createdAt?: string;
     updatedAt?: string;
@@ -32,3 +32,7 @@ export interface CurriculumLessonsFormProps {
   token: ILoginToken | null;
   courseTitle?: string;
 }
+
+export type ICurriculumLessonAttributesWithMedia = Omit<ICurriculumLessonAttributes, 'intro_pic'> & {
+  intro_pic?: IMedia;
+};

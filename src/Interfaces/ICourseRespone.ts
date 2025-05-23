@@ -97,6 +97,7 @@ export interface IFormStepProps {
 courseId: number;
   formData: ICourseAttributesDataPayload;
   setFormData: React.Dispatch<React.SetStateAction<ICourseAttributesDataPayload>>;
+  courseData:ICourseResponse | null,
 }
 
 export interface RelationData<T> {

@@ -1,23 +1,7 @@
-import { IStrapiFormats } from "./IMedia";
+import { MediaAttributes } from "./IMedia";
 
-export interface IStrapiUploadResponse {
+export interface IStrapiUploadResponse extends MediaAttributes {
   id: number;
-  name: string;
-  alternativeText: string | null;
-  caption: string | null;
-  width: number | null;
-  height: number | null;
-  formats: IStrapiFormats;
-  hash: string;
-  ext: string;
-  mime: string;
-  size: number;
-  url: string;
-  previewUrl: string | null;
-  provider: string;
-  provider_metadata: object;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export type IMediaType = 'image' | 'file' | 'both';
@@ -31,5 +15,8 @@ export interface IStrapiFileUploaderProps {
   className?: string;
   placeholder?: string;
   maximumFileCount?: number; // Maximum number of files to upload also to store on env
+  onFileDelete?: (file: IStrapiUploadResponse) => void; // New callback for file deletion
+  existingFiles?: IStrapiUploadResponse[]; // New prop for existing files
+  disabled?: boolean; // New prop to disable the component
   
 }

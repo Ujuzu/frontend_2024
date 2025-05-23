@@ -1,14 +1,15 @@
 
+import { IMedia } from "./IMedia";
 import { IMeta } from "./IMeta";
 
 export interface IWeeklyCurriculumStrapiResponse {
-  data: IWeeklyCurriculumResponse[];
+  data: ICoursesWklyCurriculumAttribWithMedia[];
   meta: IMeta;
   };
 
 export interface IWeeklyCurriculumResponse {
   id: number;
-  attributes: ICoursesWklyCurriculumAttrib;
+  attributes: ICoursesWklyCurriculumAttrib ;
 }
 
 export interface ICoursesWklyCurriculumAttrib {
@@ -19,4 +20,9 @@ export interface ICoursesWklyCurriculumAttrib {
   createdAt?: string;
   updatedAt?: string;
   courses?:number[];
+  intro_pic?:number;
 }
+
+export type ICoursesWklyCurriculumAttribWithMedia = Omit<ICoursesWklyCurriculumAttrib, 'intro_pic'> & {
+  intro_pic?: IMedia;
+};
