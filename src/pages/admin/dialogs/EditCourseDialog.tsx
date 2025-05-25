@@ -22,9 +22,10 @@ import { X, Plus } from "lucide-react";
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
+import { API_URL } from '@/helper/hooks/endPoints';
 
 // API URL from environment variable
-const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+
 
 // Category interface
 interface Category {

@@ -27,8 +27,9 @@ import BlockUserDialog from './dialogs/BlockUserDialog';
 import ViewUserDialog from './dialogs/ViewUserDialog';
 import { IUserWithRole } from '@/Interfaces/IUserLoginInterfaces';
 import { useAuth } from '@/context/AuthContext';
+import { API_URL } from '@/helper/hooks/endPoints';
 
-const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+
 
 
 interface UserFormData {

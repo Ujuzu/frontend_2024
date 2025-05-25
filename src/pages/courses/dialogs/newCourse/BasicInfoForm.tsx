@@ -1,4 +1,4 @@
-import { IFormStepProps } from "@/Interfaces/ICourseRespone";
+import { BasicInfoFormProps } from "@/Interfaces/ICourseRespone";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Loader2, Save } from "lucide-react";
 
 import React, { useEffect, useState } from "react";
 import { ICourseCategoryResponse } from "@/Interfaces/ICourseCategory";
@@ -20,21 +20,31 @@ import { useAuth } from "@/context/AuthContext";
 import CategorySelector from "../../components/AddCategories";
 import { IStrapiUploadResponse } from "@/Interfaces/IStrapiFileUploader";
 import StrapiFileUploader from "@/components/input/StrapiFileUploader";
+import { extractExistingFiles } from "@/utils/strapiMediaToUploadResponseHelper";
+import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
 
-const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData,courseData }) => {
+
+const BasicInfoForm: React.FC<BasicInfoFormProps> = ({  formData, 
+  setFormData, 
+  courseData, 
+  isEditing,
+  onSave,
+  refreshCourseData }) => {
   // Ensure formData is initialized
   const [categories, setCategories] = useState<ICourseCategoryResponse[]>([]);
   const [subcategories, setSubcategories] = useState<
     ICourseSubcategoryResponse[]
   >([]);
+  const [isSaving, setIsSaving] = useState(false);
   const { token } = useAuth();
+        
+    const [existingImage, setExistingImage] = useState<IStrapiUploadResponse[]>([]);
 
-  console.log("courseData", courseData);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categoryData =
-          (await courseService.getCourseCatergories(token)) || [];
+        const categoryData = await courseService.getCourseCatergories(token) || [];
         setCategories(categoryData.data ? categoryData.data : []);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -43,8 +53,7 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData,courseD
 
     const fetchSubcategories = async () => {
       try {
-        const subcategoryData =
-          (await courseService.getCourseSubCategories(token)) || [];
+        const subcategoryData = await courseService.getCourseSubCategories(token) || [];
         setSubcategories(subcategoryData.data ? subcategoryData.data : []);
       } catch (error) {
         console.error("Error fetching subcategories:", error);
@@ -55,11 +64,15 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData,courseD
     fetchSubcategories();
   }, [token]);
 
-  // Handle text input changes
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    if (!formData) return;
+  // Update existing image when courseData changes
+  useEffect(() => {
+    if (courseData) {
+      const files = extractExistingFiles(courseData, 'attributes.course_intro_img');
+      setExistingImage(files);
+    }
+  }, [courseData]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -67,7 +80,6 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData,courseD
     });
   };
 
-  // Handle switch toggle changes
   const handleSwitchChange = (name: string, checked: boolean) => {
     setFormData({
       ...formData,
@@ -75,7 +87,6 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData,courseD
     });
   };
 
-  // Handle select changes
   const handleSelectChange = (name: string, value: string) => {
     setFormData({
       ...formData,
@@ -83,33 +94,88 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData,courseD
     });
   };
 
-  // Handle numeric input changes
   const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: Number(value) || 0, // Converts to number safely
+      [name]: Number(value) || 0,
     });
   };
 
-    // Handle file upload changes
-    const handleThumbnailUpload = (fileData: IStrapiUploadResponse) => {
+  const handleThumbnailUpload = (fileData: IStrapiUploadResponse) => {
     setFormData(prev => ({
       ...prev,
       course_intro_img: fileData.id
     }));
+    setExistingImage([fileData]);
+  };
+
+  const handleThumbnailDelete = () => {
+    setFormData(prev => ({
+      ...prev,
+      course_intro_img: null
+    }));
+    setExistingImage([]);
+  };
+
+  const handleUploadError = (error: string) => {
+    console.error('Upload error:', error);
+    toast.error(error);
+  };
+
+  const handleSaveBasicInfo = async () => {
+    setIsSaving(true);
+    try {
+      await onSave();
+      // Refresh course data to get latest including uploaded images
+      refreshCourseData();
+    } catch (error) {
+      console.error("Error saving basic info:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div className="space-y-6 w-full h-full">
-      <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
-        <BookOpen size={20} className="text-[#AC19AD]" />
-        <h2 className="text-xl font-semibold">
-          {courseData?.id && courseData.attributes
-            ? `Editing course for ${courseData.attributes.course_name}`
-            : "Adding new Course Information"}
-        </h2>
+      <div className="flex items-center justify-between pb-2 border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          <BookOpen size={20} className="text-[#AC19AD]" />
+          <h2 className="text-xl font-semibold">
+            {courseData?.attributes?.course_name
+              ? `Editing: ${courseData.attributes.course_name}`
+              : "Basic Course Information"}
+          </h2>
+        </div>
+        
+        {/* Save Button for Basic Info */}
+        <Button
+          onClick={handleSaveBasicInfo}
+          disabled={isSaving || !formData.course_name.trim()}
+          className="bg-[#AC19AD] hover:bg-[#8A1489] text-white"
+        >
+          {isSaving ? (
+            <>
+              <Loader2 size={16} className="mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save size={16} className="mr-2" />
+              {isEditing ? 'Update' : 'Save'} Basic Info
+            </>
+          )}
+        </Button>
       </div>
+
+      {/* Show course status */}
+      {courseData && (
+        <div className="bg-green-50 border border-green-200 rounded-md p-3">
+          <p className="text-sm text-green-700">
+            ✅ Course "{courseData.attributes.course_name}" is saved (ID: {courseData.id})
+          </p>
+        </div>
+      )}
 
       {/* Course Name */}
       <div className="space-y-2">
@@ -348,11 +414,22 @@ const BasicInfoForm: React.FC<IFormStepProps> = ({ formData, setFormData,courseD
         <Label htmlFor="course_intro_img" className="text-sm font-medium">
           Course Intro Image
         </Label>
- <StrapiFileUploader
+ {/* <StrapiFileUploader
           onUploadSuccess={handleThumbnailUpload}
           mediaType="image"
           multiple={false}
           maxFileSize={1}
+        /> */}
+        <StrapiFileUploader
+          onUploadSuccess={handleThumbnailUpload}
+          onFileDelete={handleThumbnailDelete}
+          onUploadError={handleUploadError}
+          mediaType="image"
+          multiple={false}
+          maxFileSize={1}
+          maximumFileCount={1}
+          existingFiles={existingImage}
+          placeholder="Upload course introduction image"
         />
       </div>
 

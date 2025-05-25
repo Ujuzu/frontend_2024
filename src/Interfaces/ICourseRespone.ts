@@ -65,7 +65,7 @@ export interface ICourseAttributesDataPayload extends ICourseAttributes {
   courses_categories?:number[];
   courses_instructors?:number[];
   course_intro_video_url?:string;
-  course_intro_img?:number;
+  course_intro_img?:number | null;
   course_target_groups?:number[];
   course_learn_lists?:number[];
   course_qualification_equirements?:number[];
@@ -88,7 +88,7 @@ export interface ICourseDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (course: ICourseResponse) => void;
-  initialData?: ICourseResponse | null;
+  selectedCourse?: ICourseResponse | null;
   isEdit?: boolean;
   course_Id?: number;
 }
@@ -97,7 +97,13 @@ export interface IFormStepProps {
 courseId: number;
   formData: ICourseAttributesDataPayload;
   setFormData: React.Dispatch<React.SetStateAction<ICourseAttributesDataPayload>>;
-  courseData:ICourseResponse | null,
+  courseData:ICourseResponse | null;
+}
+
+export interface BasicInfoFormProps extends IFormStepProps {
+  isEditing: boolean;
+  onSave: () => Promise<unknown>;
+  refreshCourseData: () => void;
 }
 
 export interface RelationData<T> {

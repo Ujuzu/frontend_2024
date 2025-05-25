@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import logo from "@/assets/images/logo.png";
 import { Loader2, CheckCircle, Mail } from 'lucide-react';
+import { API_URL } from '@/helper/hooks/endPoints';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +14,6 @@ const ForgotPassword: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   // Define the API URL (using Vite environment variables)
-  const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

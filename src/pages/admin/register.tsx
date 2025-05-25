@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import logo from "@/assets/images/logo.png"; // Import logo
 import { Eye, EyeOff, Loader2, Check } from 'lucide-react';
+import { API_URL } from '@/helper/hooks/endPoints';
 
 const AdminRegister: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -28,7 +29,6 @@ const AdminRegister: React.FC = () => {
   });
   
   // Define the API URL (using Vite environment variables)
-  const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
   
   // Check for existing token on component mount
   useEffect(() => {

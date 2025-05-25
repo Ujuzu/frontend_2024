@@ -173,7 +173,7 @@ export const courseService = {
       throw new Error('Course ID must be a number');
     }
 
-    return axios.get<ICourseResponse>(
+    const {data} = await axios.get(
       `${API_URL}/api/courses/${courseId}?populate=*`,
       {
         headers: {
@@ -181,6 +181,8 @@ export const courseService = {
         },
       }
     );
+    console.log("USECOURSE fetch by id result " , data.data)
+    return data.data as ICourseResponse
   },
 
 
