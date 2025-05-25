@@ -63,7 +63,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
     try {
       setLoading(true);
-      const payload = { ...newQualificationData, course: [courseId] };
+      const payload = { ...newQualificationData, courses: [courseId] };
       const response = await courseQualificationService.createQualification(token, payload);
 
       setQualifications([...qualifications, response]);
