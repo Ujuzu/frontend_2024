@@ -33,7 +33,7 @@ export interface IUserWithPic extends IUser {
 }
 
 export interface ILoginSuccessResponse {
-  jwt: string;
+  jwt: ILoginToken;
   user: IUser;
 }
 export interface ILoginErrorResponse {

@@ -42,7 +42,7 @@ export const CourseDialogs: React.FC<CourseDialogsProps> = ({
             isOpen={isAddCourseOpen}
             onClose={onClose}  
             onSuccess={onEditSuccess} 
-            initialData={selectedCourse} 
+            selectedCourse={selectedCourse} 
             isEdit={!!selectedCourse}
             course_Id={selectedCourse?.id} 
           />

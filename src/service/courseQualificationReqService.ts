@@ -116,11 +116,13 @@ export const courseQualificationService = {
   unlinkQualificationFromCourse: async (token: ILoginToken | null, reqQualificationId: number) => {
 
   if (!token) {
-    throw new Error("Token is required for unlinking instructor from course.");
+    throw new Error("Token is required for unlinking Qualification from course.");
   }
   if (!reqQualificationId) {
-    throw new Error("Qualification ID is required for unlinking instructor from course.");
+    throw new Error("Qualification ID is required for unlinking Qualification from course.");
   }
+  
+  
   if (typeof reqQualificationId !== "number") {
     throw new Error("Qualification ID must be a number.");
   }

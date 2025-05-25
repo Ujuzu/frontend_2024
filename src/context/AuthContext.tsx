@@ -71,7 +71,7 @@ setUser(parsedUser);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     emptyLocalStorage();
-    
+    sessionStorage.clear();
     setIsAuthenticated(false);
     setUser(null);
 

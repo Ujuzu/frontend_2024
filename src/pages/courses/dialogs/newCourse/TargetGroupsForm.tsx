@@ -27,8 +27,8 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
         const allGroupsResponse = await courseTargetGroupService.getTargetGroups(token) || [];
         const courseGroupsResponse = await courseTargetGroupService.getCourseTargetGroups(token, courseId) || [];
 
-        setTargetGroups(allGroupsResponse.data); // All available target groups
-        setCourseTargetGroups(courseGroupsResponse.data); // Groups already linked to this course
+        setTargetGroups(allGroupsResponse.data);
+        setCourseTargetGroups(courseGroupsResponse.data); 
       } catch (error) {
         console.error("Error fetching target groups:", error);
         toast.error("Failed to load target groups.");
@@ -36,10 +36,13 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
     };
     fetchTargetGroups();
   }, [token, courseId]);
+
 const filteredTargetGroups = targetGroups
   .filter(group =>
     group.attributes.target_group_name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+   &&
+      !courseTargetGroups.some(courseQ => courseQ.id === group.id)
+    )
   .slice(0, 5);
   // Handle selection of target groups for the course
   const handleSelectTargetGroup = (id: number) => {
@@ -49,7 +52,7 @@ const filteredTargetGroups = targetGroups
       // Send request to add selected group to the course in Strapi
       courseTargetGroupService.linkTargetGroupToCourse(token, courseId, id)
         .then(() => toast.success("Target group added successfully!"))
-        .catch((error: any) => {
+        .catch((error:Error) => {
           console.error("Error linking target group:", error);
           toast.error("Failed to link target group to course.");
         });

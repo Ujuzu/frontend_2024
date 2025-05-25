@@ -9,6 +9,7 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { getLocalstorage, RemoveStorageItem, setLocalStorage } from '@/utils/localStorageHelper';
 import { ILoginEmail, ILoginSuccessResponse, ILoginToken } from '@/Interfaces/IUserLoginInterfaces';
+import { API_URL } from '@/helper/hooks/endPoints';
 
 // Success Response Type
 
@@ -34,7 +35,6 @@ const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 
   useEffect(() => {
     const token = getLocalstorage<ILoginToken>('token');
@@ -73,7 +73,7 @@ console.log('Login response:', response);
         throw new Error('Login failed');
       } 
 
-      const { jwt, user } = response.data;
+      const { jwt , user } = response.data;
 
       login(jwt, { ...user });
       setLocalStorage('token', jwt);

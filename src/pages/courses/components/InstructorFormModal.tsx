@@ -36,6 +36,7 @@ const handleSubmit = async () => {
 
 
   return (
+    <div className="space-y-6">
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
@@ -102,6 +103,7 @@ const handleSubmit = async () => {
         </Button>
       </DialogContent>
     </Dialog>
+  </div>
   );
 };
 

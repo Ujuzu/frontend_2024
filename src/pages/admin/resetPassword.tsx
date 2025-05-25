@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import logo from "@/assets/images/logo.png";
 import { Eye, EyeOff, Loader2, Check } from 'lucide-react';
+import { API_URL } from '@/helper/hooks/endPoints';
 
 const ResetPassword: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -28,7 +29,7 @@ const ResetPassword: React.FC = () => {
   });
   
   // Define the API URL (using Vite environment variables)
-  const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+
   
   // Check if token is valid on component mount
   useEffect(() => {
@@ -50,7 +51,7 @@ const ResetPassword: React.FC = () => {
     } else {
       setIsTokenValid(false);
     }
-  }, [token, API_URL]);
+  }, [token]);
   
   // Check password strength
   useEffect(() => {

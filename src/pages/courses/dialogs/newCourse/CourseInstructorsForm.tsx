@@ -52,7 +52,7 @@ const filteredInstructors = instructors
       // Send request to add selected instructor to the course
       courseInstructorService.linkInstructorToCourse(token, courseId, id)
         .then(() => toast.success("Instructor added successfully!"))
-        .catch((error: unknown) => {
+        .catch((error: Error) => {
           console.error("Error linking instructor:", error);
           toast.error("Failed to link instructor to course.");
         });
@@ -94,6 +94,7 @@ const filteredInstructors = instructors
       toast.error("Failed to unlink instructor.");
     }
   };
+
 
   return (
     <div className="space-y-6">

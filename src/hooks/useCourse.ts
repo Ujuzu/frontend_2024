@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { DialogState, ICourseAttributesDataPayload, ICourseResponse, IStrapiResponse } from '@/Interfaces/ICourseRespone';
 import { IMeta } from '@/Interfaces/IMeta';
 import { courseService } from '@/service/courseService';
-import { unwrapRelation } from '@/service/relationUnwrapper';
+import { mapCourseAttributesToFormData } from '@/utils/mapCourseAttributesToFormData ';
 
 export const useCourse = () => {
   const [courses, setCourses] = useState<ICourseResponse[]>([]);
@@ -84,38 +84,10 @@ export const useCourse = () => {
 
   // Dialog handlers
 const handleAddCourse = (course?:ICourseResponse) => {
+  console.log("handle add course in usecase , cause : ", course)
   if (!token) return; 
   if (course) {
-    const attrbs = course.attributes;
-   setFormData({
-    // 🔹 Non-array fields first
-    course_name: attrbs.course_name,
-    short_desc: attrbs.short_desc,
-    short_desc_2: attrbs.short_desc_2,
-    short_desc_3: attrbs.short_desc_3,
-    course_outline: attrbs.course_outline,
-    rating_count: attrbs.rating_count,
-    language: attrbs.language,
-    certificate: attrbs.certificate,
-    quizes: typeof attrbs.quizes === "boolean" ? attrbs.quizes : Boolean(attrbs.quizes),
-    level: attrbs.level,
-    sort_order: attrbs.sort_order,
-    weekly_curriculum_intro: attrbs.weekly_curriculum_intro,
-    duration: attrbs.duration,
-    video_url: attrbs.video_url,
-    locale: attrbs.locale || "en",
-
-    // 🔹 Relational array fields last (processed using `unwrapRelation`)
-    courses_instructors: unwrapRelation(attrbs.courses_instructors),
-    course_target_groups: unwrapRelation(attrbs.course_target_groups),
-    course_learn_lists: unwrapRelation(attrbs.course_learn_lists),
-    course_qualification_equirements: unwrapRelation(attrbs.course_qualification_equirements),
-    courses_features: unwrapRelation(attrbs.courses_features),
-    courses_weekly_curricula: unwrapRelation(attrbs.courses_weekly_curricula),
-    courses_categories: unwrapRelation(attrbs.courses_categories),
-    courses_subcategories: unwrapRelation(attrbs.courses_subcategories),
-    subscription_packages: unwrapRelation(attrbs.subscription_packages),
-  });
+   setFormData(mapCourseAttributesToFormData(course));
  // Load existing course data
     setDialogState(prev => ({
       ...prev,
@@ -127,7 +99,7 @@ const handleAddCourse = (course?:ICourseResponse) => {
     setDialogState(prev => ({
       ...prev,
       isAddCourseOpen: true,
-      selectedCourse: null, // No course, so we're adding a new one
+      selectedCourse: course ? course : null, // No course, so we're adding a new one
     }));
   }
 };
@@ -147,23 +119,7 @@ const handleAddCourse = (course?:ICourseResponse) => {
       isEditCourseOpen: true,
       selectedCourse: course,
     }));
-    setFormData({
-      short_desc: course.attributes.short_desc,
-      course_outline: course.attributes.course_outline,
-      rating_count: course.attributes.rating_count,
-      language: course.attributes.language,
-      certificate: course.attributes.certificate,
-      quizes: typeof course.attributes.quizes === 'boolean' ? course.attributes.quizes : Boolean(course.attributes.quizes),
-      level: course.attributes.level,
-      short_desc_2: course.attributes.short_desc_2,
-      sort_order: course.attributes.sort_order,
-      short_desc_3: course.attributes.short_desc_3,
-      course_name: course.attributes.course_name,
-      weekly_curriculum_intro: course.attributes.weekly_curriculum_intro,
-      duration: course.attributes.duration,
-      video_url: course.attributes.video_url,
-      locale: course.attributes.locale || 'en'
-    });
+    setFormData(mapCourseAttributesToFormData(course));
   };
   
   const handleDeleteCourse = (course: ICourseResponse) => {

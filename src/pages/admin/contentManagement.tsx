@@ -28,7 +28,7 @@ import EditCourseDialog from './dialogs/EditCourseDialog';
 import DeleteCourseDialog from './dialogs/DeleteCourseDialog';
 import ViewCourseDialog from './dialogs/ViewCourseDialog';
 import { useAuth } from '@/context/AuthContext';
-const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+import { API_URL } from '@/helper/hooks/endPoints';
 // Define the Course interface based on your structure
 interface Course {
   id: number;
