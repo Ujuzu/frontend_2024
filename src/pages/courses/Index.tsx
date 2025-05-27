@@ -8,7 +8,7 @@ import CoursePagination from "./components/CoursePagination";
 import { CourseDialogs } from "./components/CourseDialogs";
 
 const CoursesIndex = () => {
-      const {
+  const {
     courses,
     isLoading,
     meta,
@@ -28,16 +28,17 @@ const CoursesIndex = () => {
     handleEditSuccess,
     confirmDelete
   } = useCourse();
+
   return (
- <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6">
       <Toaster position="top-right" />
       
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Course Management</h1>
           <Button 
-            onClick={()=>handleAddCourse()}
-            className="bg-[#AC19AD] hover:bg-[#8A1489] text-white"
+            onClick={() => handleAddCourse()}
+            className="bg-[#AC19AD] hover:bg-[#8A1489] text-white cursor-pointer"
           >
             Add Course
             <span className="ml-2">+</span>
@@ -62,11 +63,11 @@ const CoursesIndex = () => {
               onClick={refreshData} 
               variant="outline"
               size="icon"
-              className={isRefreshing ? 'animate-spin' : ''}
+              className="cursor-pointer"
               title="Refresh data"
               disabled={isLoading || isRefreshing}
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className={`h-4 w-4 text-[#AC19AD] ${isRefreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
@@ -100,4 +101,5 @@ const CoursesIndex = () => {
     </div>
   );
 }
+
 export default CoursesIndex;
