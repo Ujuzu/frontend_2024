@@ -33,9 +33,9 @@ const links = [
     path: "/u/user-management",
   },
   {
-    title: "Content Management",
+    title: "Course Management",
     icon: <FileText className="w-5 h-5" />,
-    path: "/u/content-management",
+    path: "/u/courses",
   },
   {
     title: "Subscription Management",
