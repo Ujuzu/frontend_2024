@@ -3,7 +3,6 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/AuthContext';
 import { Loader } from 'lucide-react';
-import "react-quill/dist/quill.snow.css";
 
 type LoadingState = 'visible' | 'fading' | 'hidden';
 
