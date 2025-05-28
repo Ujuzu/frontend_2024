@@ -46,6 +46,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         console.error("Error fetching categories:", error);
       }
     };
+
     const fetchSubcategories = async () => {
       try {
         const subcategoryData = await courseService.getCourseSubCategories(token) || [];
@@ -54,6 +55,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         console.error("Error fetching subcategories:", error);
       }
     };
+
     fetchCategories();
     fetchSubcategories();
   }, [token]);
@@ -167,7 +169,6 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
             )}
           </Button>
         </div>
-
         {/* Course Status */}
         {courseData && (
           <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
@@ -190,7 +191,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         
         <div className="space-y-6">
           {/* Course Name */}
-          <div className="space-y-2">
+          <div className="w-full space-y-2">
             <Label htmlFor="course_name" className="text-sm font-medium text-gray-700">
               Course Name <span className="text-red-500">*</span>
             </Label>
@@ -205,57 +206,56 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
             />
           </div>
 
-          {/* Course Descriptions */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="short_desc" className="text-sm font-medium text-gray-700">
-                Short Description
-              </Label>
-              <Textarea
-                id="short_desc"
-                name="short_desc"
-                value={formData.short_desc || ""}
-                onChange={handleInputChange}
-                placeholder="Write a compelling brief description that highlights the main value of your course"
-                className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                rows={3}
-              />
-            </div>
+          {/* Short Description */}
+          <div className="w-full space-y-2">
+            <Label htmlFor="short_desc" className="text-sm font-medium text-gray-700">
+              Short Description
+            </Label>
+            <Textarea
+              id="short_desc"
+              name="short_desc"
+              value={formData.short_desc || ""}
+              onChange={handleInputChange}
+              placeholder="Write a compelling brief description that highlights the main value of your course"
+              className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+              rows={3}
+            />
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="short_desc_2" className="text-sm font-medium text-gray-700">
-                  Additional Description
-                </Label>
-                <Textarea
-                  id="short_desc_2"
-                  name="short_desc_2"
-                  value={formData.short_desc_2 || ""}
-                  onChange={handleInputChange}
-                  placeholder="Add more details about course benefits and outcomes"
-                  className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                  rows={3}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="short_desc_3" className="text-sm font-medium text-gray-700">
-                  Extra Description
-                </Label>
-                <Textarea
-                  id="short_desc_3"
-                  name="short_desc_3"
-                  value={formData.short_desc_3 || ""}
-                  onChange={handleInputChange}
-                  placeholder="Include target audience and prerequisites information"
-                  className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                  rows={3}
-                />
-              </div>
-            </div>
+          {/* Additional Description */}
+          <div className="w-full space-y-4">
+            <Label htmlFor="short_desc_2" className="text-sm font-medium text-gray-700">
+              Additional Description
+            </Label>
+            <Textarea
+              id="short_desc_2"
+              name="short_desc_2"
+              value={formData.short_desc_2 || ""}
+              onChange={handleInputChange}
+              placeholder="Add more details about course benefits and outcomes"
+              className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+              rows={3}
+            />
+          </div>
+          
+          {/* Extra Description */}
+          <div className="w-full space-y-2">
+            <Label htmlFor="short_desc_3" className="text-sm font-medium text-gray-700">
+              Extra Description
+            </Label>
+            <Textarea
+              id="short_desc_3"
+              name="short_desc_3"
+              value={formData.short_desc_3 || ""}
+              onChange={handleInputChange}
+              placeholder="Include target audience and prerequisites information"
+              className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+              rows={3}
+            />
           </div>
 
           {/* Course Outline */}
-          <div className="space-y-2">
+          <div className="w-full space-y-2">
             <Label htmlFor="course_outline" className="text-sm font-medium text-gray-700">
               Course Outline
             </Label>
@@ -271,7 +271,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
           </div>
 
           {/* Weekly Curriculum Intro */}
-          <div className="space-y-2">
+          <div className="w-full space-y-2">
             <Label htmlFor="weekly_curriculum_intro" className="text-sm font-medium text-gray-700">
               Weekly Curriculum Introduction
             </Label>
@@ -336,7 +336,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
             </Select>
           </div>
 
-                    <div className="space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="level" className="text-sm font-medium text-gray-700 flex items-center gap-2">
               <BarChart3 size={14} className="text-gray-500" />
               Difficulty Level

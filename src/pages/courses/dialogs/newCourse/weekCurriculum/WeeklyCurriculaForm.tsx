@@ -30,6 +30,9 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
   const [currentCurriculum, setCurrentCurriculum] = useState<IWeeklyCurriculumResponse>(
     {} as IWeeklyCurriculumResponse
   );
+  
+  // Loading state for individual curriculum items
+  const [loadingCurriculumId, setLoadingCurriculumId] = useState<string | null>(null);
 
   const handleOpenCurriculumModal = (index?: number) => {
     if (index !== undefined) {
@@ -101,7 +104,7 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
             <Calendar className="w-5 h-5 text-purple-600" />
           </div>
           <h2 className="text-xl font-semibold text-gray-900">Weekly Curriculum</h2>
@@ -121,7 +124,7 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
             <Calendar className="w-5 h-5 text-purple-600" />
           </div>
           <h2 className="text-xl font-semibold text-gray-900">Weekly Curriculum</h2>
@@ -139,7 +142,7 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
             <Button
               onClick={refreshWeeklyCurricula}
               variant="outline"
-              className="border-purple-200 text-purple-600 hover:bg-purple-50"
+              className="border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300"
             >
               Try Again
             </Button>
@@ -149,16 +152,22 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
     );
   }
 
-  const handleOpenLessonsModal = (curriculum: IWeeklyCurriculumResponse) => {
+  const handleOpenLessonsModal = async (curriculum: IWeeklyCurriculumResponse) => {
+    setLoadingCurriculumId(curriculum.id);
+    
+    // Simulate a small delay to show loading state (you can remove this if not needed)
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     setCurrentCurriculum(curriculum);
     setOpenLessonsModal(true);
+    setLoadingCurriculumId(null);
   };
 
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div className="flex items-center space-x-3">
-        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
           <Calendar className="w-5 h-5 text-purple-600" />
         </div>
         <h2 className="text-xl font-semibold text-gray-900">Weekly Curriculum</h2>
@@ -171,21 +180,28 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
             {weeklyCurricula.map((curriculum, index) => (
               <div 
                 key={curriculum.id} 
-                className="border border-gray-200 p-4 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm"
+                className="border border-purple-200 p-4 rounded-lg bg-white hover:bg-purple-50 hover:border-purple-300 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-3 flex-1">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <BookOpen className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <BookOpen className="w-4 h-4 text-purple-600" />
                     </div>
                     <div className="flex-1">
-                      <h3 
-                        className="text-lg font-medium cursor-pointer hover:text-purple-600 transition-colors" 
-                        onClick={() => handleOpenLessonsModal(curriculum)}
-                        title="Click to view lessons"
-                      >
-                        {curriculum?.attributes?.curriculum_title}
-                      </h3>
+                      <div className="flex items-center space-x-2">
+                        <h3 
+                          className={`text-lg font-medium cursor-pointer hover:text-purple-700 transition-colors ${
+                            loadingCurriculumId === curriculum.id ? 'text-purple-600' : 'text-gray-900'
+                          }`}
+                          onClick={() => handleOpenLessonsModal(curriculum)}
+                          title="Click to view lessons"
+                        >
+                          {curriculum?.attributes?.curriculum_title}
+                        </h3>
+                        {loadingCurriculumId === curriculum.id && (
+                          <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
+                        )}
+                      </div>
                       {curriculum?.attributes?.curriculum_desc && (
                         <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                           {curriculum.attributes.curriculum_desc}
@@ -197,7 +213,8 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
                     onClick={() => handleOpenCurriculumModal(index)}
                     variant="outline"
                     size="sm"
-                    className="border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                    className="border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200"
+                    disabled={loadingCurriculumId === curriculum.id}
                   >
                     <Pencil className="w-4 h-4" />
                   </Button>
@@ -206,10 +223,12 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 border border-gray-200 rounded-lg bg-gray-50">
-            <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-600 font-medium">No weekly curriculum found</p>
-            <p className="text-gray-500 text-sm mt-1">Create your first curriculum to get started</p>
+          <div className="text-center py-12 border border-purple-200 rounded-lg bg-purple-50">
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Calendar className="w-6 h-6 text-purple-400" />
+            </div>
+            <p className="text-gray-700 font-medium">No weekly curriculum found</p>
+            <p className="text-gray-600 text-sm mt-1">Create your first curriculum to get started</p>
           </div>
         )}
       </div>
@@ -217,7 +236,7 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
       {/* Add Button */}
       <Button 
         onClick={() => handleOpenCurriculumModal()} 
-        className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 transition-all duration-200 shadow-md hover:shadow-lg"
+        className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
       >
         <Plus className="w-4 h-4 mr-2" />
         Add Weekly Curriculum
@@ -225,11 +244,15 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
       {/* Curriculum Modal */}
       <Dialog open={isCurriculumModalOpen} onOpenChange={setIsCurriculumModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border-purple-200">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
-              <BookOpen className="w-5 h-5 text-purple-600" />
-              <span>{editingCurriculumIndex !== null ? "Edit Curriculum" : "Add Curriculum"}</span>
+              <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-purple-600" />
+              </div>
+              <span className="text-gray-900">
+                {editingCurriculumIndex !== null ? "Edit Curriculum" : "Add Curriculum"}
+              </span>
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -240,7 +263,7 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
                 placeholder="Enter curriculum name"
                 value={curriculumFormData.curriculum_title}
                 onChange={(e) => setCurriculumFormData({ ...curriculumFormData, curriculum_title: e.target.value })}
-                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                className="border-purple-200 focus:border-purple-500 focus:ring-purple-500 focus:ring-1"
                 required
               />
             </div>
@@ -252,17 +275,17 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
                 placeholder="Enter description (optional)"
                 value={curriculumFormData.curriculum_desc}
                 onChange={(e) => setCurriculumFormData({ ...curriculumFormData, curriculum_desc: e.target.value })}
-                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                className="border-purple-200 focus:border-purple-500 focus:ring-purple-500 focus:ring-1"
               />
             </div>
             
             <Button 
               onClick={handleSubmitCurriculum} 
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 transition-all duration-200"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 transition-all duration-200 shadow-md hover:shadow-lg"
               disabled={submitting || !curriculumFormData.curriculum_title.trim()}
             >
               {submitting ? (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center space-x-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span>Saving...</span>
                 </div>

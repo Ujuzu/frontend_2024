@@ -1,5 +1,5 @@
 // API configuration and endpoints
-export const API_URL =  'http://localhost:1337'
+export const API_URL =  'https://api.ujuzi.io'
 
 // const courseSubCategoriesURL = `${API_URL}/api/course-subcategories`;
 // const courseCategoriesURL = `${API_URL}/api/coursecategories`;
