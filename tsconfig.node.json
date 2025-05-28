@@ -9,7 +9,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "composite": true,       // Required for project references
+    "outDir": "./dist",       // Output JS files here
+    "rootDir": "./src"        // Ensure source is only in ./src
   },
   "include": ["src"]
 }
