@@ -1,15 +1,14 @@
-
 import { IMedia } from "./IMedia";
 import { IMeta } from "./IMeta";
 
 export interface IWeeklyCurriculumStrapiResponse {
-  data: ICoursesWklyCurriculumAttribWithMedia[];
+  data: IWeeklyCurriculumResponse[];
   meta: IMeta;
   };
 
 export interface IWeeklyCurriculumResponse {
   id: number;
-  attributes: ICoursesWklyCurriculumAttrib ;
+  attributes: ICoursesWklyCurriculumAttribWithMedia ;
 }
 
 export interface ICoursesWklyCurriculumAttrib {

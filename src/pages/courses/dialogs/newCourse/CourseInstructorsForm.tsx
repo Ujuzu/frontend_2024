@@ -34,8 +34,8 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
           courseInstructorService.getCourseInstructors(token, courseId)
         ]);
         
-        setInstructors(allInstructorsResponse?.data || []);
-        setCourseInstructors(courseInstructorsResponse?.data || []);
+        setInstructors(allInstructorsResponse.data);
+        setCourseInstructors(courseInstructorsResponse.data);
       } catch (error) {
         console.error("Error fetching instructors:", error);
         toast.error("Failed to load instructors.");

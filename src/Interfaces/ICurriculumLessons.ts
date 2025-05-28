@@ -19,7 +19,7 @@ export interface ICurriculumLessonAttributes {
     curriculum_lesson_reg?: string;
     sort_order?: number;
     courses_weekly_curricula?: number[];
-    intro_pic?: number;
+    intro_pic?: number | null;
     publishedAt?: string | null;
     createdAt?: string;
     updatedAt?: string;
