@@ -3,14 +3,15 @@ import { IMedia } from "./IMedia";
 import { IMeta } from "./IMeta";
 
 export interface ICoursesInstructorStrapiResponse {
-  data: ICoursesInstructorAttributesWithMedia[];
+  data: ICoursesInstructorResponse[];
   meta: IMeta
 }
 
  export interface ICoursesInstructorResponse {
   id: number;  
-  attributes: ICoursesInstructorAttributes;
+  attributes: ICoursesInstructorAttributesWithMedia;
 }
+
 export interface ICoursesInstructorAttributes {
   instructor_name: string;
   instructor_title?: string;
