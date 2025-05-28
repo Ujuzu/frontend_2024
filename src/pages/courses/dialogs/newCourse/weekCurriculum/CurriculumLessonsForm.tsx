@@ -33,7 +33,11 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
   const handleOpenLessonModal = (index?: number) => {
     if (index !== undefined) {
       setEditingLessonIndex(index);
-      setLessonFormData(lessons[index].attributes);
+      const attributest = lessons[index].attributes;
+      setLessonFormData({
+        ...attributest,
+        intro_pic: attributest.intro_pic?.data?.id  ? attributest.intro_pic?.data?.id :  null,
+      });
     } else {
       setEditingLessonIndex(null);
       setLessonFormData({ curriculum_lesson_title: "", curriculum_lesson_desc: "" });
