@@ -27,11 +27,11 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
         const allInstructorsResponse = await courseInstructorService.getInstructors(token) || [];
         const courseInstructorsResponse = await courseInstructorService.getCourseInstructors(token, courseId) || [];
 
-        setInstructors(allInstructorsResponse.data); // All available instructors
-        setCourseInstructors(courseInstructorsResponse.data); // Instructors linked to this course
+        setInstructors(allInstructorsResponse.data); 
+        setCourseInstructors(courseInstructorsResponse.data); 
       } catch (error) {
-        console.error("Error fetching instructors:", error);
-        toast.error("Failed to load instructors.");
+        // console.error("Error fetching instructors:", error);
+        toast.error(`Failed to load instructors. ${error}`);
       }
     };
     fetchInstructors();

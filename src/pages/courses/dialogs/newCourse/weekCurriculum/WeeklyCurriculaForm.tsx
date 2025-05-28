@@ -33,7 +33,11 @@ const { token } = useAuth();
   const handleOpenCurriculumModal = (index?: number) => {
     if (index !== undefined) {
       setEditingCurriculumIndex(index);
-      setCurriculumFormData(weeklyCurricula[index].attributes);
+      const attributes = weeklyCurricula[index].attributes;
+      setCurriculumFormData({
+        ...attributes,
+        intro_pic: attributes.intro_pic?.data?.id ?attributes.intro_pic?.data?.id : undefined,
+      });
     } else {
       setEditingCurriculumIndex(null);
       setCurriculumFormData({ curriculum_title : "", curriculum_desc: "" });
