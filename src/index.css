@@ -30,6 +30,10 @@
   font-family: 'Poppins', sans-serif;
 }
 
+html {
+  font-size: 16px;
+}
+
 @theme {
   --color-BLUE_01: #1e57c7;
   --color-GRAY_01: #f5f7fa;
