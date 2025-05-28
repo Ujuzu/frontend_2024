@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { ICourseResponse } from '@/Interfaces/ICourseRespone';
 
 interface CourseTableProps {
@@ -32,7 +31,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#AC19AD]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#AC19AD]"></div>
       </div>
     );
   }
@@ -57,7 +56,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
               <TableCell>{course.id}</TableCell>
               <TableCell className="font-medium">
                 <button 
-                  className="text-blue-600 hover:text-blue-900 hover:underline text-left"
+                  className="text-blue-600 hover:text-blue-900 hover:underline text-left cursor-pointer"
                   onClick={() => onFullEdit(course)}
                 >
                   {course.attributes.course_name}
@@ -79,7 +78,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
                     onClick={() => onView(course)}
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-blue-600 hover:text-blue-900 hover:bg-blue-50"
+                    className="h-8 w-8 text-blue-600 hover:text-blue-900 hover:bg-blue-50 cursor-pointer"
                     title="View Course"
                   >
                     <Eye className="h-4 w-4" />
@@ -88,7 +87,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
                     onClick={() => onEdit(course)}
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-amber-600 hover:text-amber-900 hover:bg-amber-50"
+                    className="h-8 w-8 text-amber-600 hover:text-amber-900 hover:bg-amber-50 cursor-pointer"
                     title="Edit Course"
                   >
                     <Edit className="h-4 w-4" />
@@ -97,7 +96,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
                     onClick={() => onDelete(course)}
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-red-600 hover:text-red-900 hover:bg-red-50"
+                    className="h-8 w-8 text-red-600 hover:text-red-900 hover:bg-red-50 cursor-pointer"
                     title="Delete Course"
                   >
                     <Trash2 className="h-4 w-4" />

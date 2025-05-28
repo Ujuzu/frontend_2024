@@ -32,12 +32,7 @@ const links = [
     icon: <Users className="w-5 h-5" />,
     path: "/u/user-management",
   },
-  {
-    title: "Content Management",
-    icon: <FileText className="w-5 h-5" />,
-    path: "/u/content-management",
-  },
-  {
+    {
     title: "Course Management",
     icon: <FileText className="w-5 h-5" />,
     path: "/u/courses",
