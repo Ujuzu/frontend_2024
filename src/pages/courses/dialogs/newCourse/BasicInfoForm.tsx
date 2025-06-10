@@ -118,7 +118,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
     console.error('Upload error:', error);
     toast.error(error);
   };
-console.log(formData)
+
   const handleSaveBasicInfo = async () => {
     setIsSaving(true);
     try {
@@ -192,10 +192,7 @@ console.log(formData)
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-  <RichTextEditor
-            value={formData.course_name  || ''}
-            onChange={() =>handleInputChange}
-  />
+
   </div>
         </div>
         
@@ -221,15 +218,11 @@ console.log(formData)
             <Label htmlFor="short_desc" className="text-sm font-medium text-gray-700">
               Short Description
             </Label>
-            <Textarea
-              id="short_desc"
-              name="short_desc"
-              value={formData.short_desc || ""}
-              onChange={handleInputChange}
-              placeholder="Write a compelling brief description that highlights the main value of your course"
-              className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              rows={3}
-            />
+                          <RichTextEditor
+              className="w-full border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+            value={formData.short_desc || ""}
+            onChange={(value) => setFormData({ ...formData, short_desc: value })}
+  />
           </div>
 
           {/* Additional Description */}
@@ -237,15 +230,11 @@ console.log(formData)
             <Label htmlFor="short_desc_2" className="text-sm font-medium text-gray-700">
               Additional Description
             </Label>
-            <Textarea
-              id="short_desc_2"
-              name="short_desc_2"
-              value={formData.short_desc_2 || ""}
-              onChange={handleInputChange}
-              placeholder="Add more details about course benefits and outcomes"
-              className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              rows={3}
-            />
+                                      <RichTextEditor
+              className="w-full border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+            value={formData.short_desc_2 || ""}
+            onChange={(value) => setFormData({ ...formData, short_desc_2: value })}
+  />
           </div>
           
           {/* Extra Description */}
@@ -253,15 +242,11 @@ console.log(formData)
             <Label htmlFor="short_desc_3" className="text-sm font-medium text-gray-700">
               Extra Description
             </Label>
-            <Textarea
-              id="short_desc_3"
-              name="short_desc_3"
-              value={formData.short_desc_3 || ""}
-              onChange={handleInputChange}
-              placeholder="Include target audience and prerequisites information"
-              className="w-full resize-none border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              rows={3}
-            />
+                                                  <RichTextEditor
+              className="w-full border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+            value={formData.short_desc_3 || ""}
+            onChange={(value) => setFormData({ ...formData, short_desc_3: value })}
+  />
           </div>
 
           {/* Course Outline */}
