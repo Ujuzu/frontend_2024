@@ -8,6 +8,7 @@ import { toast } from "react-hot-toast";
 import { lessonHeaderService } from "@/service/curriculumLessonHeaderService";
 import { LessonHeadersFormProps } from "@/Interfaces/ILessonHeaders";
 import useFetchLessonHeaders from "@/hooks/useFetchLessonHeaders";
+import RichTextEditor from "@/components/input/RichTextEditor";
 // import ReactQuill from "react-quill";
 // import "react-quill/dist/quill.snow.css";
 
@@ -134,7 +135,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-[1200px] h-[90vh] max-h-[90vh] flex flex-col p-4 sm:p-8 overflow-y-auto">
         <DialogHeader className="pb-6 border-b border-purple-100">
           <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center">
@@ -240,7 +241,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
         <div className="pt-6 border-t border-purple-100">
           <Button 
             onClick={() => handleOpenHeaderModal()} 
-            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-purple-200"
+            className="w-full sm:w-[300px] mx-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-2 sm:py-3 px-4 rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-purple-200/50 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-bas"
           >
             <Plus className="w-5 h-5 mr-2" />
             Add New Header
@@ -249,7 +250,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
 
         {/* Header Modal */}
         <Dialog open={isHeaderModalOpen} onOpenChange={setIsHeaderModalOpen}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-full max-w-[95vw] sm:max-w-[1200px] h-[90vh] max-h-[90vh] flex flex-col p-4 sm:p-8 overflow-y-auto">
             <DialogHeader className="pb-4 border-b border-purple-100">
               <DialogTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -265,7 +266,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
 
             <div className="space-y-6 py-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   <Type className="w-4 h-4 text-purple-600" />
                   Header Title *
                 </label>
@@ -282,25 +283,20 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   <FileText className="w-4 h-4 text-purple-600" />
                   Header Content
                 </label>
-                <textarea
-                  name="course_curriculum_lesson_header_content"
-                  placeholder="Enter detailed header content"
-                  value={headerFormData.course_curriculum_lesson_header_content}
-                  onChange={(e) =>
-                    setHeaderFormData({ ...headerFormData, course_curriculum_lesson_header_content: e.target.value })
-                  }
-                  className="w-full min-h-[100px] px-3 py-2 border border-purple-200 rounded-lg focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-vertical"
-                  rows={4}
-                />
+                                <RichTextEditor
+              className="w-full border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+            value={headerFormData.course_curriculum_lesson_header_content || ""}
+            onChange={(value) => setHeaderFormData({ ...headerFormData, course_curriculum_lesson_header_content: value })}
+  />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                     <Video className="w-4 h-4 text-purple-600" />
                     Video URL
                   </label>
@@ -314,7 +310,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 items-center gap-2">
                     <ArrowUpDown className="w-4 h-4 text-purple-600" />
                     Sort Order
                   </label>
@@ -333,34 +329,14 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
                   <Hash className="w-4 h-4 text-purple-600" />
                   Additional Content
                 </label>
-                <textarea
-                  name="content_2"
-                  placeholder="Enter additional content or notes"
-                  value={headerFormData.content_2}
-                  onChange={(e) => setHeaderFormData({ ...headerFormData, content_2: e.target.value })}
-                  className="w-full min-h-[80px] px-3 py-2 border border-purple-200 rounded-lg focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-vertical"
-                  rows={3}
-                />
-              </div>
-
-              {/* Rich Text Editor Section (Commented) */}
-              <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Edit3 className="w-4 h-4 text-purple-600" />
-                  Rich Text Content
-                </label>
-                <p className="text-sm text-gray-600 mb-2">
-                  Rich text editor is currently disabled. Use the header content field above for formatted text.
-                </p>
-                {/* <ReactQuill
-                  theme="snow"
-                  value={headerFormData.course_curriculum_lesson_header_content}
-                  onChange={(content:string) => setHeaderFormData({ ...headerFormData, course_curriculum_lesson_header_content: content })}
-                /> */}
+                <RichTextEditor
+              className="w-full border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+            value={headerFormData.content_2 || ""}
+            onChange={(value) => setHeaderFormData({ ...headerFormData, content_2: value })}/>
               </div>
             </div>
 
@@ -368,7 +344,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
               <Button 
                 onClick={handleSubmitHeader} 
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-purple-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-2 sm:py-3 px-4 rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-purple-200/50 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 {isSubmitting ? (
                   <>

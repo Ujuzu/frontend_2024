@@ -84,7 +84,6 @@ export const useCourse = () => {
 
   // Dialog handlers
 const handleAddCourse = (course?:ICourseResponse) => {
-  console.log("handle add course in usecase , cause : ", course)
   if (!token) return; 
   if (course) {
    setFormData(mapCourseAttributesToFormData(course));

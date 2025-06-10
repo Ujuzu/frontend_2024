@@ -59,11 +59,8 @@ const UserManagement: React.FC = () => {
   const [filterText, setFilterText] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<IUserWithRole[]>([]);
   
- const { user, isAuthenticated,token } = useAuth();
+ const { token } = useAuth();
 
- console.log('user', user); 
-  console.log('token', token);
-  console.log('isAuthenticated', isAuthenticated);
   // Check if user is authenticated
   // Function to fetch all users from Strapi
   
@@ -72,7 +69,6 @@ const UserManagement: React.FC = () => {
     try {
       // Get auth token from localStorage
       // const token = localStorage.getItem('token');
-      console.log('Token from localStorage:', token);
       // First try to get total count to determine pagination strategy
       const countResponse = await axios.get(`${API_URL}/api/users/count`, {
         headers: {

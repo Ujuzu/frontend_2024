@@ -181,7 +181,7 @@ export const courseService = {
         },
       }
     );
-    console.log("USECOURSE fetch by id result " , data.data)
+  
     return data.data as ICourseResponse
   },
 

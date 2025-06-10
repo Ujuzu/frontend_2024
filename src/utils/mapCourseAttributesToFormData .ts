@@ -2,7 +2,7 @@ import { ICourseAttributesDataPayload, ICourseResponse } from "@/Interfaces/ICou
 import { unwrapRelation } from "@/service/relationUnwrapper";
 
 export const mapCourseAttributesToFormData = (course?: ICourseResponse): ICourseAttributesDataPayload => {
-  console.log ("course mapping ", course?.attributes)
+
   if (!course)
      return {
      
