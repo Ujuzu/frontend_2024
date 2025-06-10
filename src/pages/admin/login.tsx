@@ -50,7 +50,6 @@ const AdminLogin: React.FC = () => {
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
-    console.log('Login form submitted' , { email, password });
     e.preventDefault();
     setErrorMessage('');
 
@@ -68,7 +67,6 @@ const AdminLogin: React.FC = () => {
         identifier: email.identifier,
         password: password,
       });
-console.log('Login response:', response);
       if (response.status !== 200) {
         throw new Error('Login failed');
       } 

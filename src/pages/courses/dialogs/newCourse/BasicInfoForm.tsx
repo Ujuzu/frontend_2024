@@ -22,6 +22,7 @@ import StrapiFileUploader from "@/components/input/StrapiFileUploader";
 import { extractExistingFiles } from "@/utils/strapiMediaToUploadResponseHelper";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
+import RichTextEditor from "@/components/input/RichTextEditor";
 
 const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
   formData, 
@@ -117,7 +118,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
     console.error('Upload error:', error);
     toast.error(error);
   };
-
+console.log(formData)
   const handleSaveBasicInfo = async () => {
     setIsSaving(true);
     try {
@@ -188,6 +189,15 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
           <BookOpen size={18} className="text-purple-600" />
           Course Details
         </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+  <RichTextEditor
+            value={formData.course_name  || ''}
+            onChange={() =>handleInputChange}
+  />
+  </div>
+        </div>
         
         <div className="space-y-6">
           {/* Course Name */}
