@@ -9,6 +9,7 @@ import LessonHeadersForm from "./LessonHeadersForm";
 import { curriculumLessonService } from "@/service/curriculumLessonService";
 import { CurriculumLessonsFormProps, ICurriculumLessonAttributes, ICurriculumLessonResponse } from "@/Interfaces/ICurriculumLessons";
 import useFetchCurriculumLessons from "@/hooks/useFetchCurriculumLessons";
+import RichTextEditor from "@/components/input/RichTextEditor";
 
 const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, onClose, curriculum, token }) => {
   const { lessons, loading, error, refreshLessons } = useFetchCurriculumLessons(
@@ -142,7 +143,7 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-[1200px] h-[90vh] max-h-[90vh] flex flex-col p-4 sm:p-8 overflow-y-auto">
         <DialogHeader className="pb-6 border-b border-purple-100">
           <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center">
@@ -206,7 +207,7 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
         <div className="pt-6 border-t border-purple-100">
           <Button 
             onClick={() => handleOpenLessonModal()} 
-            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-purple-200"
+            className="w-full sm:w-[300px] mx-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-2 sm:py-3 px-4 rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-purple-200/50 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-bas"
           >
             <Plus className="w-5 h-5 mr-2" />
             Add New Lesson
@@ -215,7 +216,7 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
 
         {/* Lesson Modal */}
         <Dialog open={isLessonModalOpen} onOpenChange={setIsLessonModalOpen}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="w-full max-w-[95vw] sm:max-w-[1200px] h-[90vh] max-h-[90vh] flex flex-col p-4 sm:p-8 overflow-y-auto">
             <DialogHeader className="pb-4 border-b border-purple-100">
               <DialogTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -248,22 +249,21 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
                 </label>
-                <Input
-                  name="curriculum_lesson_desc"
-                  placeholder="Enter lesson description"
-                  value={lessonFormData.curriculum_lesson_desc}
-                  onChange={(e) => setLessonFormData({ ...lessonFormData, curriculum_lesson_desc: e.target.value })}
-                  className="border-purple-200 focus:border-purple-500 focus:ring-purple-500"
-                />
+                <RichTextEditor
+              className="w-full border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+            value={lessonFormData.curriculum_lesson_desc || ""}
+            onChange={(value) => setLessonFormData({ ...lessonFormData, curriculum_lesson_desc: value })}
+  />
+                
               </div>
             </div>
 
             <div className="pt-4 border-t border-purple-100">
-              <Button 
-                onClick={handleSubmitLesson} 
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-purple-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+             <Button 
+  onClick={handleSubmitLesson} 
+  disabled={isSubmitting}
+  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-2 sm:py-3 px-8 rounded-lg sm:rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-purple-200/50 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />

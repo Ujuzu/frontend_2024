@@ -31,7 +31,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <Editor
         apiKey={import.meta.env.VITE_TINYMCE_KEY}
        onInit={(_evt: unknown, editor:unknown) => {
-  editorRef.current = editor as TinyMCEEditor; // ✅ Cast `editor` to correct type
+  editorRef.current = editor as TinyMCEEditor; 
 }}
 
         value={value}
@@ -59,9 +59,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             "help",
             "wordcount",
             "paste",
+            "textcolor"
           ],
+
+          toolbar_mode: "sliding",
           toolbar:
-            "undo redo | blocks | bold italic forecolor backcolor | alignleft aligncenter " +
+            "undo redo | blocks | bold italic | forecolor backcolor | alignleft aligncenter " +
             "alignright alignjustify | bullist numlist outdent indent | removeformat | help",
           content_style: `
             body {
