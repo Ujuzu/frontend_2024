@@ -94,13 +94,10 @@ export const courseQualificationService = {
     if (!documentId) {
       throw new Error("Course ID is required for fetching course qualifications.");
     }
-    if (typeof documentId !== "number") {
-      throw new Error("Course ID must be a number.");
-    }
     // Add populate parameter to fetch related data
 
     const response = await axios.get<IQualificationReqStrapiResponse>(
-      `${courseQualificationReqURL}/?filters[courses][id][$eq]=${documentId}`,
+      `${courseQualificationReqURL}/?filters[courses][documentId]=${documentId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

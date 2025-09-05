@@ -49,7 +49,7 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
   const filteredInstructors = instructors
     .filter(instructor =>
-      instructor.attributes.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      instructor.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !courseInstructors.some(courseInstructor => courseInstructor.id === instructor.id)
     )
     .slice(0, 5); 
@@ -168,7 +168,7 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                     <UserCheck className="w-4 h-4 text-green-600" />
                   </div>
                   <span className="text-sm break-words max-w-[70%] text-gray-900 font-medium">
-                    {instructor.attributes.instructor_name}
+                    {instructor.instructor_name}
                   </span>
                 </div>
                 <Button
@@ -230,7 +230,7 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                   onClick={() => handleSelectInstructor(instructor.id)}
                   variant="ghost"
                   className="w-full text-left justify-start p-3 hover:bg-purple-50 hover:text-purple-900 transition-all duration-200 border border-transparent hover:border-purple-200 rounded-md"
-                  title={instructor.attributes.instructor_name}
+                  title={instructor.instructor_name}
                   disabled={addingInstructor === instructor.id}
                 >
                   {addingInstructor === instructor.id ? (
@@ -243,13 +243,13 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                       <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                         <Users className="w-3 h-3 text-blue-600" />
                       </div>
-                      <span className="truncate text-gray-700">{instructor.attributes.instructor_name}</span>
+                      <span className="truncate text-gray-700">{instructor.instructor_name}</span>
                     </div>
                   )}
                 </Button>
               ))}
               {instructors.filter(instructor => 
-                instructor.attributes.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                instructor.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
                 !courseInstructors.some(courseInstructor => courseInstructor.id === instructor.id)
               ).length > 5 && (
                 <div className="p-2 text-center text-xs text-gray-500 border-t">

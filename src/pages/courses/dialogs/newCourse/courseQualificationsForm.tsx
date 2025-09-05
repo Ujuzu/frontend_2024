@@ -48,7 +48,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
   const filteredQualifications = qualifications
     .filter(q =>
-      q.attributes.qualification_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      q.qualification_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !courseQualifications.some(courseQ => courseQ.id === q.id)
     )
     .slice(0, 5);
@@ -160,7 +160,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                 className="flex justify-between items-start gap-4 border border-gray-200 p-4 rounded-lg bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm"
               >
                 <span className="text-sm break-words max-w-[70%] text-gray-900 font-medium">
-                  {q.attributes.qualification_name}
+                  {q.qualification_name}
                 </span>
                 <Button 
                   type="button" 
@@ -221,7 +221,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                   onClick={() => handleSelectQualification(qual.id)}
                   variant="ghost"
                   className="w-full text-left justify-start p-3 hover:bg-purple-50 hover:text-purple-900 transition-all duration-200 border border-transparent hover:border-purple-200 rounded-md"
-                  title={qual.attributes.qualification_name}
+                  title={qual.qualification_name}
                   disabled={addingQualification === qual.id}
                 >
                   {addingQualification === qual.id ? (
@@ -230,7 +230,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                       <span className="text-purple-600">Adding...</span>
                     </div>
                   ) : (
-                    <span className="truncate text-gray-700">{qual.attributes.qualification_name}</span>
+                    <span className="truncate text-gray-700">{qual.qualification_name}</span>
                   )}
                 </Button>
               ))}
