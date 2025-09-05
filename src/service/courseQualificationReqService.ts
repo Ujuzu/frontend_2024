@@ -54,7 +54,7 @@ export const courseQualificationService = {
     return response.data.data as ICourseQualificationReqResponse;
   },
 
-    linkQualificationToCourse: async (token: ILoginToken | null, documentId: string, reqQualificationId: number) => {
+    linkQualificationToCourse: async (token: ILoginToken | null, documentId: string, reqQualificationId: string) => {
  
     if (!token) {
       throw new Error("Token is required for linking instructor to course.");
@@ -64,9 +64,6 @@ export const courseQualificationService = {
     }
     if (!reqQualificationId) {
       throw new Error("Qualification ID is required for linking instructor to course.");
-    }
-    if (typeof reqQualificationId !== "number") {
-      throw new Error("Qualification ID must be a number.");
     }
 
   // Send a PUT request to link the instructor to the course
@@ -107,7 +104,7 @@ export const courseQualificationService = {
     return response.data;
   },
 
-  unlinkQualificationFromCourse: async (token: ILoginToken | null, reqQualificationId: number) => {
+  unlinkQualificationFromCourse: async (token: ILoginToken | null, reqQualificationId: string) => {
 
   if (!token) {
     throw new Error("Token is required for unlinking Qualification from course.");
@@ -115,11 +112,7 @@ export const courseQualificationService = {
   if (!reqQualificationId) {
     throw new Error("Qualification ID is required for unlinking Qualification from course.");
   }
-  
-  
-  if (typeof reqQualificationId !== "number") {
-    throw new Error("Qualification ID must be a number.");
-  }
+
 
   // Send a PUT request to unlink the instructor from the course
 

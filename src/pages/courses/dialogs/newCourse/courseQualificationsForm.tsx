@@ -64,7 +64,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
     }
   }, [searchTerm]);
 
-  const handleSelectQualification = async (id: number) => {
+  const handleSelectQualification = async (id: number, documentId: string) => {
     if (courseQualifications.some(q => q.id === id)) return;
     
     try {
@@ -72,7 +72,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
       const selectedQual = qualifications.find(q => q.id === id)!;
       setCourseQualifications([...courseQualifications, selectedQual]);
       
-      await courseQualificationService.linkQualificationToCourse(token, courseId, id);
+      await courseQualificationService.linkQualificationToCourse(token, courseId, documentId);
       toast.success("Qualification added successfully!");
     } catch (error) {
       console.error("Error linking qualification:", error);
@@ -105,10 +105,10 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
     }
   };
 
-  const handleRemoveQualification = async (id: number) => {
+  const handleRemoveQualification = async (id: number,reqQualificationId: string) => {
     try {
       setRemovingQualification(id);
-      await courseQualificationService.unlinkQualificationFromCourse(token, id);
+      await courseQualificationService.unlinkQualificationFromCourse(token, reqQualificationId);
       setCourseQualifications(courseQualifications.filter(q => q.id !== id));
       toast.success("Qualification removed successfully!");
     } catch (error) {
@@ -166,7 +166,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                   type="button" 
                   variant="outline"
                   size="sm"
-                  onClick={() => handleRemoveQualification(q.id)} 
+                  onClick={() => handleRemoveQualification(q.id, q.documentId)} 
                   className="shrink-0 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
                   disabled={removingQualification === q.id}
                 >
@@ -218,7 +218,7 @@ const CourseQualificationsForm: React.FC<IFormStepProps> = ({ courseId }) => {
               {filteredQualifications.map((qual) => (
                 <Button
                   key={qual.id}
-                  onClick={() => handleSelectQualification(qual.id)}
+                  onClick={() => handleSelectQualification(qual.id, qual.documentId)}
                   variant="ghost"
                   className="w-full text-left justify-start p-3 hover:bg-purple-50 hover:text-purple-900 transition-all duration-200 border border-transparent hover:border-purple-200 rounded-md"
                   title={qual.qualification_name}
