@@ -14,9 +14,9 @@ export interface ICourseSubcategory {
   updatedAt?: string;
 }
 
-export interface ICourseSubcategoryResponse {
+export interface ICourseSubcategoryResponse extends ICourseSubcategory {
   id: number;
-  attributes: ICourseSubcategory;
+  documentId: string;
 }
 
 export interface ICourseSubcategoryStrapiResponse {

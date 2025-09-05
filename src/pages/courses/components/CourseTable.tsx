@@ -35,7 +35,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
       </div>
     );
   }
-
+  console.log('this is courses at the index page of , courses', courses)
   return (
     <Table>
       <TableHeader className="bg-gray-100">
@@ -59,17 +59,17 @@ const CourseTable: React.FC<CourseTableProps> = ({
                   className="text-blue-600 hover:text-blue-900 hover:underline text-left cursor-pointer"
                   onClick={() => onFullEdit(course)}
                 >
-                  {course.attributes.course_name}
+                  {course.course_name}
                 </button>
               </TableCell>
-              <TableCell>{course.attributes.language}</TableCell>
-              <TableCell>{course.attributes.level}</TableCell>
-              <TableCell>{course.attributes.duration}</TableCell>
+              <TableCell>{course.language}</TableCell>
+              <TableCell>{course.level}</TableCell>
+              <TableCell>{course.duration}</TableCell>
               <TableCell>
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  course.attributes.publishedAt ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                  course.publishedAt ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                 }`}>
-                  {course.attributes.publishedAt ? 'Yes' : 'No'}
+                  {course.publishedAt ? 'Yes' : 'No'}
                 </span>
               </TableCell>
               <TableCell>

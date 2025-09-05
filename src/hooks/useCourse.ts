@@ -157,7 +157,7 @@ const handleAddCourse = (course?:ICourseResponse) => {
     if (!dialogState.selectedCourse || !token) return;
     
     try {
-      await courseService.deleteCourse(token, dialogState.selectedCourse.id);
+      await courseService.deleteCourse(token, dialogState.selectedCourse.documentId);
       toast.success('Course deleted successfully!');
       fetchCourses(currentPage, filterText);
     } catch (error) {

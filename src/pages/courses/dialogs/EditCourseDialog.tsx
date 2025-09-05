@@ -34,22 +34,22 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
   useEffect(() => {
     if (selectedCourse) {
       setFormData({
-        documentId: selectedCourse.id,
-        course_name: selectedCourse.attributes.course_name,
-        short_desc: selectedCourse.attributes.short_desc,
-        short_desc_2: selectedCourse.attributes.short_desc_2,
-        short_desc_3: selectedCourse.attributes.short_desc_3,
-        course_outline: selectedCourse.attributes.course_outline,
-        weekly_curriculum_intro: selectedCourse.attributes.weekly_curriculum_intro,
-        language: selectedCourse.attributes.language,
-        level: selectedCourse.attributes.level,
-        duration: selectedCourse.attributes.duration,
-        video_url: selectedCourse.attributes.video_url,
-        rating_count: selectedCourse.attributes.rating_count,
-        certificate: selectedCourse.attributes.certificate,
-        quizes: selectedCourse.attributes.quizes,
-        sort_order: selectedCourse.attributes.sort_order,
-        locale: selectedCourse.attributes.locale || 'en'
+        documentId: selectedCourse.documentId,
+        course_name: selectedCourse.course_name,
+        short_desc: selectedCourse.short_desc,
+        short_desc_2: selectedCourse.short_desc_2,
+        short_desc_3: selectedCourse.short_desc_3,
+        course_outline: selectedCourse.course_outline,
+        weekly_curriculum_intro: selectedCourse.weekly_curriculum_intro,
+        language: selectedCourse.language,
+        level: selectedCourse.level,
+        duration: selectedCourse.duration,
+        video_url: selectedCourse.video_url,
+        rating_count: selectedCourse.rating_count,
+        certificate: selectedCourse.certificate,
+        quizes: selectedCourse.quizes,
+        sort_order: selectedCourse.sort_order,
+        locale: selectedCourse.locale || 'en'
       });
     }
   }, [selectedCourse]);
@@ -83,7 +83,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
     
     setIsSubmitting(true);
     try {
-      await courseService.updateCourse(token, selectedCourse.id, formData as ICourseAttributes);
+      await courseService.updateCourse(token, selectedCourse.documentId, formData as ICourseAttributes);
       onSave();
     } catch (error) {
       console.error('Error updating course:', error);
@@ -98,7 +98,7 @@ const EditCourseDialog: React.FC<EditCourseDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[80vw] w-full max-h-[95vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Course: {selectedCourse.attributes.course_name}</DialogTitle>
+          <DialogTitle>Edit Course: {selectedCourse.course_name}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">

@@ -12,7 +12,7 @@ export interface ICourseFeatureStrapiResponse {
   meta: IMeta;
 }
 
-export interface ICourseFeatureResponse {
+export interface ICourseFeatureResponse  extends ICoursesFeature {
   id: number;
-  attributes: ICoursesFeature;
+  documentId: string;
 }

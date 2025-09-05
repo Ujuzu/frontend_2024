@@ -38,7 +38,7 @@ export const CourseDialogs: React.FC<CourseDialogsProps> = ({
         onSuccess={onEditSuccess} 
         selectedCourse={selectedCourse} 
         isEdit={!!selectedCourse}
-        course_Id={selectedCourse?.id} 
+        course_Id={selectedCourse?.documentId} 
       />
       
       {/* Edit Course Dialog */}

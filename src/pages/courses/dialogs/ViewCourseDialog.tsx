@@ -27,7 +27,7 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">{course.attributes.course_name}</DialogTitle>
+          <DialogTitle className="text-xl">{course.course_name}</DialogTitle>
         </DialogHeader>
         
         <div className="mt-4 space-y-6">
@@ -45,33 +45,33 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Language</h3>
-              <p>{course.attributes.language}</p>
+              <p>{course.language}</p>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Level</h3>
-              <p className="capitalize">{course.attributes.level}</p>
+              <p className="capitalize">{course.level}</p>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Duration</h3>
-              <p>{course.attributes.duration}</p>
+              <p>{course.duration}</p>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Rating Count</h3>
-              <p>{course.attributes.rating_count}</p>
+              <p>{course.rating_count}</p>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Sort Order</h3>
-              <p>{course.attributes.sort_order}</p>
+              <p>{course.sort_order}</p>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Published</h3>
               <p>
-                {course.attributes.publishedAt ? (
+                {course.publishedAt ? (
                   <span className="flex items-center text-green-600">
                     <CheckCircle2 className="h-4 w-4 mr-1" /> Yes
                   </span>
@@ -86,53 +86,53 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
           
           {/* Features */}
           <div className="flex space-x-2">
-            <Badge variant={course.attributes.certificate ? "default" : "outline"}>Certificate</Badge>
-            <Badge variant={course.attributes.quizes ? "default" : "outline"}>Quizes</Badge>
+            <Badge variant={course.certificate ? "default" : "outline"}>Certificate</Badge>
+            <Badge variant={course.quizes ? "default" : "outline"}>Quizes</Badge>
           </div>
           
           {/* Descriptions */}
           <div className="space-y-4">
             <div>
               <h3 className="text-sm font-medium text-gray-500">Short Description</h3>
-              <p className="mt-1 whitespace-pre-wrap">{course.attributes.short_desc}</p>
+              <p className="mt-1 whitespace-pre-wrap">{course.short_desc}</p>
             </div>
             
-            {course.attributes.short_desc_2 && (
+            {course.short_desc_2 && (
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Short Description 2</h3>
-                <p className="mt-1 whitespace-pre-wrap">{course.attributes.short_desc_2}</p>
+                <p className="mt-1 whitespace-pre-wrap">{course.short_desc_2}</p>
               </div>
             )}
             
-            {course.attributes.short_desc_3 && (
+            {course.short_desc_3 && (
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Short Description 3</h3>
-                <p className="mt-1 whitespace-pre-wrap">{course.attributes.short_desc_3}</p>
+                <p className="mt-1 whitespace-pre-wrap">{course.short_desc_3}</p>
               </div>
             )}
             
             <div>
               <h3 className="text-sm font-medium text-gray-500">Course Outline</h3>
-              <p className="mt-1 whitespace-pre-wrap">{course.attributes.course_outline}</p>
+              <p className="mt-1 whitespace-pre-wrap">{course.course_outline}</p>
             </div>
             
-            {course.attributes.weekly_curriculum_intro && (
+            {course.weekly_curriculum_intro && (
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Weekly Curriculum Intro</h3>
-                <p className="mt-1 whitespace-pre-wrap">{course.attributes.weekly_curriculum_intro}</p>
+                <p className="mt-1 whitespace-pre-wrap">{course.weekly_curriculum_intro}</p>
               </div>
             )}
             
-            {course.attributes.video_url && (
+            {course.video_url && (
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Video URL</h3>
                 <a 
-                  href={course.attributes.video_url} 
+                  href={course.video_url} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline break-all"
                 >
-                  {course.attributes.video_url}
+                  {course.video_url}
                 </a>
               </div>
             )}
@@ -143,24 +143,24 @@ const ViewCourseDialog: React.FC<ViewCourseDialogProps> = ({
             <h3 className="text-sm font-medium text-gray-500 mb-2">Metadata</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
               <div>
-                <span className="text-gray-500">Created:</span> {formatDate(course.attributes?.createdAt).toString()}
+                <span className="text-gray-500">Created:</span> {formatDate(course.createdAt).toString()}
               </div>
               <div>
-                <span className="text-gray-500">By:</span> {course.attributes.createdBy} {course.attributes.createdBy}
+                <span className="text-gray-500">By:</span> {course.createdBy} {course.createdBy}
               </div>
               <div>
-                <span className="text-gray-500">Updated:</span> {formatDate(course.attributes.updatedAt)}
+                <span className="text-gray-500">Updated:</span> {formatDate(course.updatedAt)}
               </div>
               <div>
-                <span className="text-gray-500">By:</span> {course.attributes.updatedBy} {course.attributes.updatedBy}
+                <span className="text-gray-500">By:</span> {course.updatedBy} {course.updatedBy}
               </div>
-              {course.attributes.publishedAt && (
+              {course.publishedAt && (
                 <div>
-                  <span className="text-gray-500">Published:</span> {formatDate(course.attributes.publishedAt)}
+                  <span className="text-gray-500">Published:</span> {formatDate(course.publishedAt)}
                 </div>
               )}
               <div>
-                <span className="text-gray-500">Locale:</span> {course.attributes.locale || 'en'}
+                <span className="text-gray-500">Locale:</span> {course.locale || 'en'}
               </div>
             </div>
           </div>

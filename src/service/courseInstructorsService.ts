@@ -90,20 +90,20 @@ export const courseInstructorService = {
     );
   },
 
-    getCourseInstructors: async (token: ILoginToken, courseId: number) => {
+    getCourseInstructors: async (token: ILoginToken, documentId: string) => {
 
     if (!token) {
       throw new Error("Token is required for fetching course instructors.");
     }
-    if (!courseId) {
+    if (!documentId) {
       throw new Error("Course ID is required for fetching course instructors.");
     }
-    if (typeof courseId !== "number") {
+    if (typeof documentId !== "number") {
       throw new Error("Course ID must be a number.");
     }
 
     const response = await axios.get<ICoursesInstructorStrapiResponse>(
-      `${courseInstructorsURL}/?filters[courses][id][$eq]=${courseId}`,
+      `${courseInstructorsURL}/?filters[courses][documentId]=${documentId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

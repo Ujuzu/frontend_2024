@@ -1,30 +1,29 @@
-export interface IMedia {
-data: null | {
-    id: number;
-    attributes: MediaAttributes;
-  };
+export interface IMedia extends MediaAttributes {
+
+    id?: number;
+  
 }
 
 export interface MediaAttributes {
-  name: string;
-  alternativeText: string | null;
-  caption: string | null;
-  width: number;
-  height: number;
-  formats: IStrapiFormats; 
-  hash: string;
-  ext: string;
-  mime: string;
-  size: number;
-  url: string;
-  previewUrl: string | null;
-  provider: string;
-  provider_metadata: {
-    public_id: string;
-    resource_type: string;
+  name?: string;
+  alternativeText?: string | null;
+  caption?: string | null;
+  width?: number;
+  height?: number;
+  formats?: IStrapiFormats; 
+  hash?: string;
+  ext?: string;
+  mime?: string;
+  size?: number;
+  url?: string;
+  previewUrl?: string | null;
+  provider?: string;
+  provider_metadata?: {
+    public_id?: string;
+    resource_type?: string;
   };
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 

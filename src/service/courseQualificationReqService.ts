@@ -54,19 +54,16 @@ export const courseQualificationService = {
     return response.data.data as ICourseQualificationReqResponse;
   },
 
-    linkQualificationToCourse: async (token: ILoginToken | null, courseId: number, reqQualificationId: number) => {
+    linkQualificationToCourse: async (token: ILoginToken | null, documentId: string, reqQualificationId: number) => {
  
     if (!token) {
       throw new Error("Token is required for linking instructor to course.");
     }
-    if (!courseId) {
+    if (!documentId) {
       throw new Error("Course ID is required for linking instructor to course.");
     }
     if (!reqQualificationId) {
       throw new Error("Qualification ID is required for linking instructor to course.");
-    }
-    if (typeof courseId !== "number") {
-      throw new Error("Course ID must be a number.");
     }
     if (typeof reqQualificationId !== "number") {
       throw new Error("Qualification ID must be a number.");
@@ -78,7 +75,7 @@ export const courseQualificationService = {
       `${courseQualificationReqURL}/${reqQualificationId}`,
       {
         data: {
-          courses: [courseId],
+          courses: [documentId],
         },
       },
       {
@@ -89,21 +86,21 @@ export const courseQualificationService = {
     );
   },
 
-    getCourseQualifications: async (token: ILoginToken, courseId: number) => {
+    getCourseQualifications: async (token: ILoginToken, documentId: string) => {
 
     if (!token) {
       throw new Error("Token is required for fetching course qualifications.");
     }
-    if (!courseId) {
+    if (!documentId) {
       throw new Error("Course ID is required for fetching course qualifications.");
     }
-    if (typeof courseId !== "number") {
+    if (typeof documentId !== "number") {
       throw new Error("Course ID must be a number.");
     }
     // Add populate parameter to fetch related data
 
     const response = await axios.get<IQualificationReqStrapiResponse>(
-      `${courseQualificationReqURL}/?filters[courses][id][$eq]=${courseId}`,
+      `${courseQualificationReqURL}/?filters[courses][id][$eq]=${documentId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

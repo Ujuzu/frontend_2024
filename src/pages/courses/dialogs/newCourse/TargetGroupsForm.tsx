@@ -48,7 +48,7 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
   const filteredTargetGroups = targetGroups
     .filter(group =>
-      group.attributes.target_group_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      group.target_group_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !courseTargetGroups.some(courseGroup => courseGroup.id === group.id)
     )
     .slice(0, 5);
@@ -171,7 +171,7 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                     <CheckCircle className="w-4 h-4 text-green-600" />
                   </div>
                   <span className="text-sm break-words max-w-[70%] text-gray-900 font-medium">
-                    {group.attributes.target_group_name}
+                    {group.target_group_name}
                   </span>
                 </div>
                 <Button
@@ -233,7 +233,7 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                   onClick={() => handleSelectTargetGroup(group.id)}
                   variant="ghost"
                   className="w-full text-left justify-start p-3 hover:bg-purple-50 hover:text-purple-900 transition-all duration-200 border border-transparent hover:border-purple-200 rounded-md"
-                  title={group.attributes.target_group_name}
+                  title={group.target_group_name}
                   disabled={addingTargetGroup === group.id}
                 >
                   {addingTargetGroup === group.id ? (
@@ -246,13 +246,13 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                       <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                         <Target className="w-3 h-3 text-blue-600" />
                       </div>
-                      <span className="truncate text-gray-700">{group.attributes.target_group_name}</span>
+                      <span className="truncate text-gray-700">{group.target_group_name}</span>
                     </div>
                   )}
                 </Button>
               ))}
               {targetGroups.filter(group => 
-                group.attributes.target_group_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                group.target_group_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
                 !courseTargetGroups.some(courseGroup => courseGroup.id === group.id)
               ).length > 5 && (
                 <div className="p-2 text-center text-xs text-gray-500 border-t">

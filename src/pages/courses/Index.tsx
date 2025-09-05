@@ -72,15 +72,20 @@ const CoursesIndex = () => {
           </div>
         </div>
         
-        {/* Course Table, lifted from Brian */}
-        <CourseTable 
-          courses={courses}
-          isLoading={isLoading}
-          onView={handleViewCourse}
-          onEdit={handleEditCourse}
-          onDelete={handleDeleteCourse}
-          onFullEdit={handleAddCourse}
-        />
+        {/* Course Table, lifted from Brian, load only if we have courses length > 0 */}
+        {
+          courses.length > 0 &&
+            
+          <CourseTable 
+            courses={courses}
+            isLoading={isLoading}
+            onView={handleViewCourse}
+            onEdit={handleEditCourse}
+            onDelete={handleDeleteCourse}
+            onFullEdit={handleAddCourse}
+            />
+            
+}
         
         {/* Pagination I have to test this once data is enough, for noe kariko works*/}
         <CoursePagination 

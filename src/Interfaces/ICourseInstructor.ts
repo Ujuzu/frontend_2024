@@ -7,9 +7,9 @@ export interface ICoursesInstructorStrapiResponse {
   meta: IMeta
 }
 
- export interface ICoursesInstructorResponse {
-  id: number;  
-  attributes: ICoursesInstructorAttributesWithMedia;
+ export interface ICoursesInstructorResponse extends ICoursesInstructorAttributesWithMedia {
+   id: number;  
+   documentId: string;
 }
 
 export interface ICoursesInstructorAttributes {

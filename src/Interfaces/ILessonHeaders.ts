@@ -8,9 +8,9 @@ export interface ILessonHeaderStrapiResponse {
     meta: IMeta;
 }
 
-export interface ILessonHeaderResponse {
-    id: number;
-    attributes: ILessonHeaderAttributesWithMedia;
+export interface ILessonHeaderResponse extends ILessonHeaderAttributesWithMedia {
+  id: number;
+  documentId: string;
 }
 
 export interface ILessonHeaderAttributes {

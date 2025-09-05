@@ -8,9 +8,9 @@ export interface ICurriculumLessonStrapiResponse {
     meta: IMeta;
 }
 
-export interface ICurriculumLessonResponse {
-    id: number;
-    attributes: ICurriculumLessonAttributesWithMedia;
+export interface ICurriculumLessonResponse extends ICurriculumLessonAttributesWithMedia{
+  id: number;
+  documentId: string;    
 }
 
 export interface ICurriculumLessonAttributes {

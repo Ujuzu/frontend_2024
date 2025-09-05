@@ -40,7 +40,7 @@ const CategorySelector: React.FC<ICategorySelectorProps> = ({
         <h3 className="font-semibold mb-2">Available Categories</h3>
         {availableCategories.filter(cat => !selectedCategories.includes(cat.id)).map((category) => (
           <Button key={category.id} onClick={() => handleSelectCategory(category.id)}>
-            {category.attributes.title}
+            {category.title}
           </Button>
         ))}
       </div>
@@ -52,7 +52,7 @@ const CategorySelector: React.FC<ICategorySelectorProps> = ({
           const category = availableCategories.find(cat => cat.id === categoryId);
           return category ? (
             <div key={categoryId} className="flex items-center gap-2">
-              <span>{category.attributes.title}</span>
+              <span>{category.title}</span>
               <Button onClick={() => handleRemoveCategory(categoryId)} variant="destructive">
                 <X size={16} />
               </Button>
@@ -66,7 +66,7 @@ const CategorySelector: React.FC<ICategorySelectorProps> = ({
         <h3 className="font-semibold mb-2">Available Subcategories</h3>
         {availableSubcategories.filter(sub => !selectedSubcategories.includes(sub.id)).map((subcategory) => (
           <Button key={subcategory.id} onClick={() => handleSelectSubcategory(subcategory.id)}>
-            {subcategory.attributes.title}
+            {subcategory.title}
           </Button>
         ))}
       </div>
@@ -78,7 +78,7 @@ const CategorySelector: React.FC<ICategorySelectorProps> = ({
           const subcategory = availableSubcategories.find(sub => sub.id === subcategoryId);
           return subcategory ? (
             <div key={subcategoryId} className="flex items-center gap-2">
-              <span>{subcategory.attributes.title}</span>
+              <span>{subcategory.title}</span>
               <Button onClick={() => handleRemoveSubcategory(subcategoryId)} variant="destructive">
                 <X size={16} />
               </Button>

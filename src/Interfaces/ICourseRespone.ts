@@ -16,9 +16,9 @@ export interface IStrapiResponse {
   meta: IMeta;
 }
 
-export interface ICourseResponse {
+export interface ICourseResponse extends ICourseAttributesStrapiResponse{
   id: number;
-  attributes: ICourseAttributesStrapiResponse;
+  documentId: string;
 }
 
 export interface ICourseAttributes {
@@ -90,11 +90,11 @@ export interface ICourseDialogProps {
   onSuccess: (course: ICourseResponse) => void;
   selectedCourse?: ICourseResponse | null;
   isEdit?: boolean;
-  course_Id?: number;
+  course_Id?: string;
 }
 
 export interface IFormStepProps {
-courseId: number;
+courseId: string;
   formData: ICourseAttributesDataPayload;
   setFormData: React.Dispatch<React.SetStateAction<ICourseAttributesDataPayload>>;
   courseData:ICourseResponse | null;
