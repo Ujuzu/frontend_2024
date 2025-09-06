@@ -7,9 +7,9 @@ export interface IWeeklyCurriculumStrapiResponse {
   meta: IMeta;
   };
 
-export interface IWeeklyCurriculumResponse {
+export interface IWeeklyCurriculumResponse extends ICoursesWklyCurriculumAttribWithMedia {
   id: number;
-  attributes: ICoursesWklyCurriculumAttribWithMedia ;
+  documentId: string;
 }
 
 export interface ICoursesWklyCurriculumAttrib {
@@ -19,7 +19,7 @@ export interface ICoursesWklyCurriculumAttrib {
   publishedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
-  courses?:number[];
+  courses?:string[];
   intro_pic?:number;
 }
 

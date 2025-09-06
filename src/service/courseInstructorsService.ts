@@ -54,7 +54,7 @@ export const courseInstructorService = {
     return response.data.data as ICoursesInstructorResponse;
   },
 
-    linkInstructorToCourse: async (token: ILoginToken | null, documentId: string, instructorId: number) => {
+    linkInstructorToCourse: async (token: ILoginToken | null, documentId: string, instructorDocId: string) => {
   if (!token) {
     throw new Error("Token is required for linking instructor to course."); 
   }
@@ -64,16 +64,13 @@ export const courseInstructorService = {
   }
 
 
-  if (!instructorId) {
+  if (!instructorDocId) {
     throw new Error("Instructor ID is required for linking instructor to course.");
-  }
-  if (typeof instructorId !== "number") {
-    throw new Error("Instructor ID must be a number.");
   }
   // Send a PUT request to link the instructor to the course
 
     return axios.put(
-      `${courseInstructorsURL}/${instructorId}`,
+      `${courseInstructorsURL}/${instructorDocId}`,
       {
         data: {
           courses: [documentId],
@@ -107,23 +104,21 @@ export const courseInstructorService = {
     return response.data;
   },
 
-  unlinkInstructorFromCourse: async (token: ILoginToken | null, documentId: string, instructorId: number) => {
+  unlinkInstructorFromCourse: async (token: ILoginToken | null, documentId: string, instructorDocId: string) => {
   if (!token) {
     throw new Error("Token is required for unlinking instructor from course.");
   }
   if (!documentId) {
     throw new Error("Course ID is required for unlinking instructor from course.");
   }
-  if (!instructorId) {
+  if (!instructorDocId) {
     throw new Error("Instructor ID is required for unlinking instructor from course.");
   }
-  if (typeof instructorId !== "number") {
-    throw new Error("Instructor ID must be a number.");
-  }
+
   // Send a PUT request to unlink the instructor from the course
 
   return axios.put(
-    `${courseInstructorsURL}/${instructorId}`,
+    `${courseInstructorsURL}/${instructorDocId}`,
     { data: { courses: [] } }, 
     { headers: { Authorization: `Bearer ${token}` } }
   );

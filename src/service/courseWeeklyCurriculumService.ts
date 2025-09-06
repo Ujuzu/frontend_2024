@@ -62,17 +62,14 @@ export const courseWeeklyCurriculumService = {
     return response.data.data as IWeeklyCurriculumResponse;
   },
 
-    updateWeeklyCurriculum: async (token: ILoginToken | null,  curriculumId: number, payload:ICoursesWklyCurriculumAttrib) => {
+    updateWeeklyCurriculum: async (token: ILoginToken | null,  curriculumDocId: string, payload:ICoursesWklyCurriculumAttrib) => {
 
    try {
      if (!token) {
        throw new Error("Token is required for updating qualification.");
      }
-     if (!curriculumId) {
+     if (!curriculumDocId) {
        throw new Error("Curriculum ID is required for updating qualification.");
-     }
-     if (typeof curriculumId !== "number") {
-       throw new Error("Curriculum ID must be a number.");
      }
      if (!payload) {
        throw new Error("Payload is required for updating qualification.");
@@ -87,7 +84,7 @@ export const courseWeeklyCurriculumService = {
    // Send a PUT request to update the qualification
  
      return axios.put(
-       `${courseWeeklyCurriculumURL}/${curriculumId}`,
+       `${courseWeeklyCurriculumURL}/${curriculumDocId}`,
        {
          data: {
            ...payload,
@@ -106,23 +103,20 @@ export const courseWeeklyCurriculumService = {
    }
   },
 
-    getCourseWeeklyCurricula: async (token: ILoginToken,  courseId:number) => {
+    getCourseWeeklyCurricula: async (token: ILoginToken,  courseDocId:string) => {
 
     try {
         if (!token) {
           throw new Error("Token is required for fetching course weekly curricula.");
         }
-        if (!courseId) {
+        if (!courseDocId) {
           throw new Error("Course ID is required for fetching course weekly curricula.");
-        }
-        if (typeof courseId !== "number") {
-          throw new Error("Course ID must be a number.");
         }
             
         // Add populate parameter to fetch related data
     
         const response = await axios.get<IWeeklyCurriculumStrapiResponse>(
-          `${courseWeeklyCurriculumURL}/?filters[courses][id][$eq]=${courseId}`,
+          `${courseWeeklyCurriculumURL}/?filters[courses][documentId]=${courseDocId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
