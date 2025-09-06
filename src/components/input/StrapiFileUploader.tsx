@@ -55,7 +55,7 @@ const StrapiFileUploader: React.FC<IStrapiFileUploaderProps> = ({
   };
 
   const getMediaTypeIcon = (file: IStrapiUploadResponse) => {
-    if (file.mime.startsWith('image/') && file.formats?.thumbnail?.url) {
+    if (file?.mime?.startsWith('image/') && file.formats?.thumbnail?.url) {
       return (
         <img
           src={file.formats.thumbnail.url}
@@ -67,7 +67,7 @@ const StrapiFileUploader: React.FC<IStrapiFileUploaderProps> = ({
     // Fallback to generic icon
     return (
       <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-        {file.mime.startsWith('image/') ? (
+        {file?.mime?.startsWith('image/') ? (
           <Image className="w-4 h-4 text-gray-500" />
         ) : (
           <File className="w-4 h-4 text-gray-500" />

@@ -14,7 +14,7 @@ export interface MediaAttributes {
   hash?: string;
   ext?: string;
   mime?: string;
-  size?: number;
+  size: number;
   url?: string;
   previewUrl?: string | null;
   provider?: string;
