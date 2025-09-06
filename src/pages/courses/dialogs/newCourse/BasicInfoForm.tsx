@@ -63,7 +63,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
 
   useEffect(() => {
     if (courseData) {
-      const files = extractExistingFiles(courseData, 'attributes.course_intro_img');
+      const files = extractExistingFiles(courseData, 'course_intro_img');
       setExistingImage(files);
     }
   }, [courseData]);

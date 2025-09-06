@@ -1,42 +1,41 @@
-// Utility functions for transforming Strapi data
+// Utility functions for transforming Strapi data (v5 compatible)
+import { IMedia } from "@/Interfaces/IMedia";
 import { IStrapiUploadResponse } from "@/Interfaces/IStrapiFileUploader";
 
 /**
- * Transform Strapi media response to IStrapiUploadResponse format
+ * Transform Strapi media response to IStrapiUploadResponse format (v5)
  */
 export const transformStrapiMediaToUploadResponse = (
-  strapiMedia: any
+  strapiMedia: IMedia
 ): IStrapiUploadResponse | null => {
-  if (!strapiMedia?.data?.attributes) {
+  if (!strapiMedia) {
     return null;
   }
 
-  const mediaData = strapiMedia.data;
-  const attributes = mediaData.attributes;
-
+  // In v5, the response is flat - no more attributes nesting
   return {
-    id: mediaData.id,
-    name: attributes.name,
-    alternativeText: attributes.alternativeText || '',
-    caption: attributes.caption || '',
-    width: attributes.width,
-    height: attributes.height,
-    formats: attributes.formats,
-    hash: attributes.hash,
-    ext: attributes.ext,
-    mime: attributes.mime,
-    size: attributes.size,
-    url: attributes.url,
-    previewUrl: attributes.previewUrl,
-    provider: attributes.provider,
-    provider_metadata: attributes.provider_metadata,
-    createdAt: attributes.createdAt,
-    updatedAt: attributes.updatedAt,
+    id: strapiMedia.id,
+    name: strapiMedia.name,
+    alternativeText: strapiMedia.alternativeText || '',
+    caption: strapiMedia.caption || '',
+    width: strapiMedia.width,
+    height: strapiMedia.height,
+    formats: strapiMedia.formats,
+    hash: strapiMedia.hash,
+    ext: strapiMedia.ext,
+    mime: strapiMedia.mime,
+    size: strapiMedia.size,
+    url: strapiMedia.url,
+    previewUrl: strapiMedia.previewUrl,
+    provider: strapiMedia.provider,
+    provider_metadata: strapiMedia.provider_metadata,
+    createdAt: strapiMedia.createdAt,
+    updatedAt: strapiMedia.updatedAt,
   };
 };
 
 /**
- * Transform multiple Strapi media responses to IStrapiUploadResponse array
+ * Transform multiple Strapi media responses to IStrapiUploadResponse array (v5)
  */
 export const transformStrapiMediaArrayToUploadResponse = (
   strapiMediaArray: any[]
@@ -46,19 +45,19 @@ export const transformStrapiMediaArrayToUploadResponse = (
   }
 
   return strapiMediaArray
-    .map(media => transformStrapiMediaToUploadResponse({ data: media }))
+    .map(media => transformStrapiMediaToUploadResponse(media))
     .filter(Boolean) as IStrapiUploadResponse[];
 };
 
 /**
- * Extract existing files from courseData for StrapiFileUploader
+ * Extract existing files from courseData for StrapiFileUploader (v5)
  */
 export const extractExistingFiles = (
   courseData: any,
   fieldPath: string
 ): IStrapiUploadResponse[] => {
   try {
-    // Handle nested path like 'attributes.course_intro_img'
+    // Handle nested path like 'course_intro_img'
     const pathSegments = fieldPath.split('.');
     let current = courseData;
     
@@ -69,15 +68,15 @@ export const extractExistingFiles = (
 
     if (!current) return [];
 
-    // Handle single file
-    if (current.data && !Array.isArray(current.data)) {
+    // Handle single file (v5 - no data wrapper)
+    if (!Array.isArray(current)) {
       const transformed = transformStrapiMediaToUploadResponse(current);
       return transformed ? [transformed] : [];
     }
 
-    // Handle multiple files
-    if (current.data && Array.isArray(current.data)) {
-      return transformStrapiMediaArrayToUploadResponse(current.data);
+    // Handle multiple files (v5 - array of media objects)
+    if (Array.isArray(current)) {
+      return transformStrapiMediaArrayToUploadResponse(current);
     }
 
     return [];
@@ -88,7 +87,7 @@ export const extractExistingFiles = (
 };
 
 /**
- * Check if a file exists in courseData
+ * Check if a file exists in courseData (v5)
  */
 export const hasExistingFile = (
   courseData: any,

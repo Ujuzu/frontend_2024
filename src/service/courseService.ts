@@ -169,9 +169,6 @@ export const courseService = {
     if (!documentId) {
       throw new Error('Course ID is required for fetching a course');
     }
-    if (typeof documentId !== 'number') {
-      throw new Error('Course ID must be a number');
-    }
 
     const {data} = await axios.get(
       `${API_URL}/api/courses/${documentId}?populate=*`,

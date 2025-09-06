@@ -1,6 +1,6 @@
 export interface IMedia extends MediaAttributes {
 
-    id?: number;
+    id: number;
   
 }
 
