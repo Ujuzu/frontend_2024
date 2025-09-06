@@ -52,24 +52,21 @@ export const courseTargetGroupService = {
     return response.data.data as ICourseTargetGroupResponse;
   },
 
-    linkTargetGroupToCourse: async (token: ILoginToken | null, courseId: number, targetGroupId: number) => {
+    linkTargetGroupToCourse: async (token: ILoginToken | null, documentId: string, targetGroupDocId: string) => {
     if (!token) {
       throw new Error('Token is required for linking target group to course');
     }
-    if (!courseId) {
+    if (!documentId) {
       throw new Error('Course ID is required for linking target group to course');
     }
-    if (!targetGroupId) {
+    if (!targetGroupDocId) {
       throw new Error('Target group ID is required for linking target group to course');
     }
-    if (typeof targetGroupId !== 'number') {
-      throw new Error('Target group ID must be a number');
-    }
     return axios.put(
-      `${targetGroupsUrl}/${targetGroupId}`,
+      `${targetGroupsUrl}/${targetGroupDocId}`,
       {
         data: {
-          courses: [courseId],
+          courses: [documentId],
         },
       },
       {
@@ -80,9 +77,9 @@ export const courseTargetGroupService = {
     );
   },
 
-    getCourseTargetGroups: async (token: ILoginToken, courseId: number) => {
+    getCourseTargetGroups: async (token: ILoginToken, documentId: string) => {
     const response = await axios.get<ITargetGroupStrapiResponse>(
-      `${targetGroupsUrl}/?filters[courses][id][$eq]=${courseId}`,
+      `${targetGroupsUrl}/?filters[courses][documentId]=${documentId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -92,19 +89,19 @@ export const courseTargetGroupService = {
     return response.data;
   },
 
-  unlinkTargetGroupFromCourse: async (token: ILoginToken | null, courseId: number, targetGroupId: number) => {
+  unlinkTargetGroupFromCourse: async (token: ILoginToken | null, documentId: string, targetGroupDocId: string) => {
   if (!token) {
     throw new Error("Token is required for unlinking target group.");
   }
-  if (!courseId) {
-    throw new Error("Course ID is required for unlinking target group.");
+  if (!documentId) {
+    throw new Error("Course documentId is required for unlinking target group.");
   }
-  if (!targetGroupId) {
+  if (!targetGroupDocId) {
     throw new Error("Target group ID is required.");
   }
 
   return axios.put(
-    `${targetGroupsUrl}/${targetGroupId}`,
+    `${targetGroupsUrl}/${targetGroupDocId}`,
     { data: { courses: [] } }, 
     { headers: { Authorization: `Bearer ${token}` } }
   );

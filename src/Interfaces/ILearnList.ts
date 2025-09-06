@@ -1,8 +1,9 @@
 import { IMeta } from "./IMeta";
 
-export interface ILearnListResponse {
+export interface ILearnListResponse extends ILearnListAttributes{
     id: number;
-    attributes: ILearnListAttributes;
+    documentId: string;
+
 }
 
 export interface ILearnListAttributes {

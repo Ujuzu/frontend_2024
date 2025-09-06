@@ -54,32 +54,26 @@ export const courseInstructorService = {
     return response.data.data as ICoursesInstructorResponse;
   },
 
-    linkInstructorToCourse: async (token: ILoginToken | null, courseId: number, instructorId: number) => {
+    linkInstructorToCourse: async (token: ILoginToken | null, documentId: string, instructorDocId: string) => {
   if (!token) {
     throw new Error("Token is required for linking instructor to course."); 
   }
 
-  if (!courseId) {
+  if (!documentId) {
     throw new Error("Course ID is required for linking instructor to course.");
   }
 
 
-  if (!instructorId) {
+  if (!instructorDocId) {
     throw new Error("Instructor ID is required for linking instructor to course.");
-  }
-  if (typeof instructorId !== "number") {
-    throw new Error("Instructor ID must be a number.");
-  }
-  if (typeof courseId !== "number") {
-    throw new Error("Course ID must be a number."); 
   }
   // Send a PUT request to link the instructor to the course
 
     return axios.put(
-      `${courseInstructorsURL}/${instructorId}`,
+      `${courseInstructorsURL}/${instructorDocId}`,
       {
         data: {
-          courses: [courseId],
+          courses: [documentId],
         },
       },
       {
@@ -90,20 +84,17 @@ export const courseInstructorService = {
     );
   },
 
-    getCourseInstructors: async (token: ILoginToken, courseId: number) => {
+    getCourseInstructors: async (token: ILoginToken, documentId: string) => {
 
     if (!token) {
       throw new Error("Token is required for fetching course instructors.");
     }
-    if (!courseId) {
+    if (!documentId) {
       throw new Error("Course ID is required for fetching course instructors.");
-    }
-    if (typeof courseId !== "number") {
-      throw new Error("Course ID must be a number.");
     }
 
     const response = await axios.get<ICoursesInstructorStrapiResponse>(
-      `${courseInstructorsURL}/?filters[courses][id][$eq]=${courseId}`,
+      `${courseInstructorsURL}/?filters[courses][documentId]=${documentId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -113,26 +104,21 @@ export const courseInstructorService = {
     return response.data;
   },
 
-  unlinkInstructorFromCourse: async (token: ILoginToken | null, courseId: number, instructorId: number) => {
+  unlinkInstructorFromCourse: async (token: ILoginToken | null, documentId: string, instructorDocId: string) => {
   if (!token) {
     throw new Error("Token is required for unlinking instructor from course.");
   }
-  if (!courseId) {
+  if (!documentId) {
     throw new Error("Course ID is required for unlinking instructor from course.");
   }
-  if (!instructorId) {
+  if (!instructorDocId) {
     throw new Error("Instructor ID is required for unlinking instructor from course.");
   }
-  if (typeof instructorId !== "number") {
-    throw new Error("Instructor ID must be a number.");
-  }
-  if (typeof courseId !== "number") {
-    throw new Error("Course ID must be a number.");
-  }
+
   // Send a PUT request to unlink the instructor from the course
 
   return axios.put(
-    `${courseInstructorsURL}/${instructorId}`,
+    `${courseInstructorsURL}/${instructorDocId}`,
     { data: { courses: [] } }, 
     { headers: { Authorization: `Bearer ${token}` } }
   );

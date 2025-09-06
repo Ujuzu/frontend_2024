@@ -63,7 +63,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
 
   useEffect(() => {
     if (courseData) {
-      const files = extractExistingFiles(courseData, 'attributes.course_intro_img');
+      const files = extractExistingFiles(courseData, 'course_intro_img');
       setExistingImage(files);
     }
   }, [courseData]);
@@ -142,8 +142,8 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">
-                {courseData?.attributes?.course_name
-                  ? `Editing: ${courseData.attributes.course_name}`
+                {courseData?.course_name
+                  ? `Editing: ${courseData.course_name}`
                   : "Basic Course Information"}
               </h2>
               <p className="text-sm text-gray-600 mt-1">
@@ -176,7 +176,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
             <div className="flex items-center gap-2">
               <CheckCircle size={16} className="text-green-600" />
               <p className="text-sm text-green-700 font-medium">
-                Course "{courseData.attributes.course_name}" is saved (ID: {courseData.id})
+                Course "{courseData.course_name}" is saved (ID: {courseData.id})
               </p>
             </div>
           </div>

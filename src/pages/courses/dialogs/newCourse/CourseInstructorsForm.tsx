@@ -49,7 +49,7 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
   const filteredInstructors = instructors
     .filter(instructor =>
-      instructor.attributes.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      instructor.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !courseInstructors.some(courseInstructor => courseInstructor.id === instructor.id)
     )
     .slice(0, 5); 
@@ -66,7 +66,7 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
   }, [searchTerm]);
 
   // Handle selection of instructors for the course
-  const handleSelectInstructor = async (id: number) => {
+  const handleSelectInstructor = async (id: number, instructorDocId: string) => {
     if (courseInstructors.some((instructor) => instructor.id === id)) return;
     
     try {
@@ -74,7 +74,7 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
       const selectedInstructor = instructors.find((instructor) => instructor.id === id)!;
       setCourseInstructors([...courseInstructors, selectedInstructor]);
       
-      await courseInstructorService.linkInstructorToCourse(token, courseId, id);
+      await courseInstructorService.linkInstructorToCourse(token, courseId, instructorDocId);
       toast.success("Instructor added successfully!");
     } catch (error) {
       console.error("Error linking instructor:", error);
@@ -109,10 +109,10 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
   };
 
   // Handle removing an instructor from the course
-  const handleRemoveInstructor = async (id: number) => {
+  const handleRemoveInstructor = async (id: number, instructorDocId: string) => {
     try {
       setRemovingInstructor(id);
-      await courseInstructorService.unlinkInstructorFromCourse(token, courseId, id);
+      await courseInstructorService.unlinkInstructorFromCourse(token, courseId, instructorDocId);
       setCourseInstructors(courseInstructors.filter((instructor) => instructor.id !== id));
       toast.success("Instructor removed successfully!");
     } catch (error) {
@@ -168,14 +168,14 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                     <UserCheck className="w-4 h-4 text-green-600" />
                   </div>
                   <span className="text-sm break-words max-w-[70%] text-gray-900 font-medium">
-                    {instructor.attributes.instructor_name}
+                    {instructor.instructor_name}
                   </span>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => handleRemoveInstructor(instructor.id)}
+                  onClick={() => handleRemoveInstructor(instructor.id, instructor.documentId)}
                   className="shrink-0 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
                   disabled={removingInstructor === instructor.id}
                 >
@@ -227,10 +227,10 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
               {filteredInstructors.map((instructor) => (
                 <Button
                   key={instructor.id}
-                  onClick={() => handleSelectInstructor(instructor.id)}
+                  onClick={() => handleSelectInstructor(instructor.id, instructor.documentId)}
                   variant="ghost"
                   className="w-full text-left justify-start p-3 hover:bg-purple-50 hover:text-purple-900 transition-all duration-200 border border-transparent hover:border-purple-200 rounded-md"
-                  title={instructor.attributes.instructor_name}
+                  title={instructor.instructor_name}
                   disabled={addingInstructor === instructor.id}
                 >
                   {addingInstructor === instructor.id ? (
@@ -243,13 +243,13 @@ const CourseInstructorsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                       <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                         <Users className="w-3 h-3 text-blue-600" />
                       </div>
-                      <span className="truncate text-gray-700">{instructor.attributes.instructor_name}</span>
+                      <span className="truncate text-gray-700">{instructor.instructor_name}</span>
                     </div>
                   )}
                 </Button>
               ))}
               {instructors.filter(instructor => 
-                instructor.attributes.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                instructor.instructor_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
                 !courseInstructors.some(courseInstructor => courseInstructor.id === instructor.id)
               ).length > 5 && (
                 <div className="p-2 text-center text-xs text-gray-500 border-t">

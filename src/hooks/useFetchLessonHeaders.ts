@@ -5,7 +5,7 @@ import { ILessonHeaderResponse } from "@/Interfaces/ILessonHeaders";
 import { lessonHeaderService } from "@/service/curriculumLessonHeaderService";
 
 
-const useFetchLessonHeaders = (token: ILoginToken | null, lessonId: number | undefined, shouldFetch: boolean = true) => {
+const useFetchLessonHeaders = (token: ILoginToken | null, lessonHeaderDocId: string | undefined, shouldFetch: boolean = true) => {
   const [headers, setHeaders] = useState<ILessonHeaderResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,12 +13,12 @@ const useFetchLessonHeaders = (token: ILoginToken | null, lessonId: number | und
   // Auto-fetch when dependencies change
   useEffect(() => {
     const fetchHeaders = async () => {
-      if (!token || !lessonId || !shouldFetch) return;
+      if (!token || !lessonHeaderDocId || !shouldFetch) return;
       
       try {
         setLoading(true);
         setError(null);
-        const response = await lessonHeaderService.getCurriculumLessonsHeader(token, lessonId);
+        const response = await lessonHeaderService.getCurriculumLessonsHeader(token, lessonHeaderDocId);
         setHeaders(response.data);
       } catch (error) {
         const errorMessage = "Error fetching lesson headers.";
@@ -31,16 +31,16 @@ const useFetchLessonHeaders = (token: ILoginToken | null, lessonId: number | und
     };
 
     fetchHeaders();
-  }, [token, lessonId, shouldFetch]);
+  }, [token, lessonHeaderDocId, shouldFetch]);
 
   // Manual refresh function
   const refreshHeaders = useCallback(async () => {
-    if (!token || !lessonId) return;
+    if (!token || !lessonHeaderDocId) return;
     
     try {
       setLoading(true);
       setError(null);
-      const response = await lessonHeaderService.getCurriculumLessonsHeader(token, lessonId);
+      const response = await lessonHeaderService.getCurriculumLessonsHeader(token, lessonHeaderDocId);
       setHeaders(response.data);
     } catch (error) {
       const errorMessage = "Error fetching lesson headers.";
@@ -50,7 +50,7 @@ const useFetchLessonHeaders = (token: ILoginToken | null, lessonId: number | und
     } finally {
       setLoading(false);
     }
-  }, [token, lessonId]);
+  }, [token, lessonHeaderDocId]);
 
   return { 
     headers, 

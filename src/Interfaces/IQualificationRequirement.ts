@@ -13,9 +13,9 @@ export interface IQualificationReqAttributes {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface ICourseQualificationReqResponse {
+export interface ICourseQualificationReqResponse extends IQualificationReqAttributes{
   id: number;
-  attributes: IQualificationReqAttributes;
+  documentId: string;
 } 
 
 

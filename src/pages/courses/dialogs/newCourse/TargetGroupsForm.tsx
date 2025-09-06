@@ -48,7 +48,7 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
   const filteredTargetGroups = targetGroups
     .filter(group =>
-      group.attributes.target_group_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      group.target_group_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !courseTargetGroups.some(courseGroup => courseGroup.id === group.id)
     )
     .slice(0, 5);
@@ -65,7 +65,7 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
   }, [searchTerm]);
 
   // Handle selection of target groups for the course
-  const handleSelectTargetGroup = async (id: number) => {
+  const handleSelectTargetGroup = async (id: number, targetGroupDocId: string) => {
     if (courseTargetGroups.some((group) => group.id === id)) return;
     
     try {
@@ -73,7 +73,7 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
       const selectedGroup = targetGroups.find((group) => group.id === id)!;
       setCourseTargetGroups([...courseTargetGroups, selectedGroup]);
       
-      await courseTargetGroupService.linkTargetGroupToCourse(token, courseId, id);
+      await courseTargetGroupService.linkTargetGroupToCourse(token, courseId, targetGroupDocId);
       toast.success("Target group added successfully!");
     } catch (error) {
       console.error("Error linking target group:", error);
@@ -112,10 +112,10 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
   };
 
   // Handle removing a target group from the course
-  const handleRemoveTargetGroup = async (id: number) => {
+  const handleRemoveTargetGroup = async (id: number, targetGroupDocId: string) => {
     try {
       setRemovingTargetGroup(id);
-      await courseTargetGroupService.unlinkTargetGroupFromCourse(token, courseId, id);
+      await courseTargetGroupService.unlinkTargetGroupFromCourse(token, courseId, targetGroupDocId);
       setCourseTargetGroups(courseTargetGroups.filter((group) => group.id !== id));
       toast.success("Target group removed successfully!");
     } catch (error) {
@@ -171,14 +171,14 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                     <CheckCircle className="w-4 h-4 text-green-600" />
                   </div>
                   <span className="text-sm break-words max-w-[70%] text-gray-900 font-medium">
-                    {group.attributes.target_group_name}
+                    {group.target_group_name}
                   </span>
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => handleRemoveTargetGroup(group.id)}
+                  onClick={() => handleRemoveTargetGroup(group.id, group.documentId)}
                   className="shrink-0 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
                   disabled={removingTargetGroup === group.id}
                 >
@@ -230,10 +230,10 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
               {filteredTargetGroups.map((group) => (
                 <Button
                   key={group.id}
-                  onClick={() => handleSelectTargetGroup(group.id)}
+                  onClick={() => handleSelectTargetGroup(group.id, group.documentId)}
                   variant="ghost"
                   className="w-full text-left justify-start p-3 hover:bg-purple-50 hover:text-purple-900 transition-all duration-200 border border-transparent hover:border-purple-200 rounded-md"
-                  title={group.attributes.target_group_name}
+                  title={group.target_group_name}
                   disabled={addingTargetGroup === group.id}
                 >
                   {addingTargetGroup === group.id ? (
@@ -246,13 +246,13 @@ const TargetGroupsForm: React.FC<IFormStepProps> = ({ courseId }) => {
                       <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                         <Target className="w-3 h-3 text-blue-600" />
                       </div>
-                      <span className="truncate text-gray-700">{group.attributes.target_group_name}</span>
+                      <span className="truncate text-gray-700">{group.target_group_name}</span>
                     </div>
                   )}
                 </Button>
               ))}
               {targetGroups.filter(group => 
-                group.attributes.target_group_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                group.target_group_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
                 !courseTargetGroups.some(courseGroup => courseGroup.id === group.id)
               ).length > 5 && (
                 <div className="p-2 text-center text-xs text-gray-500 border-t">

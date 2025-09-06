@@ -8,9 +8,9 @@ export interface ICourseCategory {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface ICourseCategoryResponse {
+export interface ICourseCategoryResponse extends ICourseCategory {
   id: number;
-  attributes: ICourseCategory;
+   documentId: string;
 }
 export interface ICourseCategoryStrapiResponse {
   data: ICourseCategoryResponse[];

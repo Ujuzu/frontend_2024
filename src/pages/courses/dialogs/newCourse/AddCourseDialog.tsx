@@ -25,7 +25,7 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
 }) => {
   const [activeStep, setActiveStep] = useState('basic-info');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [courseId, setCourseId] = useState<number>(course_Id || 0);
+  const [courseId, setCourseId] = useState<string>(course_Id || '');
   const [courseData, setCourseData] = useState<ICourseResponse | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
@@ -40,7 +40,7 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
   const resetFormForNewCourse = useCallback(() => {
     const emptyFormData = mapCourseAttributesToFormData(); // This should return empty/default values
     setFormData(emptyFormData);
-    setCourseId(0);
+    setCourseId('');
     setCourseData(null);
     setIsEditing(false);
     setActiveStep('basic-info');
@@ -49,10 +49,10 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
   }, []);
 
   // Function to fetch and update course data
-  const fetchAndUpdateCourseData = useCallback(async (id: number) => {
+  const fetchAndUpdateCourseData = useCallback(async (documentId: string) => {
     try {
       setIsLoadingCourseData(true);
-      const response = await courseService.getCourseById(token, id);
+      const response = await courseService.getCourseById(token, documentId);
       const freshCourseData = response;
       
       setCourseData(freshCourseData);
@@ -82,9 +82,9 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
       
       if (isEdit && selectedCourse) {
         // Editing existing course
-        setCourseId(selectedCourse.id);
+        setCourseId(selectedCourse.documentId);
         setIsEditing(true);
-        fetchAndUpdateCourseData(selectedCourse.id);
+        fetchAndUpdateCourseData(selectedCourse.documentId);
       } else if (course_Id) {
         // Editing course by ID
         setCourseId(course_Id);
@@ -221,7 +221,7 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
         <div className="flex-shrink-0 p-6 pb-0">
           <DialogHeader>
             <DialogTitle className="text-3xl font-bold text-gray-800">
-              {courseData?.attributes?.course_name || (isEditing ? 'Edit Course' : 'Create New Course')}
+              {courseData?.course_name || (isEditing ? 'Edit Course' : 'Create New Course')}
             </DialogTitle>
             {/* Status indicator - only show for editing mode */}
             {isEditing && courseId && (

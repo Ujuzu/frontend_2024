@@ -6,9 +6,9 @@ export interface ITargetGroupStrapiResponse {
   meta: IMeta
 } 
 
-export interface ICourseTargetGroupResponse {
+export interface ICourseTargetGroupResponse extends ITargetGroupAttributes {
   id: number;
-  attributes: ITargetGroupAttributes;
+  documentId: string;
 }
 
 export interface ITargetGroupAttributes {

@@ -82,7 +82,7 @@ export const courseService = {
   /**
    * Delete a course by documentId
    */
-  deleteCourse: async (token: ILoginToken, documentId: number) => {
+  deleteCourse: async (token: ILoginToken, documentId: string) => {
     return axios.delete(
       `${API_URL}/api/courses/${documentId}`,
       {
@@ -128,11 +128,11 @@ export const courseService = {
   /**
    * Update an existing course
    */
-  updateCourse: async (token: ILoginToken | null, courseId: number, courseData: ICourseAttributes) => {
+  updateCourse: async (token: ILoginToken | null, documentId: string, courseData: ICourseAttributes) => {
     if (!token) {
       throw new Error('Token is required for updating a course');
     }
-    if (!courseId) {
+    if (!documentId) {
       throw new Error('Course ID is required for updating a course');
     }
     if (!courseData) {
@@ -143,7 +143,7 @@ export const courseService = {
     }
 
     return axios.put(
-      `${API_URL}/api/courses/${courseId}?populate=*`,
+      `${API_URL}/api/courses/${documentId}?populate=*`,
       { data: courseData },
       {
         headers: {
@@ -162,19 +162,16 @@ export const courseService = {
   /**
    * Get a single course by ID
    */
-  getCourseById: async (token: ILoginToken | null, courseId: number) => {
+  getCourseById: async (token: ILoginToken | null, documentId: string) => {
     if (!token) {
       throw new Error('Token is required for fetching a course');
     }
-    if (!courseId) {
+    if (!documentId) {
       throw new Error('Course ID is required for fetching a course');
-    }
-    if (typeof courseId !== 'number') {
-      throw new Error('Course ID must be a number');
     }
 
     const {data} = await axios.get(
-      `${API_URL}/api/courses/${courseId}?populate=*`,
+      `${API_URL}/api/courses/${documentId}?populate=*`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

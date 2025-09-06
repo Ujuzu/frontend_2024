@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { ILoginToken } from "@/Interfaces/IUserLoginInterfaces";
 import { ICurriculumLessonResponse } from "@/Interfaces/ICurriculumLessons";
 
-const useFetchCurriculumLessons = (token: ILoginToken | null, curriculumId: number | undefined, shouldFetch: boolean = true) => {
+const useFetchCurriculumLessons = (token: ILoginToken | null, curriculumDocId: string | undefined, shouldFetch: boolean = true) => {
   const [lessons, setLessons] = useState<ICurriculumLessonResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -12,12 +12,12 @@ const useFetchCurriculumLessons = (token: ILoginToken | null, curriculumId: numb
   // Auto-fetch when dependencies change
   useEffect(() => {
     const fetchLessons = async () => {
-      if (!token || !curriculumId || !shouldFetch) return;
+      if (!token || !curriculumDocId || !shouldFetch) return;
       
       try {
         setLoading(true);
         setError(null);
-        const response = await curriculumLessonService.getCurriculumLessons(token, curriculumId);
+        const response = await curriculumLessonService.getCurriculumLessons(token, curriculumDocId);
         setLessons(response.data);
       } catch (error) {
         const errorMessage = "Error fetching lessons.";
@@ -30,16 +30,16 @@ const useFetchCurriculumLessons = (token: ILoginToken | null, curriculumId: numb
     };
 
     fetchLessons();
-  }, [token, curriculumId, shouldFetch]);
+  }, [token, curriculumDocId, shouldFetch]);
 
   // Manual refresh function
   const refreshLessons = useCallback(async () => {
-    if (!token || !curriculumId) return;
+    if (!token || !curriculumDocId) return;
     
     try {
       setLoading(true);
       setError(null);
-      const response = await curriculumLessonService.getCurriculumLessons(token, curriculumId);
+      const response = await curriculumLessonService.getCurriculumLessons(token, curriculumDocId);
       setLessons(response.data);
     } catch (error) {
       const errorMessage = "Error fetching lessons.";
@@ -49,7 +49,7 @@ const useFetchCurriculumLessons = (token: ILoginToken | null, curriculumId: numb
     } finally {
       setLoading(false);
     }
-  }, [token, curriculumId]);
+  }, [token, curriculumDocId]);
 
   return { 
     lessons, 

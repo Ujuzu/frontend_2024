@@ -53,11 +53,11 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
   const handleOpenCurriculumModal = (index?: number) => {
     if (index !== undefined) {
       setEditingCurriculumIndex(index);
-      const attributes = weeklyCurricula[index].attributes;
+      const attributes = weeklyCurricula[index];
       setCurriculumFormData({
         ...attributes,
-        intro_pic: attributes.intro_pic?.data?.id
-          ? attributes.intro_pic?.data?.id
+        intro_pic: attributes.intro_pic?.id
+          ? attributes.intro_pic?.id
           : undefined,
       });
     } else {
@@ -75,14 +75,14 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
     setIsSubmitting(true);
     try {
-      const payload = { ...curriculumFormData, courses: [courseId] };
+      const payload:ICoursesWklyCurriculumAttrib = { ...curriculumFormData, courses: [courseId] };
       let savedCurriculum;
 
       if (editingCurriculumIndex !== null) {
         const updated =
           await courseWeeklyCurriculumService.updateWeeklyCurriculum(
             token,
-            weeklyCurricula[editingCurriculumIndex].id,
+            weeklyCurricula[editingCurriculumIndex].documentId,
             payload
           );
         savedCurriculum = updated.data;
@@ -106,14 +106,14 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
       const refreshedCurriculum = weeklyCurricula.find(
         (curriculum) =>
-          curriculum.id === (savedCurriculum.id || savedCurriculum.data?.id)
+          curriculum.id === (savedCurriculum.id || savedCurriculum?.id)
       );
 
       if (refreshedCurriculum) {
         setCurrentCurriculum(refreshedCurriculum);
         setOpenLessonsModal(true);
       } else {
-        setCurrentCurriculum(savedCurriculum.data || savedCurriculum);
+        setCurrentCurriculum(savedCurriculum || savedCurriculum);
         setOpenLessonsModal(true);
       }
     } catch (error) {
@@ -192,11 +192,11 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
                   </span>
                   <div>
                     <h3 className="text-lg font-medium text-gray-800 hover:text-purple-600 transition-colors">
-                      {curriculum?.attributes?.curriculum_title}
+                      {curriculum?.curriculum_title}
                     </h3>
-                    {curriculum?.attributes?.curriculum_desc && (
+                    {curriculum?.curriculum_desc && (
                       <p className="text-sm text-gray-600 mt-1">
-                        {curriculum.attributes.curriculum_desc}
+                        {curriculum.curriculum_desc}
                       </p>
                     )}
                   </div>
