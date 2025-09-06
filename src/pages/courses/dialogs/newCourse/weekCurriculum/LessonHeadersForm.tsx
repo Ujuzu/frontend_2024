@@ -21,7 +21,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
   // Use the custom hook - only fetch when modal is open
   const { headers, loading, error, refreshHeaders } = useFetchLessonHeaders(
     token, 
-    lesson?.id, 
+    lesson?.documentId, 
     isOpen
   );
   
@@ -40,11 +40,11 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
     if (index !== undefined) {
       setEditingHeaderIndex(index);
       setHeaderFormData({
-        curriculum_lesson_header_title: headers[index].attributes.curriculum_lesson_header_title ?? "",
-        course_curriculum_lesson_header_content: headers[index].attributes.course_curriculum_lesson_header_content ?? "",
-        video_url: headers[index].attributes.video_url ?? "",
-        sort_order: headers[index].attributes.sort_order ?? 0,
-        content_2: headers[index].attributes.content_2 ?? ""
+        curriculum_lesson_header_title: headers[index].curriculum_lesson_header_title ?? "",
+        course_curriculum_lesson_header_content: headers[index].course_curriculum_lesson_header_content ?? "",
+        video_url: headers[index].video_url ?? "",
+        sort_order: headers[index].sort_order ?? 0,
+        content_2: headers[index].content_2 ?? ""
       });
     } else {
       setEditingHeaderIndex(null);
@@ -74,7 +74,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
         // Update existing header
         await lessonHeaderService.updateCurriculumLessonHeader(
           token, 
-          headers[editingHeaderIndex].id, 
+          headers[editingHeaderIndex].documentId, 
           payload
         );
       } else {
@@ -144,7 +144,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
             <div>
               <h2>Lesson Headers</h2>
               <p className="text-sm font-normal text-gray-600 mt-1">
-                {lesson?.attributes?.curriculum_lesson_title || "No Lesson available"}
+                {lesson?.curriculum_lesson_title || "No Lesson available"}
               </p>
             </div>
           </DialogTitle>
@@ -162,7 +162,7 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
           ) : (
             <div className="grid gap-4">
               {headers
-                .sort((a, b) => (a.attributes.sort_order || 0) - (b.attributes.sort_order || 0))
+                .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
                 .map((header, index) => (
                   <div 
                     key={header.id} 
@@ -173,32 +173,32 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
                             <span className="text-purple-600 font-bold text-sm">
-                              {header.attributes.sort_order || index + 1}
+                              {header.sort_order || index + 1}
                             </span>
                           </div>
                           <h3 className="text-xl font-semibold text-gray-800 group-hover:text-purple-700 transition-colors">
-                            {header?.attributes?.curriculum_lesson_header_title}
+                            {header?.curriculum_lesson_header_title}
                           </h3>
                         </div>
                         
                         <div className="ml-11 space-y-2">
-                          {header.attributes.course_curriculum_lesson_header_content && (
+                          {header.course_curriculum_lesson_header_content && (
                             <div className="flex items-start gap-2">
                               <Type className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                               <p className="text-gray-600 text-sm">
-                                {header.attributes.course_curriculum_lesson_header_content.length > 100 
-                                  ? `${header.attributes.course_curriculum_lesson_header_content.substring(0, 100)}...`
-                                  : header.attributes.course_curriculum_lesson_header_content
+                                {header.course_curriculum_lesson_header_content.length > 100 
+                                  ? `${header.course_curriculum_lesson_header_content.substring(0, 100)}...`
+                                  : header.course_curriculum_lesson_header_content
                                 }
                               </p>
                             </div>
                           )}
                           
-                          {header.attributes.video_url && (
+                          {header.video_url && (
                             <div className="flex items-center gap-2">
                               <Play className="w-4 h-4 text-purple-500 flex-shrink-0" />
                               <a 
-                                href={header.attributes.video_url} 
+                                href={header.video_url} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                                 className="text-purple-600 hover:text-purple-800 text-sm cursor-pointer transition-colors"
@@ -208,13 +208,13 @@ const LessonHeadersForm: React.FC<LessonHeadersFormProps> = ({
                             </div>
                           )}
                           
-                          {header.attributes.content_2 && (
+                          {header.content_2 && (
                             <div className="flex items-start gap-2">
                               <FileText className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                               <p className="text-gray-600 text-sm">
-                                {header.attributes.content_2.length > 80 
-                                  ? `${header.attributes.content_2.substring(0, 80)}...`
-                                  : header.attributes.content_2
+                                {header.content_2.length > 80 
+                                  ? `${header.content_2.substring(0, 80)}...`
+                                  : header.content_2
                                 }
                               </p>
                             </div>

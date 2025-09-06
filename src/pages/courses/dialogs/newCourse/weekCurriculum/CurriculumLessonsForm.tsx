@@ -14,7 +14,7 @@ import RichTextEditor from "@/components/input/RichTextEditor";
 const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, onClose, curriculum, token }) => {
   const { lessons, loading, error, refreshLessons } = useFetchCurriculumLessons(
     token, 
-    curriculum?.id, 
+    curriculum?.documentId, 
     isOpen
   );
   
@@ -33,10 +33,10 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
   const handleOpenLessonModal = (index?: number) => {
     if (index !== undefined) {
       setEditingLessonIndex(index);
-      const attributest = lessons[index].attributes;
+      const attributest = lessons[index];
       setLessonFormData({
         ...attributest,
-        intro_pic: attributest.intro_pic?.data?.id ? attributest.intro_pic?.data?.id : null,
+        intro_pic: attributest.intro_pic?.id ? attributest.intro_pic?.id : null,
       });
     } else {
       setEditingLessonIndex(null);
@@ -61,7 +61,7 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
         // Update existing lesson
         const updated = await curriculumLessonService.updateCurriculumLesson(
           token, 
-          lessons[editingLessonIndex].id, 
+          lessons[editingLessonIndex].documentId, 
           payload
         );
         savedLesson = updated.data;
@@ -152,7 +152,7 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
             <div>
               <h2>Curriculum Lessons</h2>
               <p className="text-sm font-normal text-gray-600 mt-1">
-                {curriculum?.attributes?.curriculum_title || "No Curriculum created"}
+                {curriculum?.curriculum_title || "No Curriculum created"}
               </p>
             </div>
           </DialogTitle>
@@ -182,11 +182,11 @@ const CurriculumLessonsForm: React.FC<CurriculumLessonsFormProps> = ({ isOpen, o
                       <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
                         <span className="text-purple-600 font-bold text-sm">{index + 1}</span>
                       </div>
-                      {lesson.attributes.curriculum_lesson_title}
+                      {lesson.curriculum_lesson_title}
                     </h3>
-                    {lesson.attributes.curriculum_lesson_desc && (
+                    {lesson.curriculum_lesson_desc && (
                       <p className="text-gray-600 mt-2 ml-11 text-sm">
-                        {lesson.attributes.curriculum_lesson_desc}
+                        {lesson.curriculum_lesson_desc}
                       </p>
                     )}
                   </div>

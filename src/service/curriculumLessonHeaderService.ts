@@ -76,7 +76,7 @@ export const lessonHeaderService = {
    }
   },
 
-updateCurriculumLessonHeader: async (token: ILoginToken | null,  lessonHeaderId: number, payload:ILessonHeaderAttributes) => {
+updateCurriculumLessonHeader: async (token: ILoginToken | null,  lessonHeaderDocId: string, payload:ILessonHeaderAttributes) => {
 
    try {
         // Validate the token and payload
@@ -84,11 +84,8 @@ updateCurriculumLessonHeader: async (token: ILoginToken | null,  lessonHeaderId:
         if (!token) {
             throw new Error("Token is required for updating the curriculum lesson.");
             }
-        if (!lessonHeaderId) {
+        if (!lessonHeaderDocId) {
             throw new Error("Lesson header ID is required for updating the curriculum lesson.");
-            }
-        if (typeof lessonHeaderId !== "number") {
-            throw new Error("Lesson header ID must be a number.");
             }
         if (!payload) {
             throw new Error("Payload is required for updating the curriculum lesson.");
@@ -108,7 +105,7 @@ updateCurriculumLessonHeader: async (token: ILoginToken | null,  lessonHeaderId:
    // Send a PUT request to update the qualification
  
      return axios.put(
-       `${courseWeeklyCurriculumLessonHeadersURL}/${lessonHeaderId}`,
+       `${courseWeeklyCurriculumLessonHeadersURL}/${lessonHeaderDocId}`,
        {
          data:payload,
          
@@ -126,23 +123,20 @@ updateCurriculumLessonHeader: async (token: ILoginToken | null,  lessonHeaderId:
    }
   },
 
-    getCurriculumLessonsHeader: async (token: ILoginToken,  lessonHeaderId:number) => {
+    getCurriculumLessonsHeader: async (token: ILoginToken,  lessonHeaderDocId:string) => {
 
     try {
         // Validate the token and lessonHeaderId
         if (!token) {
           throw new Error("Token is required for fetching curriculum lessons header.");
         }
-        if (!lessonHeaderId) {
+        if (!lessonHeaderDocId) {
           throw new Error("Lesson header ID is required for fetching curriculum lessons header.");
-        }
-        if (typeof lessonHeaderId !== "number") {
-          throw new Error("Lesson header ID must be a number.");
         }
         // Send a GET request to fetch curriculum lessons headers
     
         const response = await axios.get<ILessonHeaderStrapiResponse>(
-          `${courseWeeklyCurriculumLessonHeadersURL}/?filters[crs_cur_lessons][id][$eq]=${lessonHeaderId}`,
+          `${courseWeeklyCurriculumLessonHeadersURL}/?filters[crs_cur_lessons][documentId]=${lessonHeaderDocId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

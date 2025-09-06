@@ -29,6 +29,13 @@ const CoursesIndex = () => {
     confirmDelete
   } = useCourse();
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-[#AC19AD]"></div>
+      </div>
+    );
+  }
   return (
     <div className="container mx-auto p-6">
       <Toaster position="top-right" />

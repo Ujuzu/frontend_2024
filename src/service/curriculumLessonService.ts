@@ -72,7 +72,7 @@ export const curriculumLessonService = {
    }
   },
 
-updateCurriculumLesson: async (token: ILoginToken | null,  lessonId: number, payload:ICurriculumLessonAttributes) => {
+updateCurriculumLesson: async (token: ILoginToken | null,  lessonId: string, payload:ICurriculumLessonAttributes) => {
 
    try {
         // Validate the token and payload
@@ -81,9 +81,6 @@ updateCurriculumLesson: async (token: ILoginToken | null,  lessonId: number, pay
         }
         if (!lessonId) {
         throw new Error("Lesson ID is required for updating the qualification.");
-        }
-        if (typeof lessonId !== "number") {
-        throw new Error("Lesson ID must be a number.");
         }
         if (!payload) {
         throw new Error("Payload is required for updating the qualification.");
@@ -119,24 +116,21 @@ updateCurriculumLesson: async (token: ILoginToken | null,  lessonId: number, pay
    }
   },
 
-    getCurriculumLessons: async (token: ILoginToken,  curriculumId:number) => {
+    getCurriculumLessons: async (token: ILoginToken,  curriculumDocId:string) => {
 
     try {
         if (!token) {
           throw new Error("Token is required for fetching curriculum lessons.");
         }
 
-        if (!curriculumId) {
+        if (!curriculumDocId) {
           throw new Error("Curriculum ID is required for fetching curriculum lessons.");
         }
 
-        if (typeof curriculumId !== "number") {
-          throw new Error("Curriculum ID must be a number.");
-        }
         // Send a GET request to fetch curriculum lessons
     
         const response = await axios.get<ICurriculumLessonStrapiResponse>(
-          `${courseWeeklyCurriculumLessonsURL}/?filters[courses_weekly_curricula][id][$eq]=${curriculumId}`,
+          `${courseWeeklyCurriculumLessonsURL}/?filters[courses_weekly_curricula][documentId]=${curriculumDocId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

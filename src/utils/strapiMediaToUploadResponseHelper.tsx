@@ -1,4 +1,5 @@
 // Utility functions for transforming Strapi data (v5 compatible)
+import { ICourseResponse } from "@/Interfaces/ICourseRespone";
 import { IMedia } from "@/Interfaces/IMedia";
 import { IStrapiUploadResponse } from "@/Interfaces/IStrapiFileUploader";
 
@@ -38,7 +39,7 @@ export const transformStrapiMediaToUploadResponse = (
  * Transform multiple Strapi media responses to IStrapiUploadResponse array (v5)
  */
 export const transformStrapiMediaArrayToUploadResponse = (
-  strapiMediaArray: any[]
+  strapiMediaArray: IStrapiUploadResponse[]
 ): IStrapiUploadResponse[] => {
   if (!Array.isArray(strapiMediaArray)) {
     return [];
@@ -90,7 +91,7 @@ export const extractExistingFiles = (
  * Check if a file exists in courseData (v5)
  */
 export const hasExistingFile = (
-  courseData: any,
+  courseData: ICourseResponse,
   fieldPath: string
 ): boolean => {
   const files = extractExistingFiles(courseData, fieldPath);

@@ -106,14 +106,14 @@ const WeeklyCurriculumForm: React.FC<IFormStepProps> = ({ courseId }) => {
 
       const refreshedCurriculum = weeklyCurricula.find(
         (curriculum) =>
-          curriculum.id === (savedCurriculum.id || savedCurriculum.data?.id)
+          curriculum.id === (savedCurriculum.id || savedCurriculum?.id)
       );
 
       if (refreshedCurriculum) {
         setCurrentCurriculum(refreshedCurriculum);
         setOpenLessonsModal(true);
       } else {
-        setCurrentCurriculum(savedCurriculum.data || savedCurriculum);
+        setCurrentCurriculum(savedCurriculum || savedCurriculum);
         setOpenLessonsModal(true);
       }
     } catch (error) {
