@@ -46,16 +46,16 @@ export interface ICourseAttributes {
 }
 
 export interface ICourseAttributesStrapiResponse extends ICourseAttributes {
-courses_subcategories?: RelationData<ICourseSubcategoryResponse[]>;
-  courses_categories?: RelationData<ICourseCategoryResponse[]>;
-  courses_instructors?: RelationData<ICoursesInstructorResponse[]>;
-  course_target_groups?: RelationData<ICourseTargetGroupResponse[]>;
-  course_learn_lists?: RelationData<ILearnListResponse[]>;
-  course_qualification_equirements?: RelationData<ICourseQualificationReqResponse[]>;
-  subscription_packages?: RelationData<ISubscriptionPackageResponse[]>;
-  course_reviews?: RelationData<unknown>;
-  courses_features?: RelationData<ICourseFeatureResponse[]>;
-  courses_weekly_curricula?: RelationData<IWeeklyCurriculumResponse[]>;
+courses_subcategories?: ICourseSubcategoryResponse[];
+  courses_categories?: ICourseCategoryResponse[];
+  courses_instructors?: ICoursesInstructorResponse[];
+  course_target_groups?: ICourseTargetGroupResponse[];
+  course_learn_lists?: ILearnListResponse[];
+  course_qualification_equirements?: ICourseQualificationReqResponse[];
+  subscription_packages?: ISubscriptionPackageResponse[];
+  course_reviews?: unknown;
+  courses_features?: ICourseFeatureResponse[];
+  courses_weekly_curricula?: IWeeklyCurriculumResponse[];
   course_intro_img?: IMedia;
    course_intro_video?: IMedia;
 }
