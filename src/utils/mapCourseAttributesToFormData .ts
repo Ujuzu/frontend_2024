@@ -1,7 +1,7 @@
 import { ICourseAttributesDataPayload, ICourseResponse } from "@/Interfaces/ICourseRespone";
-import { unwrapRelation } from "@/service/relationUnwrapper";
 
-export const mapCourseAttributesToFormData = (course?: ICourseResponse): ICourseAttributesDataPayload => {
+export const mapCourseAttributesToFormData = (course?: ICourseResponse):
+  ICourseAttributesDataPayload => {
 
   if (!course)
      return {
@@ -43,14 +43,16 @@ export const mapCourseAttributesToFormData = (course?: ICourseResponse): ICourse
     course_intro_img: course.course_intro_img?.id,
 
     // 🔹 Relational array fields last
-    courses_instructors: unwrapRelation(course.courses_instructors),
-    course_target_groups: unwrapRelation(course.course_target_groups),
-    course_learn_lists: unwrapRelation(course.course_learn_lists),
-    course_qualification_equirements: unwrapRelation(course.course_qualification_equirements),
-    courses_features: unwrapRelation(course.courses_features),
-    courses_weekly_curricula: unwrapRelation(course.courses_weekly_curricula),
-    courses_categories: unwrapRelation(course.courses_categories),
-    courses_subcategories: unwrapRelation(course.courses_subcategories),
-    subscription_packages: unwrapRelation(course.subscription_packages),
+    course_target_groups: course.course_target_groups?.map(item => item.id) ?? [],
+    course_learn_lists: course.course_learn_lists?.map(item => item.id) ?? [],
+    course_qualification_equirements: course.course_qualification_equirements?.map(item => item.id) ?? [],
+    courses_features: course.courses_features?.map(item => item.id) ?? [],
+    courses_weekly_curricula: course.courses_weekly_curricula?.map(item => item.id) ?? [],
+    courses_categories: course.courses_categories?.map(item => item.id) ?? [],
+    courses_subcategories: course?.courses_subcategories?.map(subcat => subcat.id) ?? [],
+    subscription_packages: course.subscription_packages?.map(item => item.id) ?? [],
+    courses_instructors: course.courses_instructors?.map(item => item.id) ?? [],
+    // course_reviews: course.course_reviews),
+  
   };
 };

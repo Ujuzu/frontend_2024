@@ -28,6 +28,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
   onDelete,
   onFullEdit
 }) => {
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -35,7 +36,7 @@ const CourseTable: React.FC<CourseTableProps> = ({
       </div>
     );
   }
-  console.log('this is courses at the index page of , courses', courses)
+
   return (
     <Table>
       <TableHeader className="bg-gray-100">

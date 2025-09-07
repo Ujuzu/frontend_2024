@@ -12,12 +12,7 @@ const CategorySelector: React.FC<ICategorySelectorProps> = ({
   setSelectedCategories,
   setSelectedSubcategories,
 }) => {
-
-  // console.log('availableCategories', availableCategories)
-  // console.log('availableSubcategories', availableSubcategories)
-  // console.log('selectedCategories', selectedCategories)
-  // console.log('selectedSubcategories', selectedSubcategories)
-
+  
   // Handle Category Selection
   const handleSelectCategory = (categoryId: number) => {
     setSelectedCategories([...selectedCategories, categoryId]);

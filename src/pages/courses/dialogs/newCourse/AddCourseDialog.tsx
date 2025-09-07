@@ -64,8 +64,8 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
       
       return freshCourseData;
     } catch (error) {
-      console.error("Error fetching course data:", error);
-      toast.error("Failed to fetch latest course data");
+      const errorMessage = error instanceof Error ? error.message : 'unknown error';
+      toast.error(`Failed to fetch course data, ${errorMessage} `);
       return null;
     } finally {
       setIsLoadingCourseData(false);
@@ -141,8 +141,8 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
       
       return freshData;
     } catch (error) {
-      console.error("Error saving course:", error);
-      toast.error(`Failed to ${isEditing ? "update" : "create"} course`);
+      const errorMessage = error instanceof Error ? error.message : 'unknown error';
+      toast.error(`Failed to ${isEditing ? "update" : "create"} course, ${errorMessage} `);
       return null;
     } finally {
       setIsSubmitting(false);
@@ -194,8 +194,8 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
       onSuccess(courseData!);
       onClose();
     } catch (error) {
-      console.error("Error completing course:", error);
-      toast.error("Failed to complete course");
+      const errorMessage = error instanceof Error ? error.message : 'unknown error';
+      toast.error(`Failed to complete course, ${errorMessage} `);
     } finally {
       setIsSubmitting(false);
     }
@@ -234,7 +234,7 @@ const AddCourseDialog: React.FC<ICourseDialogProps> = ({
                 ) : (
                   <div className="flex items-center gap-2 text-sm text-green-600">
                     <Check size={14} />
-                    <span>Course ID: {courseId} - Editing Mode</span>
+                    <span>Course Document ID: {courseId} - Editing Mode</span>
                   </div>
                 )}
               </div>
